@@ -12,7 +12,7 @@ let nextId = 0;
   standalone: true,
   imports: [CommonModule],
   templateUrl: './sqx-input.component.html',
-  styleUrl: './sqx-input.component.css'
+  styleUrl: './sqx-input.component.scss'
 })
 export class SqxInputComponent implements ControlValueAccessor {
   // Public inputs let templates configure label, validation, and styling.

@@ -1,0 +1,76 @@
+.sqx-input {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: #1f2937;
+
+  &.full-width {
+    width: 100%;
+  }
+
+  .label {
+    font-weight: 600;
+  }
+
+  .field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  &.is-focused .field {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  &.has-error .field {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+  }
+
+  &.is-disabled .field {
+    background: #f3f4f6;
+    color: #9ca3af;
+  }
+
+  .input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: inherit;
+    background: transparent;
+    color: inherit;
+    min-width: 0;
+  }
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    color: #6b7280;
+  }
+
+  .errors {
+    display: grid;
+    gap: 4px;
+    color: #dc2626;
+  }
+
+  .hint {
+    color: #6b7280;
+  }
+
+  &.size-sm .field {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  &.size-lg .field {
+    padding: 8px 12px;
+    font-size: 16px;
+  }
+}

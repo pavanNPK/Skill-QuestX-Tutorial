@@ -9,7 +9,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'ghost';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './sqx-button.component.html',
-  styleUrl: './sqx-button.component.css'
+  styleUrl: './sqx-button.component.scss'
 })
 export class SqxButtonComponent {
   // Public inputs let templates configure label, style, and behavior.

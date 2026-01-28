@@ -8,6 +8,7 @@ import { RegisterComponent } from './modules/core/components/register/register.c
 import { ResetPasswordComponent } from './modules/core/components/reset/reset-password.component';
 import { TermsAndConditionsComponent } from './modules/core/components/terms-and-conditions/terms-and-conditions.component';
 import { authGuard, authLoadGuard } from './shared/guards/auth.guards';
+import { UtilitiesDemoComponent } from './shared/components/utilities-demo/utilities-demo.component';
 
 export const routes: Routes = [
   {
@@ -22,5 +23,6 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'privacy-policy', component: PrivacyPolicyComponent },
   { path: 'terms-and-conditions', component: TermsAndConditionsComponent },
+  { path: 'utilities-demo', component: UtilitiesDemoComponent },
   { path: '**', component: PageNotFoundComponent }
 ];
