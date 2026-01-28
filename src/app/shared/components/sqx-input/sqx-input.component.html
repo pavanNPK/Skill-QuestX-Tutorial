@@ -1,0 +1,62 @@
+<div
+  class="sqx-input"
+  [class.full-width]="fullWidth"
+  [class.is-focused]="focused"
+  [class.is-disabled]="disabled"
+  [class.has-error]="showErrors"
+  [class.size-sm]="size === 'sm'"
+  [class.size-xs]="size === 'xs'"
+  [class.size-md]="size === 'md'"
+  [class.size-lg]="size === 'lg'"
+  [style.width]="fullWidth ? '100%' : width || null"
+>
+  @if (label) {
+    <label class="label" [for]="id">{{ label }}</label>
+  }
+
+  <div class="field">
+    @if (prefixIcon) {
+      <span class="icon prefix" aria-hidden="true">
+        <i [class]="prefixIcon"></i>
+      </span>
+    }
+
+    <input
+      class="input"
+      [id]="id"
+      [type]="type"
+      [attr.autocomplete]="autocomplete || null"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [value]="value ?? ''"
+      [attr.required]="required || null"
+      [attr.minlength]="minLength ?? null"
+      [attr.maxlength]="maxLength ?? null"
+      [attr.min]="min ?? null"
+      [attr.max]="max ?? null"
+      [attr.step]="step ?? null"
+      [attr.pattern]="pattern || null"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+
+    @if (suffixIcon) {
+      <span class="icon suffix" aria-hidden="true">
+        <i [class]="suffixIcon"></i>
+      </span>
+    }
+  </div>
+
+  @if (hint && !showErrors) {
+    <small class="hint">{{ hint }}</small>
+  }
+
+  @if (showErrors) {
+    <div class="errors">
+      @for (error of errors; track error) {
+        <small>{{ error }}</small>
+      }
+    </div>
+  }
+</div>
