@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-reset-password',
+  selector: 'sqx-reset-password',
   standalone: true,
-  template: `
-    <section class="page">
-      <h1>Reset Password</h1>
-      <p>Set a new password.</p>
-    </section>
-  `,
+  templateUrl: './reset-password.component.html',
+  styleUrl: './reset-password.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResetPasswordComponent {}

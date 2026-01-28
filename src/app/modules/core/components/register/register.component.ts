@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-register',
+  selector: 'sqx-register',
   standalone: true,
-  template: `
-    <section class="page">
-      <h1>Register</h1>
-      <p>Create your account.</p>
-    </section>
-  `,
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterComponent {}

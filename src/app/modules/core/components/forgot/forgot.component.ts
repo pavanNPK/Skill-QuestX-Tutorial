@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-forgot',
+  selector: 'sqx-forgot',
   standalone: true,
-  template: `
-    <section class="page">
-      <h1>Forgot Password</h1>
-      <p>Request a reset link.</p>
-    </section>
-  `,
+  templateUrl: './forgot.component.html',
+  styleUrl: './forgot.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ForgotComponent {}

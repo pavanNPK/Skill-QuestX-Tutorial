@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-login',
+  selector: 'sqx-login',
   standalone: true,
-  template: `
-    <section class="page">
-      <h1>Login</h1>
-      <p>Sign in to continue.</p>
-    </section>
-  `,
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {}

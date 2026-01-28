@@ -5,16 +5,11 @@ import { HeaderComponent } from '../core/components/header/header.component';
 import { NavbarComponent } from '../core/components/navbar/navbar.component';
 
 @Component({
-  selector: 'app-home',
+  selector: 'sqx-home',
   standalone: true,
   imports: [RouterOutlet, HeaderComponent, NavbarComponent],
-  template: `
-    <app-header></app-header>
-    <app-navbar></app-navbar>
-    <main class="page">
-      <router-outlet></router-outlet>
-    </main>
-  `,
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent {}

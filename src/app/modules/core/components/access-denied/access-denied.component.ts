@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-access-denied',
+  selector: 'sqx-access-denied',
   standalone: true,
-  template: `
-    <section class="page">
-      <h1>Access Denied</h1>
-      <p>You do not have permission to view this page.</p>
-    </section>
-  `,
+  templateUrl: './access-denied.component.html',
+  styleUrl: './access-denied.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccessDeniedComponent {}

@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-terms-and-conditions',
+  selector: 'sqx-terms-and-conditions',
   standalone: true,
-  template: `
-    <section class="page">
-      <h1>Terms and Conditions</h1>
-      <p>Terms and conditions content goes here.</p>
-    </section>
-  `,
+  templateUrl: './terms-and-conditions.component.html',
+  styleUrl: './terms-and-conditions.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TermsAndConditionsComponent {}

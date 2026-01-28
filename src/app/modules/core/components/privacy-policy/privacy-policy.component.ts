@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-privacy-policy',
+  selector: 'sqx-privacy-policy',
   standalone: true,
-  template: `
-    <section class="page">
-      <h1>Privacy Policy</h1>
-      <p>Privacy policy content goes here.</p>
-    </section>
-  `,
+  templateUrl: './privacy-policy.component.html',
+  styleUrl: './privacy-policy.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PrivacyPolicyComponent {}
