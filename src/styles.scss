@@ -1,3 +1,43 @@
 /* You can add global styles to this file, and also import other style files */
 @use './styles/tokens';
 @use './styles/utilities';
+
+/* Font Definitions */
+@font-face {
+  font-family: 'Sen';
+  src: url('/assets/fonts/Sen-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sen';
+  src: url('/assets/fonts/Sen-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sen';
+  src: url('/assets/fonts/Sen-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sen';
+  src: url('/assets/fonts/Sen-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sen';
+  src: url('/assets/fonts/Sen-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-display: swap;
+}
+
+body {
+  font-family: 'Sen', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

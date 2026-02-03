@@ -1,4 +1,46 @@
-<section class="page">
-  <h1>Login</h1>
-  <p>Sign in to continue.</p>
+<section class="login-page">
+  <div class="login-card grid gap-0">
+    <div class="login-hero col-12 lg:col-6 p-0 hidden lg:block">
+      <div class="hero-content">
+        <div class="hero-profile">
+          <div class="hero-avatar">
+            <img [src]="carouselItems[activeIndex].avatar" [alt]="carouselItems[activeIndex].author" />
+          </div>
+          <div>
+            <div class="hero-name">{{ carouselItems[activeIndex].author }}</div>
+            <div class="hero-role">{{ carouselItems[activeIndex].role }}</div>
+          </div>
+        </div>
+        <div class="hero-quote">
+          <span class="quote-mark">"</span>{{ carouselItems[activeIndex].quote }}<span class="quote-mark">"</span>
+        </div>
+        <div class="hero-dots">
+          <button type="button" *ngFor="let item of carouselItems; let i = index" [class.active]="i === activeIndex"
+            (click)="setActive(i)" aria-label="Show testimonial"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-form col-12 lg:col-6 p-0">
+      <img class="login-logo" src="/core/logo.svg" alt="Skill Questx" />
+      <h2>Welcome</h2>
+      <p class="login-subtitle">Enter your Email Id and password to Login</p>
+
+      <div class="form-field">
+        <p-iconfield>
+          <p-inputicon class="pi pi-envelope"></p-inputicon>
+          <input pInputText type="email" placeholder="Email Id" />
+        </p-iconfield>
+      </div>
+
+      <div class="form-field">
+        <p-iconfield>
+          <p-inputicon class="pi pi-key"></p-inputicon>
+          <input pInputText type="password" placeholder="Password" />
+        </p-iconfield>
+      </div>
+
+      <button pButton type="button" label="Login" class="login-button"></button>
+    </div>
+  </div>
 </section>
