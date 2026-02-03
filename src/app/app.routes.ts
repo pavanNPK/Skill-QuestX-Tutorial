@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { AccessDeniedComponent } from './modules/core/components/access-denied/access-denied.component';
-import { LoginComponent } from './modules/core/components/login/login.component';
+import { LoginComponent } from './modules/auth/login/login.component';
 import { PageNotFoundComponent } from './modules/core/components/page-not-found/page-not-found.component';
 import { PrivacyPolicyComponent } from './modules/core/components/privacy-policy/privacy-policy.component';
 import { RegisterComponent } from './modules/core/components/register/register.component';

@@ -1,0 +1,52 @@
+.login-container {
+  overflow: hidden;
+}
+
+.branding-side {
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+  color: white;
+  min-height: 400px;
+  
+  .bg-gradient {
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.2) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .blur-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .avatar {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.form-side {
+  .p-inputtext:focus {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+
+  .p-button {
+    background: #6366f1;
+    transition: transform 0.2s, background 0.2s;
+    
+    &:hover {
+      background: #4f46e5;
+      transform: translateY(-2px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .branding-side {
+    min-height: 350px;
+  }
+}
