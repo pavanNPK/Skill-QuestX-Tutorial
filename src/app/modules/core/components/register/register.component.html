@@ -5,127 +5,163 @@
       <div class="hero-content">
         <div class="hero-slides">
           @for (item of carouselItems; track item) {
-            <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
-              <div class="hero-title-stack">
-                <h3 class="hero-title m-0">{{ item.title }}</h3>
-                <div class="hero-quote">
-                  <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
-                </div>
+          <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
+            <div class="hero-title-stack">
+              <h3 class="hero-title m-0">{{ item.title }}</h3>
+              <div class="hero-quote">
+                <span class="quote-mark">"</span>{{ item.subtitle }}<span class="quote-mark">"</span>
               </div>
             </div>
+          </div>
           }
         </div>
         <div class="hero-dots">
           @for (item of carouselItems; track item) {
-            <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
-              (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
+          <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
+            (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
           }
         </div>
       </div>
     </div>
   </div>
 
-  <form class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column gap-4 bg-white register-form"
-    [formGroup]="registerForm" (ngSubmit)="submitRegister()">
-    <div class="flex justify-content-center lg:justify-content-start">
-      <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
-    </div>
-    <div>
-      <h2 class="m-0">Complete your Profile</h2>
-      <p class="mt-2 mb-0">Let's Get to Know You Better by Filling your Profile</p>
-    </div>
-
-    <div class="section">
-      <h3>Contact Details</h3>
-      <div class="avatar-row">
-        <div class="avatar">
-          <img src="/assets/images/avatar-1.jpg" alt="Profile" />
-          <span class="avatar-edit"><i class="pi pi-pencil"></i></span>
+  <div class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white">
+    <div class="register-scroll-container w-full overflow-y-auto">
+      <form class="register-form" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+        <div class="flex justify-content-center lg:justify-content-start">
+          <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
         </div>
-      </div>
 
-      <div class="field form-field">
-        <p-floatlabel variant="on" class="w-full">
-          <p-iconfield class="w-full">
-            <p-inputicon class="pi pi-user"></p-inputicon>
-            <input id="reg-first" pInputText type="text" formControlName="firstName" class="w-full" />
-          </p-iconfield>
-          <label for="reg-first">First Name</label>
-        </p-floatlabel>
-      </div>
-
-      <div class="field form-field">
-        <p-floatlabel variant="on" class="w-full">
-          <p-iconfield class="w-full">
-            <p-inputicon class="pi pi-user"></p-inputicon>
-            <input id="reg-last" pInputText type="text" formControlName="lastName" class="w-full" />
-          </p-iconfield>
-          <label for="reg-last">Last Name</label>
-        </p-floatlabel>
-      </div>
-
-      <div class="field form-field">
-        <p-floatlabel variant="on" class="w-full">
-          <p-iconfield class="w-full">
-            <p-inputicon class="pi pi-envelope"></p-inputicon>
-            <input id="reg-email" pInputText type="email" formControlName="email" class="w-full" />
-          </p-iconfield>
-          <label for="reg-email">Email Id</label>
-        </p-floatlabel>
-      </div>
-
-      <div class="field form-field">
-        <p-floatlabel variant="on" class="w-full">
-          <p-iconfield class="w-full">
-            <p-inputicon class="pi pi-phone"></p-inputicon>
-            <input id="reg-phone" pInputText type="text" formControlName="phoneNumber" class="w-full" />
-          </p-iconfield>
-          <label for="reg-phone">Phone Number</label>
-        </p-floatlabel>
-      </div>
-    </div>
-
-    <div class="section">
-      <h3>Academics</h3>
-      <div class="field form-field">
-        <p-floatlabel variant="on" class="w-full">
-          <p-iconfield class="w-full">
-            <p-inputicon class="pi pi-book"></p-inputicon>
-            <input id="reg-ug" pInputText type="text" formControlName="underGraduate" class="w-full" />
-          </p-iconfield>
-          <label for="reg-ug">Under Graduate</label>
-        </p-floatlabel>
-      </div>
-      <div class="field form-field">
-        <label>Resume</label>
-        <button pButton type="button" label="Upload updated Resume" icon="pi pi-paperclip"
-          class="resume-button"></button>
-      </div>
-    </div>
-
-    <div class="section">
-      <h3>Skills</h3>
-      <div class="field form-field">
-        <p-floatlabel variant="on" class="w-full">
-          <p-iconfield class="w-full">
-            <p-inputicon class="pi pi-tags"></p-inputicon>
-            <input id="reg-skills" pInputText type="text" formControlName="skillInput" class="w-full" />
-          </p-iconfield>
-          <label for="reg-skills">Add Skills <span class="muted">(Upto 10 Skills)</span></label>
-        </p-floatlabel>
-      </div>
-      <div class="field form-field">
-        <label>Skills added</label>
-        <div class="skills">
-          @for (skill of skills; track skill) {
-            <span class="skill-chip">
-              {{ skill }} <i class="pi pi-times"></i>
-            </span>
-          }
+        <div>
+          <h2 class="m-0">Complete your Profile</h2>
+          <p class="mt-2 mb-0">Let's Get to Know You Better by Filling your Profile</p>
         </div>
-      </div>
-    </div>
 
-    <button pButton type="submit" label="Save Details" class="login-button"></button>
-  </form>
+        <div class="flex flex-column gap-3">
+          <!-- Contact Details Section -->
+          <div class="section-group">
+            <h3 class="section-title">Contact Details</h3>
+
+            <!-- Profile Picture -->
+            <div class="flex justify-content-center lg:justify-content-start mb-3">
+              <div class="profile-avatar-wrapper">
+                <img src="/assets/images/avatar-1.jpg" alt="Profile" class="profile-avatar" />
+                <button type="button" class="avatar-edit-btn" pButton icon="pi pi-pencil"></button>
+              </div>
+            </div>
+
+            <div class="flex flex-column gap-1">
+              <p-floatlabel variant="on" class="w-full">
+                <p-iconfield class="w-full">
+                  <p-inputicon class="pi pi-user"></p-inputicon>
+                  <input id="reg-firstname" pInputText type="text" class="w-full" formControlName="firstName" />
+                </p-iconfield>
+                <label for="reg-firstname">First Name</label>
+              </p-floatlabel>
+              <small class="p-error"
+                *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid">
+                First name is required.
+              </small>
+            </div>
+
+            <div class="flex flex-column gap-1">
+              <p-floatlabel variant="on" class="w-full">
+                <p-iconfield class="w-full">
+                  <p-inputicon class="pi pi-user"></p-inputicon>
+                  <input id="reg-lastname" pInputText type="text" class="w-full" formControlName="lastName" />
+                </p-iconfield>
+                <label for="reg-lastname">Last Name</label>
+              </p-floatlabel>
+              <small class="p-error"
+                *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid">
+                Last name is required.
+              </small>
+            </div>
+
+            <div class="flex flex-column gap-1">
+              <p-floatlabel variant="on" class="w-full">
+                <p-iconfield class="w-full">
+                  <p-inputicon class="pi pi-envelope"></p-inputicon>
+                  <input id="reg-email" pInputText type="email" class="w-full" formControlName="email" />
+                </p-iconfield>
+                <label for="reg-email">Email Id</label>
+              </p-floatlabel>
+              <small class="p-error" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+                Enter a valid email address.
+              </small>
+            </div>
+
+            <div class="flex flex-column gap-1">
+              <p-floatlabel variant="on" class="w-full">
+                <p-iconfield class="w-full">
+                  <p-inputicon class="pi pi-phone"></p-inputicon>
+                  <input id="reg-phone" pInputText type="tel" class="w-full" formControlName="phoneNumber" />
+                </p-iconfield>
+                <label for="reg-phone">Phone Number</label>
+              </p-floatlabel>
+              <small class="p-error"
+                *ngIf="registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid">
+                Phone number is required.
+              </small>
+            </div>
+          </div>
+
+          <!-- Academics Section -->
+          <div class="section-group">
+            <h3 class="section-title">Academics</h3>
+
+            <div class="flex flex-column gap-1">
+              <p-floatlabel variant="on" class="w-full">
+                <p-iconfield class="w-full">
+                  <p-inputicon class="pi pi-book"></p-inputicon>
+                  <input id="reg-undergraduate" pInputText type="text" class="w-full" formControlName="underGraduate" />
+                </p-iconfield>
+                <label for="reg-undergraduate">Under Graduate</label>
+              </p-floatlabel>
+            </div>
+
+            <div class="flex flex-column gap-1">
+              <label class="resume-label">Resume</label>
+              <button pButton type="button" label="Upload updated Resume" icon="pi pi-paperclip"
+                class="resume-upload-btn w-full"></button>
+            </div>
+          </div>
+
+          <!-- Skills Section -->
+          <div class="section-group">
+            <h3 class="section-title">Skills</h3>
+
+            <div class="flex flex-column gap-1">
+              <p-floatlabel variant="on" class="w-full">
+                <p-iconfield class="w-full">
+                  <p-inputicon class="pi pi-tags"></p-inputicon>
+                  <input id="reg-skills" pInputText type="text" class="w-full" formControlName="skillInput" />
+                </p-iconfield>
+                <label for="reg-skills">Add Skills <span class="text-400 text-xs">(Upto 10 Skills)</span></label>
+              </p-floatlabel>
+            </div>
+
+            <div class="flex flex-column gap-1">
+              <label class="skills-label">Skills added</label>
+              <div class="skills-container">
+                @for (skill of skills; track skill) {
+                <span class="skill-chip">
+                  {{ skill }}
+                  <i class="pi pi-times ml-1 cursor-pointer"></i>
+                </span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button pButton type="submit" label="Save Details" class="login-button w-full"
+          [disabled]="registerForm.invalid"></button>
+
+        <div class="text-sm text-center">
+          Already have an account? <a routerLink="/login" class="brand-link">Login</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </section>

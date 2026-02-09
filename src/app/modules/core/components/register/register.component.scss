@@ -1,3 +1,4 @@
+// Hero section styles (matching login/forgot)
 .hero-content {
   max-width: 720px;
   display: flex;
@@ -70,143 +71,247 @@
   background: #ffffff;
 }
 
-.section h3 {
-  margin: 0 0 16px;
+// Register form container with scroll
+.register-scroll-container {
+  max-height: 100%;
+  padding-right: 8px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+}
+
+// Register form styles
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  padding: 24px 0;
+}
+
+.register-form>* {
+  max-width: none;
+}
+
+.register-form h2 {
+  font-size: 34px;
+  margin: 0;
+  color: #101828;
+}
+
+.register-form p {
   font-size: 16px;
+  color: #475467;
 }
 
-.avatar-row {
-  margin-bottom: 12px;
+// Section groups
+.section-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.avatar {
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #101828;
+  margin: 0;
+}
+
+// Profile Avatar
+.profile-avatar-wrapper {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
 }
 
-.avatar img {
+.profile-avatar {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #f9fafb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.avatar-edit {
+.avatar-edit-btn {
   position: absolute;
-  right: -4px;
-  bottom: -4px;
-  width: 24px;
-  height: 24px;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
   border-radius: 50%;
-  background: #6730de;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
+  background: #6730de !important;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+  .pi {
+    font-size: 12px;
+  }
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 0;
+.avatar-edit-btn:hover {
+  background: #5d2bc9 !important;
 }
 
-.form-field {
-  margin-bottom: 16px;
-}
-
-::ng-deep .register-form .p-iconfield {
+// Input fields matching login/forgot
+:host ::ng-deep .register-form .p-iconfield {
   width: 100%;
 }
 
-::ng-deep .register-form .p-inputicon {
-  color: #9ca3af;
+:host ::ng-deep .register-form .p-inputtext {
+  width: 100%;
+  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding-left: 44px;
+  box-shadow: none;
   font-size: 16px;
 }
 
-::ng-deep .register-form .p-inputtext {
-  width: 100%;
-  border-radius: 12px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  height: 48px;
-  box-shadow: none;
-  font-size: 15px;
-  padding-left: 44px;
-}
-
-::ng-deep .register-form .p-inputtext:focus {
+:host ::ng-deep .register-form .p-inputtext:focus {
   border-color: #6b44d8;
   background: #ffffff;
   box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
 }
 
-
-.register-form {
-  overflow-y: auto;
+:host ::ng-deep .register-form .p-inputicon {
+  color: #9ca3af;
+  font-size: 16px;
 }
 
-.phone-prefix {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
+// Resume upload button
+.resume-label {
+  font-size: 14px;
+  font-weight: 500;
   color: #344054;
+  margin-bottom: 4px;
 }
 
-.resume-button.p-button {
+:host ::ng-deep .resume-upload-btn.p-button {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   color: #667085;
   justify-content: flex-start;
-  height: 48px;
-  border-radius: 12px;
+  height: 35px;
+  border-radius: 6px;
+  box-shadow: none;
+  font-weight: 400;
 }
 
-.skills {
+:host ::ng-deep .resume-upload-btn.p-button:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #667085;
+}
+
+// Skills section
+.skills-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #344054;
+  margin-bottom: 4px;
+}
+
+.skills-container {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  background: #f2f4f7;
-  border: 1px solid #e4e7ec;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
-  padding: 10px;
+  padding: 12px;
+  min-height: 56px;
 }
 
 .skill-chip {
+  display: inline-flex;
+  align-items: center;
   background: #6730de;
   color: #ffffff;
   border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: default;
+
+  .pi-times {
+    font-size: 11px;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
-::ng-deep .login-button.p-button {
+// Submit button matching login/forgot
+:host ::ng-deep .login-button.p-button {
+  margin-top: 5px;
+  width: 100%;
+  color: #ffffff;
+  background: #6730de;
+  border: none;
+  box-shadow: none;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+
+:host ::ng-deep .login-button.p-button:hover {
+  background: #5d2bc9;
+  border: none;
+  box-shadow: none;
+}
+
+:host ::ng-deep .login-button.p-button:focus,
+:host ::ng-deep .login-button.p-button:active {
   background: #6730de;
   border: none;
   color: #ffffff;
-  width: 100%;
-  box-shadow: none;
 }
 
-::ng-deep .login-button.p-button:enabled:hover,
-::ng-deep .login-button.p-button:enabled:focus,
-::ng-deep .login-button.p-button:enabled:active {
-  background: #5d2bc9;
-  border: none;
-  color: #ffffff;
-  box-shadow: none;
+:host ::ng-deep .login-button.p-button:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  opacity: 1;
 }
 
-.muted {
-  color: #98a2b3;
+// Error messages
+.p-error {
+  color: #d32f2f;
   font-size: 12px;
-  margin-left: 6px;
 }
- 
+
+// Brand link styling (for login link)
+.brand-link {
+  color: #6730de;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.brand-link:hover {
+  text-decoration: underline;
+}
+
+// Responsive adjustments
+@media (max-width: 960px) {
+  .register-form {
+    max-width: 100%;
+  }
+}

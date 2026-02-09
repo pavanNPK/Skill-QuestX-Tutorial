@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -13,6 +14,7 @@ import { InputTextModule } from 'primeng/inputtext';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterLink,
     ButtonModule,
     FloatLabelModule,
     IconFieldModule,
@@ -51,7 +53,7 @@ export class RegisterComponent implements OnDestroy {
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phoneCountry: ['+91'],
-      phoneNumber: [''],
+      phoneNumber: ['', [Validators.required]],
       underGraduate: [''],
       resume: [''],
       skillInput: ['']
