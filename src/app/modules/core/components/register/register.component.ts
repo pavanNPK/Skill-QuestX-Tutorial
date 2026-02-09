@@ -95,7 +95,7 @@ export class RegisterComponent implements OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       phoneCountry: ['+91'],
       phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-      underGraduate: [''],
+      underGraduate: ['', Validators.required],
     });
 
     this.passwordForm = this.fb.group({
@@ -201,7 +201,12 @@ export class RegisterComponent implements OnDestroy {
   }
 
   // Skills Management
-  addSkill() {
+  addSkill(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     const skill = this.skillInput.trim();
 
     if (!skill) {
@@ -245,6 +250,39 @@ export class RegisterComponent implements OnDestroy {
   submitStep1() {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    // Validate profile image
+    if (!this.profileImage) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Profile Image Required',
+        detail: 'Please upload a profile image',
+        life: 3000
+      });
+      return;
+    }
+
+    // Validate resume
+    if (!this.resumeFile) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Resume Required',
+        detail: 'Please upload your resume',
+        life: 3000
+      });
+      return;
+    }
+
+    // Validate skills (at least 1 skill required)
+    if (this.skills.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Skills Required',
+        detail: 'Please add at least one skill',
+        life: 3000
+      });
       return;
     }
 
