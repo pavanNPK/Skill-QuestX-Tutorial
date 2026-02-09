@@ -5,20 +5,20 @@
       <div class="hero-content">
         <div class="hero-slides">
           @for (item of carouselItems; track item) {
-            <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
-              <div class="hero-title-stack">
-                <h3 class="hero-title m-0">{{ item.title }}</h3>
-                <div class="hero-quote">
-                  <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
-                </div>
+          <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
+            <div class="hero-title-stack">
+              <h3 class="hero-title m-0">{{ item.title }}</h3>
+              <div class="hero-quote">
+                <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
               </div>
             </div>
+          </div>
           }
         </div>
         <div class="hero-dots">
           @for (item of carouselItems; track item) {
-            <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
-              (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
+          <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
+            (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
           }
         </div>
       </div>
@@ -52,7 +52,7 @@
       <div class="flex flex-column gap-1">
         <p-floatlabel variant="on" class="w-full">
           <p-iconfield class="w-full">
-            <p-inputicon class="pi pi-key"></p-inputicon>
+            <p-inputicon class="pi pi-lock"></p-inputicon>
             <p-password class="w-full" inputStyleClass="w-full" inputId="login-password" [toggleMask]="true"
               [feedback]="false" formControlName="password"></p-password>
           </p-iconfield>

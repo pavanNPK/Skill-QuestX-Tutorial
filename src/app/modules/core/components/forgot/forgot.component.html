@@ -52,7 +52,8 @@
           <a routerLink="/login" class="brand-link text-sm">Back to login</a>
         </div>
 
-        <button pButton type="submit" label="Send OTP" class="login-button w-full" [disabled]="emailForm.invalid"></button>
+        <button pButton type="submit" label="Send OTP" class="login-button w-full"
+          [disabled]="emailForm.invalid"></button>
       </form>
     </div>
     }
@@ -77,15 +78,16 @@
         <div class="flex flex-column gap-2 align-items-center">
           <div class="text-sm text-600">OTP expires in</div>
           <div class="otp-timer">
-            <p-knob [ngModel]="otpProgress" [ngModelOptions]="{ standalone: true }" [readonly]="true"
-              [strokeWidth]="8" [size]="90" [showValue]="false"></p-knob>
+            <p-knob [ngModel]="otpProgress" [ngModelOptions]="{ standalone: true }" [readonly]="true" [strokeWidth]="8"
+              [size]="90" [showValue]="false"></p-knob>
             <div class="otp-timer-label text-sm font-medium">{{ otpTimeLabel }}</div>
           </div>
         </div>
 
         <div class="flex flex-column sm:flex-row gap-2">
           <button pButton type="submit" label="Verify OTP" class="login-button w-full"></button>
-          <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full" (click)="resendOtp()"></button>
+          <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full"
+            (click)="resendOtp()"></button>
         </div>
       </form>
     </div>
@@ -97,7 +99,7 @@
         <div class="flex flex-column gap-1">
           <p-floatlabel variant="on" class="w-full">
             <p-iconfield class="w-full">
-              <p-inputicon class="pi pi-key"></p-inputicon>
+              <p-inputicon class="pi pi-lock"></p-inputicon>
               <p-password inputId="new-password" [toggleMask]="true" [feedback]="false" formControlName="password"
                 inputStyleClass="w-full" class="w-full"></p-password>
             </p-iconfield>
@@ -106,20 +108,23 @@
           <small class="p-error" *ngIf="resetForm.get('password')?.touched && resetForm.get('password')?.invalid">
             Password must be at least 6 characters.
           </small>
+
+          <!-- Password Strength Indicator -->
+          <div class="password-strength" *ngIf="resetForm.get('password')?.value">
+            <div class="strength-bar">
+              <div class="strength-fill" [attr.data-strength]="passwordLabel.toLowerCase()"></div>
+            </div>
+            <small class="strength-text" [attr.data-strength]="passwordLabel.toLowerCase()">
+              Password strength: {{ passwordLabel }}
+            </small>
+          </div>
         </div>
 
-        <div class="flex flex-column gap-2">
-          <div class="flex justify-content-between align-items-center text-sm">
-            <span>Password strength</span>
-            <span class="font-medium" [ngClass]="strengthClass">{{ passwordLabel }}</span>
-          </div>
-          <p-progressBar [value]="passwordStrength" [styleClass]="strengthClass"></p-progressBar>
-        </div>
 
         <div class="flex flex-column gap-1">
           <p-floatlabel variant="on" class="w-full">
             <p-iconfield class="w-full">
-              <p-inputicon class="pi pi-key"></p-inputicon>
+              <p-inputicon class="pi pi-lock"></p-inputicon>
               <p-password inputId="confirm-password" [toggleMask]="true" [feedback]="false"
                 formControlName="confirmPassword" inputStyleClass="w-full" class="w-full"></p-password>
             </p-iconfield>

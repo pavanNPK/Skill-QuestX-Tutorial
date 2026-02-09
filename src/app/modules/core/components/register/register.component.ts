@@ -11,6 +11,7 @@ import { PasswordModule } from 'primeng/password';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ChipModule } from 'primeng/chip';
+import { KnobModule } from 'primeng/knob';
 
 @Component({
   selector: 'sqx-register',
@@ -27,7 +28,8 @@ import { ChipModule } from 'primeng/chip';
     InputTextModule,
     PasswordModule,
     ToastModule,
-    ChipModule
+    ChipModule,
+    KnobModule
   ],
   providers: [MessageService],
   templateUrl: './register.component.html',
@@ -72,7 +74,12 @@ export class RegisterComponent implements OnDestroy {
   otpSent: boolean = false;
   canResendOTP: boolean = false;
   resendTimer: number = 180; // 3 minutes
+  otpExpired: boolean = false;
 
+  // Calculate OTP progress percentage for knob
+  get otpProgress(): number {
+    return Math.round((this.resendTimer / 180) * 100);
+  }
   private rotationTimer?: ReturnType<typeof setInterval>;
   private resendInterval?: ReturnType<typeof setInterval>;
 

@@ -38,24 +38,6 @@
           <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
         </div>
 
-        <!-- Steps Indicator -->
-        <div class="steps-indicator">
-          <div class="step active completed">
-            <div class="step-number">1</div>
-            <div class="step-label">Profile</div>
-          </div>
-          <div class="step-line" [class.active]="currentStep > 1"></div>
-          <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
-            <div class="step-number">2</div>
-            <div class="step-label">Verify Email</div>
-          </div>
-          <div class="step-line" [class.active]="currentStep > 2"></div>
-          <div class="step" [class.active]="currentStep >= 3">
-            <div class="step-number">3</div>
-            <div class="step-label">Password</div>
-          </div>
-        </div>
-
         <div>
           <h2 class="m-0">Complete your Profile</h2>
           <p class="mt-2 mb-0">Let's Get to Know You Better by Filling your Profile</p>
@@ -207,47 +189,45 @@
       </form>
 
       <!-- Step 2: OTP Verification -->
-      <div class="register-form" *ngIf="currentStep === 2">
+      <form class="register-form" *ngIf="currentStep === 2" (ngSubmit)="submitOTP()">
         <div class="flex justify-content-center lg:justify-content-start">
           <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
         </div>
 
-        <!-- Steps Indicator -->
-        <div class="steps-indicator">
-          <div class="step completed">
-            <div class="step-number"><i class="pi pi-check"></i></div>
-            <div class="step-label">Profile</div>
-          </div>
-          <div class="step-line active"></div>
-          <div class="step active">
-            <div class="step-number">2</div>
-            <div class="step-label">Verify Email</div>
-          </div>
-          <div class="step-line"></div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <div class="step-label">Password</div>
-          </div>
-        </div>
-
-        <div class="text-center">
+        <div>
           <h2 class="m-0">Verify Your Email</h2>
           <p class="mt-2 mb-0">We sent a 6-digit code to <strong>{{ registerForm.get('email')?.value }}</strong></p>
         </div>
 
-        <div class="otp-container">
-          <input type="text" class="otp-input" maxlength="6" placeholder="••••••" [(ngModel)]="otpCode"
-            (keyup.enter)="submitOTP()" />
-        </div>
+        <div class="flex flex-column gap-3">
+          <div class="flex flex-column gap-1">
+            <p-floatlabel variant="on" class="w-full">
+              <p-iconfield class="w-full">
+                <p-inputicon class="pi pi-key"></p-inputicon>
+                <input id="reg-otp" pInputText type="text" maxlength="6" [(ngModel)]="otpCode"
+                  [ngModelOptions]="{standalone: true}" class="w-full" />
+              </p-iconfield>
+              <label for="reg-otp">OTP</label>
+            </p-floatlabel>
+          </div>
 
-        <button pButton type="button" label="Verify OTP" class="login-button w-full" [disabled]="otpCode.length !== 6"
-          (click)="submitOTP()"></button>
+          <div class="flex flex-column gap-2 align-items-center">
+            <div class="text-sm text-600">OTP expires in</div>
+            <div class="otp-timer">
+              <p-knob [ngModel]="otpProgress" [ngModelOptions]="{ standalone: true }" [readonly]="true"
+                [strokeWidth]="8" [size]="90" [showValue]="false"></p-knob>
+              <div class="otp-timer-label text-sm font-medium">{{ formatTime(resendTimer) }}</div>
+            </div>
+          </div>
 
-        <div class="text-sm text-center">
-          <span *ngIf="!canResendOTP" class="text-500">Resend OTP in {{ formatTime(resendTimer) }}</span>
-          <a *ngIf="canResendOTP" (click)="resendOTP()" class="brand-link cursor-pointer">Resend OTP</a>
+          <div class="flex flex-column sm:flex-row gap-2">
+            <button pButton type="submit" label="Verify OTP" class="login-button w-full"
+              [disabled]="otpCode.length !== 6"></button>
+            <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full" [disabled]="!canResendOTP"
+              (click)="resendOTP()"></button>
+          </div>
         </div>
-      </div>
+      </form>
 
       <!-- Step 3: Password Creation -->
       <form class="register-form" *ngIf="currentStep === 3" [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
@@ -255,25 +235,7 @@
           <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
         </div>
 
-        <!-- Steps Indicator -->
-        <div class="steps-indicator">
-          <div class="step completed">
-            <div class="step-number"><i class="pi pi-check"></i></div>
-            <div class="step-label">Profile</div>
-          </div>
-          <div class="step-line active"></div>
-          <div class="step completed">
-            <div class="step-number"><i class="pi pi-check"></i></div>
-            <div class="step-label">Verify Email</div>
-          </div>
-          <div class="step-line active"></div>
-          <div class="step active">
-            <div class="step-number">3</div>
-            <div class="step-label">Password</div>
-          </div>
-        </div>
-
-        <div class="text-center">
+        <div>
           <h2 class="m-0">Create Your Password</h2>
           <p class="mt-2 mb-0">Choose a strong password to secure your account</p>
         </div>

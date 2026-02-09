@@ -178,7 +178,7 @@
 :host ::ng-deep .register-form .p-inputtext {
   width: 100%;
   border-radius: 6px;
-  background: #f9fafb;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   padding-left: 44px;
   box-shadow: none;
@@ -205,7 +205,7 @@
 }
 
 :host ::ng-deep .resume-upload-btn.p-button {
-  background: #f9fafb;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   color: #667085;
   justify-content: flex-start;
@@ -229,7 +229,7 @@
 }
 
 .no-skills-card {
-  background: #f9fafb;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   padding: 16px;
@@ -242,7 +242,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  background: #f9fafb;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   padding: 12px;
@@ -419,7 +419,7 @@
   letter-spacing: 8px;
   border: 2px solid #e5e7eb;
   border-radius: 12px;
-  background: #f9fafb;
+  background: #ffffff;
   transition: all 0.3s ease;
 
   &:focus {
@@ -526,7 +526,7 @@
   input {
     width: 100%;
     border-radius: 6px;
-    background: #f9fafb;
+    background: #ffffff;
     border: 1px solid #e5e7eb;
     padding-left: 44px; // Space for lock icon
     box-shadow: none;
@@ -547,4 +547,28 @@
   button {
     cursor: pointer;
   }
+}
+
+// OTP Timer Styling
+.otp-timer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otp-timer-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// Knob theming
+::ng-deep .p-knob-value {
+  stroke: #6730de;
+}
+
+::ng-deep .p-knob-range {
+  stroke: #e5e7eb;
 }
