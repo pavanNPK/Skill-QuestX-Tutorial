@@ -71,8 +71,8 @@
               <div class="profile-avatar-wrapper" (click)="triggerProfileImageUpload()">
                 <img [src]="profileImagePreview" alt="Profile" class="profile-avatar" />
                 <button type="button" class="avatar-edit-btn" pButton icon="pi pi-pencil"></button>
-                <input type="file" id="profile-image-input" accept="image/*" (change)="onProfileImageSelect($event)"
-                  hidden />
+                <input type="file" #profileImageInput id="profile-image-input" accept="image/jpeg,image/jpg,image/png"
+                  (change)="onProfileImageSelect($event)" hidden />
               </div>
             </div>
 
@@ -86,7 +86,9 @@
               </p-floatlabel>
               <small class="p-error"
                 *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid">
-                First name is required.
+                <span *ngIf="registerForm.get('firstName')?.errors?.['required']">First name is required.</span>
+                <span *ngIf="registerForm.get('firstName')?.errors?.['pattern']">First name must contain only
+                  alphabets.</span>
               </small>
             </div>
 
@@ -100,7 +102,9 @@
               </p-floatlabel>
               <small class="p-error"
                 *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid">
-                Last name is required.
+                <span *ngIf="registerForm.get('lastName')?.errors?.['required']">Last name is required.</span>
+                <span *ngIf="registerForm.get('lastName')?.errors?.['pattern']">Last name must contain only
+                  alphabets.</span>
               </small>
             </div>
 
@@ -113,7 +117,8 @@
                 <label for="reg-email">Email Id</label>
               </p-floatlabel>
               <small class="p-error" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
-                Enter a valid email address.
+                <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
+                <span *ngIf="registerForm.get('email')?.errors?.['email']">Enter a valid email address.</span>
               </small>
             </div>
 
@@ -127,7 +132,9 @@
               </p-floatlabel>
               <small class="p-error"
                 *ngIf="registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid">
-                Phone number is required.
+                <span *ngIf="registerForm.get('phoneNumber')?.errors?.['required']">Phone number is required.</span>
+                <span *ngIf="registerForm.get('phoneNumber')?.errors?.['pattern']">Phone number must be 10
+                  digits.</span>
               </small>
             </div>
           </div>
@@ -148,7 +155,7 @@
 
             <div class="flex flex-column gap-1">
               <label class="resume-label">Resume</label>
-              <input type="file" #resumeInput id="resume-input" accept=".pdf,.doc,.docx"
+              <input type="file" #resumeInput id="resume-input" accept=".pdf,.doc,.docx,.xls,.xlsx"
                 (change)="onResumeSelect($event)" hidden />
               <button pButton type="button" [label]="resumeFileName || 'Upload updated Resume'" icon="pi pi-paperclip"
                 class="resume-upload-btn w-full" (click)="resumeInput.click()"></button>
@@ -165,22 +172,27 @@
                 <p-iconfield class="w-full">
                   <p-inputicon class="pi pi-tags"></p-inputicon>
                   <input id="reg-skills" pInputText type="text" class="w-full" [(ngModel)]="skillInput"
-                    [ngModelOptions]="{standalone: true}" (keyup.enter)="addSkill()" placeholder="Press Enter to add" />
+                    [ngModelOptions]="{standalone: true}" (keyup.enter)="addSkill()" />
                 </p-iconfield>
                 <label for="reg-skills">Add Skills <span class="text-400 text-xs">(Upto 10 Skills)</span></label>
               </p-floatlabel>
             </div>
 
             <!-- Skills Preview (shown first if any exist) -->
-            <div class="flex flex-column gap-1" *ngIf="skills.length > 0">
-              <label class="skills-label">Skills added</label>
-              <div class="skills-container">
-                @for (skill of skills; track skill; let i = $index) {
-                <span class="skill-chip">
-                  {{ skill }}
-                  <i class="pi pi-times ml-1 cursor-pointer" (click)="removeSkill(i)"></i>
-                </span>
-                }
+            <!-- Skills Section -->
+            <div class="flex flex-column gap-1">
+              <label class="skills-section-label">Skills added</label>
+
+              <!-- Show gray card with message when no skills added -->
+              <div *ngIf="skills.length === 0" class="no-skills-card">
+                <span class="text-500">No skills added. Press Enter to add</span>
+              </div>
+
+              <!-- Show skills list when skills are added -->
+              <div *ngIf="skills.length > 0" class="skills-container">
+                <p-chip *ngFor="let skill of skills" [label]="skill" [removable]="true" (onRemove)="removeSkill(skill)"
+                  styleClass="skill-chip">
+                </p-chip>
               </div>
             </div>
           </div>

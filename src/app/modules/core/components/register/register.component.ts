@@ -10,6 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { ChipModule } from 'primeng/chip';
 
 @Component({
   selector: 'sqx-register',
@@ -25,7 +26,8 @@ import { MessageService } from 'primeng/api';
     InputIconModule,
     InputTextModule,
     PasswordModule,
-    ToastModule
+    ToastModule,
+    ChipModule
   ],
   providers: [MessageService],
   templateUrl: './register.component.html',
@@ -81,11 +83,11 @@ export class RegisterComponent implements OnDestroy {
     private messageService: MessageService
   ) {
     this.registerForm = this.fb.group({
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
+      firstName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
+      lastName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
       email: ['', [Validators.required, Validators.email]],
       phoneCountry: ['+91'],
-      phoneNumber: ['', [Validators.required]],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       underGraduate: [''],
     });
 
@@ -115,23 +117,24 @@ export class RegisterComponent implements OnDestroy {
     if (input.files && input.files[0]) {
       const file = input.files[0];
 
-      // Validate file type
-      if (!file.type.match(/image\/(jpg|jpeg|png|webp)/)) {
+      // Validate file type (JPEG, JPG, PNG only)
+      const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!validImageTypes.includes(file.type)) {
         this.messageService.add({
           severity: 'error',
           summary: 'Invalid File Type',
-          detail: 'Please select a valid image file (JPG, PNG, or WEBP)',
+          detail: 'Please select a valid image file (JPEG, JPG, or PNG)',
           life: 3000
         });
         return;
       }
 
-      // Validate file size (2MB)
-      if (file.size > 2 * 1024 * 1024) {
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
         this.messageService.add({
           severity: 'error',
           summary: 'File Too Large',
-          detail: 'Image size must be less than 2MB',
+          detail: 'Image size must be less than 5MB',
           life: 3000
         });
         return;
@@ -155,12 +158,19 @@ export class RegisterComponent implements OnDestroy {
     if (input.files && input.files[0]) {
       const file = input.files[0];
 
-      // Validate file type
-      if (!file.type.match(/application\/(pdf|msword|vnd.openxmlformats-officedocument.wordprocessingml.document)/)) {
+      // Validate file type (PDF, DOC, DOCX, Excel)
+      const validTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ];
+      if (!validTypes.includes(file.type)) {
         this.messageService.add({
           severity: 'error',
           summary: 'Invalid File Type',
-          detail: 'Please select a valid resume file (PDF, DOC, or DOCX)',
+          detail: 'Please select a valid file (PDF, DOC, DOCX, or Excel)',
           life: 3000
         });
         return;
@@ -216,8 +226,11 @@ export class RegisterComponent implements OnDestroy {
     this.cdr.markForCheck();
   }
 
-  removeSkill(index: number) {
-    this.skills.splice(index, 1);
+  removeSkill(skill: string) {
+    const index = this.skills.indexOf(skill);
+    if (index > -1) {
+      this.skills.splice(index, 1);
+    }
     this.cdr.markForCheck();
   }
 

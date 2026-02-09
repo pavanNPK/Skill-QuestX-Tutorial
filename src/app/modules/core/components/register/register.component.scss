@@ -222,11 +222,20 @@
 }
 
 // Skills section
-.skills-label {
+.skills-section-label {
   font-size: 14px;
   font-weight: 500;
   color: #344054;
-  margin-bottom: 4px;
+}
+
+.no-skills-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
 }
 
 .skills-container {
@@ -240,23 +249,22 @@
   min-height: 56px;
 }
 
-.skill-chip {
-  display: inline-flex;
-  align-items: center;
+:host ::ng-deep .skill-chip.p-chip {
   background: #6730de;
   color: #ffffff;
-  border-radius: 999px;
-  padding: 6px 12px;
   font-size: 13px;
   font-weight: 500;
-  cursor: default;
+  border-radius: 999px;
+  padding: 6px 12px;
 
-  .pi-times {
-    font-size: 11px;
-    opacity: 0.8;
+  .p-chip-remove-icon {
+    color: #ffffff;
+    font-size: 14px;
+    margin-left: 6px;
 
     &:hover {
-      opacity: 1;
+      color: #ffffff;
+      opacity: 0.8;
     }
   }
 }
