@@ -1,46 +1,48 @@
-<section class="login-page">
-  <div class="login-card grid gap-0">
-    <div class="login-hero col-12 lg:col-6 p-0 hidden lg:block">
+<section class="flex flex-column lg:flex-row h-screen overflow-hidden p-2 box-border bg-white">
+  <div class="w-full lg:w-6 p-0 hidden lg:block h-full relative">
+    <img class="w-full h-full block object-cover" src="/assets/images/auth.jpg" alt="Login banner" />
+    <div class="absolute bottom-0 left-0 p-4 lg:p-5 text-white">
       <div class="hero-content">
-        <div class="hero-profile">
-          <div class="hero-avatar">
-            <img [src]="carouselItems[activeIndex].avatar" [alt]="carouselItems[activeIndex].author" />
+        <div class="hero-slides">
+          <div class="hero-slide" *ngFor="let item of carouselItems; let i = index" [class.active]="i === activeIndex">
+          <div class="hero-title-stack">
+            <h3 class="hero-title m-0">{{ item.title }}</h3>
+            <div class="hero-quote">
+              <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
+            </div>
           </div>
-          <div>
-            <div class="hero-name">{{ carouselItems[activeIndex].author }}</div>
-            <div class="hero-role">{{ carouselItems[activeIndex].role }}</div>
           </div>
-        </div>
-        <div class="hero-quote">
-          <span class="quote-mark">"</span>{{ carouselItems[activeIndex].quote }}<span class="quote-mark">"</span>
         </div>
         <div class="hero-dots">
           <button type="button" *ngFor="let item of carouselItems; let i = index" [class.active]="i === activeIndex"
-            (click)="setActive(i)" aria-label="Show testimonial"></button>
+            (click)="setActive(i)" aria-label="Show slide"></button>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="login-form col-12 lg:col-6 p-0">
-      <img class="login-logo" src="/core/logo.svg" alt="Skill Questx" />
-      <h2>Welcome</h2>
-      <p class="login-subtitle">Enter your Email Id and password to Login</p>
-
-      <div class="form-field">
-        <p-iconfield>
-          <p-inputicon class="pi pi-envelope"></p-inputicon>
-          <input pInputText type="email" placeholder="Email Id" />
-        </p-iconfield>
-      </div>
-
-      <div class="form-field">
-        <p-iconfield>
-          <p-inputicon class="pi pi-key"></p-inputicon>
-          <input pInputText type="password" placeholder="Password" />
-        </p-iconfield>
-      </div>
-
-      <button pButton type="button" label="Login" class="login-button"></button>
+  <div class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white">
+    <div class="flex justify-content-center lg:justify-content-start">
+      <img src="/core/logo.svg" alt="Skill Questx" class="w-12rem" />
     </div>
+    <div>
+      <h2 class="m-0">Welcome</h2>
+      <p class="mt-2 mb-0">Enter your Email Id and password to Login</p>
+    </div>
+
+    <div class="flex flex-column gap-3">
+      <p-iconfield class="w-full">
+        <p-inputicon class="pi pi-envelope"></p-inputicon>
+        <input pInputText type="email" placeholder="Email Id" class="w-full" />
+      </p-iconfield>
+
+      <p-iconfield class="w-full">
+        <p-inputicon class="pi pi-key"></p-inputicon>
+        <p-password class="w-full" inputStyleClass="w-full" placeholder="Password" [toggleMask]="true"
+          [feedback]="false"></p-password>
+      </p-iconfield>
+    </div>
+
+    <button pButton type="button" label="Login" class="login-button w-full"></button>
   </div>
 </section>

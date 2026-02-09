@@ -4,11 +4,12 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { PasswordModule } from 'primeng/password';
 
 @Component({
   selector: 'sqx-login',
   standalone: true,
-  imports: [CommonModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule],
+  imports: [CommonModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, PasswordModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -18,25 +19,16 @@ export class LoginComponent implements OnDestroy {
 
   carouselItems = [
     {
-      author: 'Sam Halftime',
-      role: 'System Designer at coinquake',
-      quote:
-        'Skill Questx elevated my career and personal growth. Tailored content and feedback were key. Highly recommend for serious progress.',
-      avatar: '/assets/images/avatar-1.jpg'
+      title: 'REDEFINE',
+      subtitle: 'Boost your learning and career path'
     },
     {
-      author: 'Jane Doe',
-      role: 'Frontend Architect',
-      quote:
-        'The depth of content here is unmatched. I was able to transition to a senior role within months.',
-      avatar: '/assets/images/avatar-2.jpg'
+      title: 'UPSKILL',
+      subtitle: 'Gain modern, in-demand technical expertise'
     },
     {
-      author: 'John Smith',
-      role: 'Backend Engineer',
-      quote:
-        'Practical assignments and real-world scenarios made all the difference in my interviewing process.',
-      avatar: '/assets/images/avatar-3.jpg'
+      title: 'SUCCEED',
+      subtitle: 'Land your dream role or promotion'
     }
   ];
 
@@ -45,7 +37,7 @@ export class LoginComponent implements OnDestroy {
   constructor() {
     this.rotationTimer = setInterval(() => {
       this.activeIndex = (this.activeIndex + 1) % this.carouselItems.length;
-    }, 5000);
+    }, 3000);
   }
 
   setActive(index: number) {
