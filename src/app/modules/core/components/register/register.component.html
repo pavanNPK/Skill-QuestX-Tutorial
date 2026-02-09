@@ -1,4 +1,7 @@
+<p-toast></p-toast>
+
 <section class="flex flex-column lg:flex-row h-screen overflow-hidden p-2 box-border bg-white">
+  <!-- Left side: Hero section with carousel (same as before) -->
   <div class="w-full lg:w-6 p-0 hidden lg:block h-full relative">
     <img class="w-full h-full block object-cover" src="/assets/images/auth.jpg" alt="Register banner" />
     <div class="absolute bottom-0 left-0 p-4 lg:p-5 text-white">
@@ -25,11 +28,32 @@
     </div>
   </div>
 
+  <!-- Right side: Registration form -->
   <div class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white">
     <div class="register-scroll-container w-full overflow-y-auto">
-      <form class="register-form" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+
+      <!-- Step 1: Profile Form -->
+      <form class="register-form" *ngIf="currentStep === 1" [formGroup]="registerForm" (ngSubmit)="submitStep1()">
         <div class="flex justify-content-center lg:justify-content-start">
           <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
+        </div>
+
+        <!-- Steps Indicator -->
+        <div class="steps-indicator">
+          <div class="step active completed">
+            <div class="step-number">1</div>
+            <div class="step-label">Profile</div>
+          </div>
+          <div class="step-line" [class.active]="currentStep > 1"></div>
+          <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+            <div class="step-number">2</div>
+            <div class="step-label">Verify Email</div>
+          </div>
+          <div class="step-line" [class.active]="currentStep > 2"></div>
+          <div class="step" [class.active]="currentStep >= 3">
+            <div class="step-number">3</div>
+            <div class="step-label">Password</div>
+          </div>
         </div>
 
         <div>
@@ -42,11 +66,13 @@
           <div class="section-group">
             <h3 class="section-title">Contact Details</h3>
 
-            <!-- Profile Picture -->
+            <!-- Profile Picture with Upload-->
             <div class="flex justify-content-center lg:justify-content-start mb-3">
-              <div class="profile-avatar-wrapper">
-                <img src="/assets/images/avatar-1.jpg" alt="Profile" class="profile-avatar" />
+              <div class="profile-avatar-wrapper" (click)="triggerProfileImageUpload()">
+                <img [src]="profileImagePreview" alt="Profile" class="profile-avatar" />
                 <button type="button" class="avatar-edit-btn" pButton icon="pi pi-pencil"></button>
+                <input type="file" id="profile-image-input" accept="image/*" (change)="onProfileImageSelect($event)"
+                  hidden />
               </div>
             </div>
 
@@ -122,8 +148,11 @@
 
             <div class="flex flex-column gap-1">
               <label class="resume-label">Resume</label>
-              <button pButton type="button" label="Upload updated Resume" icon="pi pi-paperclip"
-                class="resume-upload-btn w-full"></button>
+              <input type="file" #resumeInput id="resume-input" accept=".pdf,.doc,.docx"
+                (change)="onResumeSelect($event)" hidden />
+              <button pButton type="button" [label]="resumeFileName || 'Upload updated Resume'" icon="pi pi-paperclip"
+                class="resume-upload-btn w-full" (click)="resumeInput.click()"></button>
+              <small class="text-xs text-500" *ngIf="resumeFileName">{{ resumeFileName }}</small>
             </div>
           </div>
 
@@ -135,19 +164,21 @@
               <p-floatlabel variant="on" class="w-full">
                 <p-iconfield class="w-full">
                   <p-inputicon class="pi pi-tags"></p-inputicon>
-                  <input id="reg-skills" pInputText type="text" class="w-full" formControlName="skillInput" />
+                  <input id="reg-skills" pInputText type="text" class="w-full" [(ngModel)]="skillInput"
+                    [ngModelOptions]="{standalone: true}" (keyup.enter)="addSkill()" placeholder="Press Enter to add" />
                 </p-iconfield>
                 <label for="reg-skills">Add Skills <span class="text-400 text-xs">(Upto 10 Skills)</span></label>
               </p-floatlabel>
             </div>
 
-            <div class="flex flex-column gap-1">
+            <!-- Skills Preview (shown first if any exist) -->
+            <div class="flex flex-column gap-1" *ngIf="skills.length > 0">
               <label class="skills-label">Skills added</label>
               <div class="skills-container">
-                @for (skill of skills; track skill) {
+                @for (skill of skills; track skill; let i = $index) {
                 <span class="skill-chip">
                   {{ skill }}
-                  <i class="pi pi-times ml-1 cursor-pointer"></i>
+                  <i class="pi pi-times ml-1 cursor-pointer" (click)="removeSkill(i)"></i>
                 </span>
                 }
               </div>
@@ -155,13 +186,138 @@
           </div>
         </div>
 
-        <button pButton type="submit" label="Save Details" class="login-button w-full"
+        <button pButton type="submit" label="Continue to Verify Email" class="login-button w-full"
           [disabled]="registerForm.invalid"></button>
 
         <div class="text-sm text-center">
           Already have an account? <a routerLink="/login" class="brand-link">Login</a>
         </div>
       </form>
+
+      <!-- Step 2: OTP Verification -->
+      <div class="register-form" *ngIf="currentStep === 2">
+        <div class="flex justify-content-center lg:justify-content-start">
+          <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
+        </div>
+
+        <!-- Steps Indicator -->
+        <div class="steps-indicator">
+          <div class="step completed">
+            <div class="step-number"><i class="pi pi-check"></i></div>
+            <div class="step-label">Profile</div>
+          </div>
+          <div class="step-line active"></div>
+          <div class="step active">
+            <div class="step-number">2</div>
+            <div class="step-label">Verify Email</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-label">Password</div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <h2 class="m-0">Verify Your Email</h2>
+          <p class="mt-2 mb-0">We sent a 6-digit code to <strong>{{ registerForm.get('email')?.value }}</strong></p>
+        </div>
+
+        <div class="otp-container">
+          <input type="text" class="otp-input" maxlength="6" placeholder="••••••" [(ngModel)]="otpCode"
+            (keyup.enter)="submitOTP()" />
+        </div>
+
+        <button pButton type="button" label="Verify OTP" class="login-button w-full" [disabled]="otpCode.length !== 6"
+          (click)="submitOTP()"></button>
+
+        <div class="text-sm text-center">
+          <span *ngIf="!canResendOTP" class="text-500">Resend OTP in {{ formatTime(resendTimer) }}</span>
+          <a *ngIf="canResendOTP" (click)="resendOTP()" class="brand-link cursor-pointer">Resend OTP</a>
+        </div>
+      </div>
+
+      <!-- Step 3: Password Creation -->
+      <form class="register-form" *ngIf="currentStep === 3" [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
+        <div class="flex justify-content-center lg:justify-content-start">
+          <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
+        </div>
+
+        <!-- Steps Indicator -->
+        <div class="steps-indicator">
+          <div class="step completed">
+            <div class="step-number"><i class="pi pi-check"></i></div>
+            <div class="step-label">Profile</div>
+          </div>
+          <div class="step-line active"></div>
+          <div class="step completed">
+            <div class="step-number"><i class="pi pi-check"></i></div>
+            <div class="step-label">Verify Email</div>
+          </div>
+          <div class="step-line active"></div>
+          <div class="step active">
+            <div class="step-number">3</div>
+            <div class="step-label">Password</div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <h2 class="m-0">Create Your Password</h2>
+          <p class="mt-2 mb-0">Choose a strong password to secure your account</p>
+        </div>
+
+        <div class="flex flex-column gap-3">
+          <div class="flex flex-column gap-1">
+            <p-floatlabel variant="on" class="w-full">
+              <p-iconfield class="w-full">
+                <p-inputicon class="pi pi-lock"></p-inputicon>
+                <p-password id="reg-password" class="w-full" formControlName="password" [feedback]="false"
+                  [toggleMask]="true">
+                </p-password>
+              </p-iconfield>
+              <label for="reg-password">Password</label>
+            </p-floatlabel>
+            <small class="p-error"
+              *ngIf="passwordForm.get('password')?.touched && passwordForm.get('password')?.invalid">
+              Password must be at least 8 characters.
+            </small>
+
+            <!-- Password Strength Indicator -->
+            <div class="password-strength" *ngIf="passwordForm.get('password')?.value">
+              <div class="strength-bar">
+                <div class="strength-fill" [attr.data-strength]="getPasswordStrength()"></div>
+              </div>
+              <small class="strength-text" [attr.data-strength]="getPasswordStrength()">
+                Password strength: {{ getPasswordStrength() }}
+              </small>
+            </div>
+          </div>
+
+          <div class="flex flex-column gap-1">
+            <p-floatlabel variant="on" class="w-full">
+              <p-iconfield class="w-full">
+                <p-inputicon class="pi pi-lock"></p-inputicon>
+                <p-password id="reg-confirm-password" class="w-full" formControlName="confirmPassword"
+                  [feedback]="false" [toggleMask]="true">
+                </p-password>
+              </p-iconfield>
+              <label for="reg-confirm-password">Confirm Password</label>
+            </p-floatlabel>
+            <small class="p-error"
+              *ngIf="passwordForm.get('confirmPassword')?.touched && passwordForm.hasError('passwordMismatch')">
+              Passwords do not match.
+            </small>
+          </div>
+        </div>
+
+        <button pButton type="submit" label="Complete Registration" class="login-button w-full"
+          [disabled]="passwordForm.invalid"></button>
+
+        <div class="text-sm text-center">
+          Already have an account? <a routerLink="/login" class="brand-link">Login</a>
+        </div>
+      </form>
+
     </div>
   </div>
 </section>
