@@ -1,1 +1,212 @@
+.hero-content {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hero-slides {
+  position: relative;
+  min-height: 72px;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-title-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hero-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.hero-quote {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  position: relative;
+  white-space: nowrap;
+}
+
+.quote-mark {
+  font-size: 36px;
+  line-height: 0;
+  vertical-align: baseline;
+  opacity: 0.6;
+}
+
+.hero-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.hero-dots button {
+  width: 20px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.hero-dots button.active {
+  width: 40px;
+  background: #ffffff;
+}
+
+.section h3 {
+  margin: 0 0 16px;
+  font-size: 16px;
+}
+
+.avatar-row {
+  margin-bottom: 12px;
+}
+
+.avatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-edit {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #6730de;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+::ng-deep .register-form .p-iconfield {
+  width: 100%;
+}
+
+::ng-deep .register-form .p-inputicon {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+::ng-deep .register-form .p-inputtext {
+  width: 100%;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  height: 48px;
+  box-shadow: none;
+  font-size: 15px;
+  padding-left: 44px;
+}
+
+::ng-deep .register-form .p-inputtext:focus {
+  border-color: #6b44d8;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+}
+
+
+.register-form {
+  overflow-y: auto;
+}
+
+.phone-prefix {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #344054;
+}
+
+.resume-button.p-button {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #667085;
+  justify-content: flex-start;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: #f2f4f7;
+  border: 1px solid #e4e7ec;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.skill-chip {
+  background: #6730de;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+::ng-deep .login-button.p-button {
+  background: #6730de;
+  border: none;
+  color: #ffffff;
+  width: 100%;
+  box-shadow: none;
+}
+
+::ng-deep .login-button.p-button:enabled:hover,
+::ng-deep .login-button.p-button:enabled:focus,
+::ng-deep .login-button.p-button:enabled:active {
+  background: #5d2bc9;
+  border: none;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.muted {
+  color: #98a2b3;
+  font-size: 12px;
+  margin-left: 6px;
+}
  

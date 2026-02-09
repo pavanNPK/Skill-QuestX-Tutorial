@@ -1,4 +1,138 @@
-<section class="page">
-  <h1>Forgot Password</h1>
-  <p>Request a reset link.</p>
+<section class="flex flex-column lg:flex-row h-screen overflow-hidden p-2 box-border bg-white">
+  <p-toast></p-toast>
+
+  <div class="w-full lg:w-6 p-0 hidden lg:block h-full relative">
+    <img class="w-full h-full block object-cover" src="/assets/images/auth.jpg" alt="Forgot password banner" />
+    <div class="absolute bottom-0 left-0 p-4 lg:p-5 text-white">
+      <div class="hero-content">
+        <div class="hero-slides">
+          <div class="hero-slide" *ngFor="let item of carouselItems; let i = index" [class.active]="i === activeIndex">
+            <div class="hero-title-stack">
+              <h3 class="hero-title m-0">{{ item.title }}</h3>
+              <div class="hero-quote">
+                <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-dots">
+          <button type="button" *ngFor="let item of carouselItems; let i = index" [class.active]="i === activeIndex"
+            (click)="setActive(i)" aria-label="Show slide"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white forgot-form">
+    <div class="flex justify-content-center lg:justify-content-start">
+      <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
+    </div>
+    <div>
+      <h2 class="m-0">Forgot Password</h2>
+      <p class="mt-2 mb-0">We’ll help you reset your password in a few steps.</p>
+    </div>
+
+    @if (step === 'email') {
+    <div class="animate-in">
+      <form [formGroup]="emailForm" (ngSubmit)="submitEmail()" class="flex flex-column gap-3">
+        <div class="flex flex-column gap-1">
+          <p-floatlabel variant="on" class="w-full">
+            <p-iconfield class="w-full">
+              <p-inputicon class="pi pi-envelope"></p-inputicon>
+              <input id="forgot-email" pInputText type="email" formControlName="email" class="w-full" />
+            </p-iconfield>
+            <label for="forgot-email">Email</label>
+          </p-floatlabel>
+          <small class="p-error" *ngIf="emailForm.get('email')?.touched && emailForm.get('email')?.invalid">
+            Enter a valid email address.
+          </small>
+        </div>
+
+        <div class="flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-2">
+          <a routerLink="/login" class="brand-link text-sm">Back to login</a>
+        </div>
+
+        <button pButton type="submit" label="Send OTP" class="login-button w-full" [disabled]="emailForm.invalid"></button>
+      </form>
+    </div>
+    }
+
+    @if (step === 'otp') {
+    <div class="animate-in">
+      <form [formGroup]="otpForm" (ngSubmit)="submitOtp()" class="flex flex-column gap-3">
+        <div class="flex flex-column gap-1">
+          <p-floatlabel variant="on" class="w-full">
+            <p-iconfield class="w-full">
+              <p-inputicon class="pi pi-key"></p-inputicon>
+              <input id="forgot-otp" pInputText type="text" maxlength="6" formControlName="otp" class="w-full" />
+            </p-iconfield>
+            <label for="forgot-otp">OTP</label>
+          </p-floatlabel>
+          <small class="p-error" *ngIf="otpForm.get('otp')?.touched && otpForm.get('otp')?.invalid">
+            Enter a valid 6-digit OTP.
+          </small>
+          <small class="p-error" *ngIf="otpExpired">OTP expired. Please resend.</small>
+        </div>
+
+        <div class="flex flex-column gap-2 align-items-center">
+          <div class="text-sm text-600">OTP expires in</div>
+          <div class="otp-timer">
+            <p-knob [ngModel]="otpProgress" [ngModelOptions]="{ standalone: true }" [readonly]="true"
+              [strokeWidth]="8" [size]="90" [showValue]="false"></p-knob>
+            <div class="otp-timer-label text-sm font-medium">{{ otpTimeLabel }}</div>
+          </div>
+        </div>
+
+        <div class="flex flex-column sm:flex-row gap-2">
+          <button pButton type="submit" label="Verify OTP" class="login-button w-full"></button>
+          <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full" (click)="resendOtp()"></button>
+        </div>
+      </form>
+    </div>
+    }
+
+    @if (step === 'reset') {
+    <div class="animate-in">
+      <form [formGroup]="resetForm" (ngSubmit)="submitReset()" class="flex flex-column gap-3">
+        <div class="flex flex-column gap-1">
+          <p-floatlabel variant="on" class="w-full">
+            <p-iconfield class="w-full">
+              <p-inputicon class="pi pi-key"></p-inputicon>
+              <p-password inputId="new-password" [toggleMask]="true" [feedback]="false" formControlName="password"
+                inputStyleClass="w-full" class="w-full"></p-password>
+            </p-iconfield>
+            <label for="new-password">New Password</label>
+          </p-floatlabel>
+          <small class="p-error" *ngIf="resetForm.get('password')?.touched && resetForm.get('password')?.invalid">
+            Password must be at least 6 characters.
+          </small>
+        </div>
+
+        <div class="flex flex-column gap-2">
+          <div class="flex justify-content-between align-items-center text-sm">
+            <span>Password strength</span>
+            <span class="font-medium" [ngClass]="strengthClass">{{ passwordLabel }}</span>
+          </div>
+          <p-progressBar [value]="passwordStrength" [styleClass]="strengthClass"></p-progressBar>
+        </div>
+
+        <div class="flex flex-column gap-1">
+          <p-floatlabel variant="on" class="w-full">
+            <p-iconfield class="w-full">
+              <p-inputicon class="pi pi-key"></p-inputicon>
+              <p-password inputId="confirm-password" [toggleMask]="true" [feedback]="false"
+                formControlName="confirmPassword" inputStyleClass="w-full" class="w-full"></p-password>
+            </p-iconfield>
+            <label for="confirm-password">Confirm Password</label>
+          </p-floatlabel>
+          <small class="p-error" *ngIf="resetForm.get('confirmPassword')?.touched && !passwordsMatch()">
+            Passwords do not match.
+          </small>
+        </div>
+
+        <button pButton type="submit" label="Update Password" class="login-button w-full"></button>
+      </form>
+    </div>
+    }
+  </div>
 </section>

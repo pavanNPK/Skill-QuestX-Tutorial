@@ -192,7 +192,6 @@
 
 :host ::ng-deep .login-button.p-button {
   margin-top: 5px;
-  height: 38px;
   width: 100%;
   color: #ffffff;
   background: #6730de;
@@ -203,6 +202,7 @@
 
 :host ::ng-deep .login-button.p-button:hover {
   background: #5d2bc9;
+  border: none;
   box-shadow: none;
 }
 
@@ -210,6 +210,34 @@
 ::host ::ng-deep .p-password .p-password-toggle-icon,
 ::host ::ng-deep .p-password .p-icon {
   cursor: pointer;
+}
+
+::host ::ng-deep .p-password .p-password-toggle,
+::host ::ng-deep .p-password .p-password-toggle-icon,
+::host ::ng-deep .p-password .p-icon {
+  cursor: pointer;
+}
+
+.p-error {
+  color: #d32f2f;
+  font-size: 12px;
+}
+
+.brand-link {
+  color: #6730de;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.brand-link:hover {
+  text-decoration: underline;
+}
+
+::host ::ng-deep .login-button.p-button:focus,
+::host ::ng-deep .login-button.p-button:active {
+  background: #6730de;
+  border: none;
+  color: #ffffff;
 }
 
 ::host ::ng-deep .p-password .p-password-toggle,

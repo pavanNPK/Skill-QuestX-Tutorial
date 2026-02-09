@@ -1,1 +1,199 @@
+.forgot-form {
+  position: relative;
+}
+
+.otp-timer-screen {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.animate-in {
+  animation: fadeSlideIn 0.4s ease;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.brand-link {
+  color: #6730de;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.brand-link:hover {
+  text-decoration: underline;
+}
+
+.p-error {
+  color: #d32f2f;
+  font-size: 12px;
+}
+
+.strength-weak ::ng-deep .p-progressbar-value {
+  background: #ef4444;
+}
+
+.strength-medium ::ng-deep .p-progressbar-value {
+  background: #f59e0b;
+}
+
+.strength-strong ::ng-deep .p-progressbar-value {
+  background: #22c55e;
+}
+
+.otp-progress ::ng-deep .p-progressbar-value {
+  background: #6730de;
+  transition: width 0.4s ease;
+}
+
+.otp-timer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otp-timer-label {
+  position: absolute;
+}
+
+
+::ng-deep .p-knob-value {
+  stroke: #6730de;
+}
+
+::ng-deep .p-knob-range {
+  stroke: #e5e7eb;
+}
+
+::ng-deep .p-password .p-password-toggle,
+::ng-deep .p-password .p-password-toggle-icon,
+::ng-deep .p-password .p-icon {
+  cursor: pointer;
+}
+
+.hero-content {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hero-slides {
+  position: relative;
+  min-height: 72px;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-title-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hero-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.hero-quote {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  position: relative;
+  white-space: nowrap;
+}
+
+.quote-mark {
+  font-size: 36px;
+  line-height: 0;
+  vertical-align: baseline;
+  opacity: 0.6;
+}
+
+.hero-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.hero-dots button {
+  width: 20px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.hero-dots button.active {
+  width: 40px;
+  background: #ffffff;
+}
+
+::ng-deep .p-progressbar {
+  height: 6px;
+  border-radius: 999px;
+}
+
+::ng-deep .p-progressbar-value {
+  border-radius: 999px;
+}
+
+::ng-deep .login-button.p-button {
+  background: #6730de;
+  border: 1px solid #6730de;
+  color: #ffffff;
+}
+
+::ng-deep .login-button.p-button:enabled:hover,
+::ng-deep .login-button.p-button:enabled:focus,
+::ng-deep .login-button.p-button:enabled:active {
+  background: #5d2bc9;
+  border: 1px solid #5d2bc9;
+  color: #ffffff;
+}
  
+::ng-deep .login-button.p-button:focus,
+::ng-deep .login-button.p-button:active {
+  background: #6730de;
+  border: none;
+  color: #ffffff;
+}
+
+::ng-deep .p-button.p-button-outlined {
+  color: #6730de;
+  border-color: #6730de;
+}
+
+::ng-deep .p-button.p-button-outlined:enabled:hover,
+::ng-deep .p-button.p-button-outlined:enabled:focus,
+::ng-deep .p-button.p-button-outlined:enabled:active {
+  color: #5d2bc9;
+  border-color: #5d2bc9;
+  background: rgba(103, 48, 222, 0.08);
+}

@@ -9,6 +9,7 @@ import { ResetPasswordComponent } from './modules/core/components/reset/reset-pa
 import { TermsAndConditionsComponent } from './modules/core/components/terms-and-conditions/terms-and-conditions.component';
 import { authGuard, authLoadGuard } from './shared/guards/auth.guards';
 import { UtilitiesDemoComponent } from './shared/components/utilities-demo/utilities-demo.component';
+import { ForgotComponent } from './modules/core/components/forgot/forgot.component';
 
 export const routes: Routes = [
   {
@@ -19,6 +20,7 @@ export const routes: Routes = [
   },
   { path: 'access-denied', component: AccessDeniedComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'forgot-password', component: ForgotComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'privacy-policy', component: PrivacyPolicyComponent },

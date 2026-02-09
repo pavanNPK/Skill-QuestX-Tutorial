@@ -4,26 +4,31 @@
     <div class="absolute bottom-0 left-0 p-4 lg:p-5 text-white">
       <div class="hero-content">
         <div class="hero-slides">
-          <div class="hero-slide" *ngFor="let item of carouselItems; let i = index" [class.active]="i === activeIndex">
-          <div class="hero-title-stack">
-            <h3 class="hero-title m-0">{{ item.title }}</h3>
-            <div class="hero-quote">
-              <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
+          @for (item of carouselItems; track item) {
+            <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
+              <div class="hero-title-stack">
+                <h3 class="hero-title m-0">{{ item.title }}</h3>
+                <div class="hero-quote">
+                  <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
+                </div>
+              </div>
             </div>
-          </div>
-          </div>
+          }
         </div>
         <div class="hero-dots">
-          <button type="button" *ngFor="let item of carouselItems; let i = index" [class.active]="i === activeIndex"
-            (click)="setActive(i)" aria-label="Show slide"></button>
+          @for (item of carouselItems; track item) {
+            <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
+              (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
+          }
         </div>
       </div>
     </div>
   </div>
 
-  <div class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white">
+  <form class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white"
+    [formGroup]="loginForm" (ngSubmit)="submitLogin()">
     <div class="flex justify-content-center lg:justify-content-start">
-      <img src="/core/logo.svg" alt="Skill Questx" class="w-12rem" />
+      <img src="/core/logo.svg" alt="Skill Questx" class="w-15rem" />
     </div>
     <div>
       <h2 class="m-0">Welcome</h2>
@@ -31,18 +36,41 @@
     </div>
 
     <div class="flex flex-column gap-3">
-      <p-iconfield class="w-full">
-        <p-inputicon class="pi pi-envelope"></p-inputicon>
-        <input pInputText type="email" placeholder="Email Id" class="w-full" />
-      </p-iconfield>
+      <div class="flex flex-column gap-1">
+        <p-floatlabel variant="on" class="w-full">
+          <p-iconfield class="w-full">
+            <p-inputicon class="pi pi-envelope"></p-inputicon>
+            <input id="login-email" pInputText type="email" class="w-full" formControlName="email" />
+          </p-iconfield>
+          <label for="login-email">Email Id</label>
+        </p-floatlabel>
+        <small class="p-error" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+          Enter a valid email address.
+        </small>
+      </div>
 
-      <p-iconfield class="w-full">
-        <p-inputicon class="pi pi-key"></p-inputicon>
-        <p-password class="w-full" inputStyleClass="w-full" placeholder="Password" [toggleMask]="true"
-          [feedback]="false"></p-password>
-      </p-iconfield>
+      <div class="flex flex-column gap-1">
+        <p-floatlabel variant="on" class="w-full">
+          <p-iconfield class="w-full">
+            <p-inputicon class="pi pi-key"></p-inputicon>
+            <p-password class="w-full" inputStyleClass="w-full" inputId="login-password" [toggleMask]="true"
+              [feedback]="false" formControlName="password"></p-password>
+          </p-iconfield>
+          <label for="login-password">Password</label>
+        </p-floatlabel>
+        <small class="p-error" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+          Password must be at least 6 characters.
+        </small>
+      </div>
     </div>
 
-    <button pButton type="button" label="Login" class="login-button w-full"></button>
-  </div>
+    <div class="flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-2">
+      <a routerLink="/forgot-password" class="brand-link text-sm">Forgot password?</a>
+      <div class="text-sm">
+        Don’t have an account? <a routerLink="/register" class="brand-link">Sign up</a>
+      </div>
+    </div>
+
+    <button pButton type="submit" label="Login" class="login-button w-full" [disabled]="loginForm.invalid"></button>
+  </form>
 </section>
