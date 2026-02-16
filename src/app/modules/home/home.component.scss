@@ -1,1 +1,13 @@
- 
+// Main Content positioning to account for fixed sidebar
+.main-content {
+    margin-left: 266px; // Width of sidebar
+    min-height: 100vh;
+    background: var(--sqx-color-bg);
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+    }
+}

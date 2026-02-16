@@ -1,3 +1,99 @@
-<nav class="nav">
-  <span class="brand">Skill QuestX</span>
-</nav>
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+  <!-- Logo Section -->
+  <div class="sidebar-header">
+    <div class="logo">
+      <i class="pi pi-graduation-cap"></i>
+      <div class="logo-text">
+        <span class="brand-name">SKILL QUESTX</span>
+        <span class="brand-tagline">REDEFINE | UPSKILL | SUCCEED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav">
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+      <i class="pi pi-th-large"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a routerLink="/syllabus" routerLinkActive="active" class="nav-item">
+      <i class="pi pi-file-edit"></i>
+      <span>Syllabus</span>
+    </a>
+
+    <a routerLink="/materials" routerLinkActive="active" class="nav-item">
+      <i class="pi pi-book"></i>
+      <span>Materials</span>
+    </a>
+
+    <!-- Classes Dropdown -->
+    <div class="nav-item dropdown" [class.open]="classesDropdownOpen()">
+      <div class="nav-item-header" (click)="toggleClassesDropdown()">
+        <div class="nav-item-content">
+          <i class="pi pi-graduation-cap"></i>
+          <span>Classes</span>
+        </div>
+        <i class="pi pi-angle-down dropdown-icon"></i>
+      </div>
+      <div class="dropdown-menu">
+        <a routerLink="/classes/recorded" routerLinkActive="active" class="dropdown-item">
+          <i class="pi pi-video"></i>
+          <span>Recorded Classes</span>
+        </a>
+        <a routerLink="/classes/live" routerLinkActive="active" class="dropdown-item">
+          <i class="pi pi-circle"></i>
+          <span>Live Stream</span>
+        </a>
+      </div>
+    </div>
+
+    <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
+      <i class="pi pi-list-check"></i>
+      <span>Tasks</span>
+    </a>
+
+    <!-- Exams Dropdown -->
+    <div class="nav-item dropdown" [class.open]="examsDropdownOpen()">
+      <div class="nav-item-header" (click)="toggleExamsDropdown()">
+        <div class="nav-item-content">
+          <i class="pi pi-file"></i>
+          <span>Exam</span>
+        </div>
+        <i class="pi pi-angle-down dropdown-icon"></i>
+      </div>
+      <div class="dropdown-menu">
+        <a routerLink="/exams/assessment" routerLinkActive="active" class="dropdown-item">
+          <i class="pi pi-list"></i>
+          <span>Online Assessment</span>
+        </a>
+        <a routerLink="/exams/docs" routerLinkActive="active" class="dropdown-item">
+          <i class="pi pi-file-pdf"></i>
+          <span>Docs</span>
+        </a>
+      </div>
+    </div>
+
+    <a routerLink="/projects" routerLinkActive="active" class="nav-item">
+      <i class="pi pi-briefcase"></i>
+      <span>Projects</span>
+    </a>
+  </nav>
+
+  <!-- User Profile Section -->
+  <div class="sidebar-footer">
+    <div class="user-profile">
+      <div class="user-avatar">
+        <img src="/assets/images/default-avatar.png" alt="User" />
+      </div>
+      <div class="user-info">
+        <span class="user-name">Rehaan Naragund</span>
+      </div>
+    </div>
+    <button class="logout-btn">
+      <i class="pi pi-sign-out"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+</aside>

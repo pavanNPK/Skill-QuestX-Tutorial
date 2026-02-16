@@ -1,1 +1,409 @@
- 
+.dashboard-container {
+    padding: var(--sqx-space-8);
+    max-width: 1600px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--sqx-space-8);
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--sqx-color-text);
+        margin: 0;
+    }
+}
+
+.notification-btn {
+    position: relative;
+    padding: 12px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    cursor: pointer;
+    box-shadow: var(--sqx-shadow-sm);
+    transition: all 0.2s ease;
+
+    i {
+        font-size: 20px;
+        color: var(--sqx-color-text);
+    }
+
+    &:hover {
+        box-shadow: var(--sqx-shadow-md);
+    }
+
+    .badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background: var(--sqx-color-danger);
+        color: white;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 5px;
+        border-radius: 10px;
+        min-width: 16px;
+        text-align: center;
+    }
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--sqx-space-6);
+}
+
+.main-area {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sqx-space-6);
+}
+
+// Top Cards Row
+.cards-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sqx-space-6);
+}
+
+.info-card {
+    padding: var(--sqx-space-6);
+    border-radius: var(--sqx-radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sqx-space-4);
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+    }
+
+    &.card-purple {
+        background-color: var(--sqx-color-card-purple);
+    }
+
+    &.card-yellow {
+        background-color: var(--sqx-color-card-yellow);
+    }
+
+    &.card-violet {
+        background-color: var(--sqx-color-card-violet);
+    }
+
+    .card-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+            font-size: 28px;
+            color: white;
+        }
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--sqx-color-text);
+        margin: 0;
+        text-align: center;
+    }
+}
+
+// Middle Section
+.middle-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sqx-space-6);
+}
+
+.progress-card,
+.feedbacks-card {
+    background: white;
+    padding: var(--sqx-space-6);
+    border-radius: var(--sqx-radius-lg);
+    box-shadow: var(--sqx-shadow-sm);
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--sqx-color-text);
+    margin: 0 0 var(--sqx-space-5) 0;
+}
+
+.progress-chart {
+    display: flex;
+    align-items: center;
+    gap: var(--sqx-space-6);
+}
+
+.donut-chart {
+    width: 200px;
+    height: 200px;
+}
+
+.progress-legend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sqx-space-3);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sqx-space-2);
+    font-size: 14px;
+    color: var(--sqx-color-text);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.feedback-item {
+    .feedback-author {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--sqx-color-text);
+        margin: 0 0 var(--sqx-space-2) 0;
+    }
+
+    .feedback-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--sqx-color-text-light);
+        margin: 0;
+    }
+}
+
+// Tasks Section
+.tasks-section {
+    background: white;
+    padding: var(--sqx-space-6);
+    border-radius: var(--sqx-radius-lg);
+    box-shadow: var(--sqx-shadow-sm);
+}
+
+.tasks-table {
+    border: 1px solid var(--sqx-color-border);
+    border-radius: var(--sqx-radius-md);
+    overflow: hidden;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 60px 1fr 200px;
+    background: #F9FAFB;
+    border-bottom: 1px solid var(--sqx-color-border);
+}
+
+.th {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sqx-color-text);
+    text-align: left;
+
+    &.th-num {
+        text-align: center;
+    }
+}
+
+.table-body {
+    .table-row {
+        display: grid;
+        grid-template-columns: 60px 1fr 200px;
+        border-bottom: 1px solid var(--sqx-color-border);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background: #F9FAFB;
+        }
+    }
+}
+
+.td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--sqx-color-text);
+
+    &.td-num {
+        text-align: center;
+        font-weight: 600;
+    }
+}
+
+// Sidebar Area
+.sidebar-area {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sqx-space-6);
+}
+
+.calendar-widget,
+.job-board-widget {
+    background: white;
+    padding: var(--sqx-space-5);
+    border-radius: var(--sqx-radius-lg);
+    box-shadow: var(--sqx-shadow-sm);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--sqx-space-4);
+}
+
+.calendar-nav {
+    padding: 6px 10px;
+    border: 1px solid var(--sqx-color-border);
+    background: white;
+    border-radius: var(--sqx-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #F9FAFB;
+    }
+
+    i {
+        font-size: 14px;
+        color: var(--sqx-color-text);
+    }
+}
+
+.calendar-month {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--sqx-color-text);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day-label {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sqx-color-muted);
+    padding: 8px 0;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--sqx-color-text);
+    border-radius: var(--sqx-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #F3F4F6;
+    }
+
+    &.active {
+        background: #6C5CE7;
+        color: white;
+        font-weight: 600;
+    }
+
+    &.empty {
+        color: var(--sqx-color-muted);
+    }
+}
+
+// Job Board
+.widget-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sqx-color-text);
+    margin: 0 0 var(--sqx-space-5) 0;
+}
+
+.job-card {
+    padding: var(--sqx-space-4);
+    background: #F9FAFB;
+    border-radius: var(--sqx-radius-md);
+    margin-bottom: var(--sqx-space-3);
+    transition: all 0.2s ease;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &:hover {
+        box-shadow: var(--sqx-shadow-sm);
+    }
+
+    .job-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--sqx-color-text);
+        margin: 0 0 var(--sqx-space-3) 0;
+    }
+
+    .job-detail {
+        display: flex;
+        align-items: center;
+        gap: var(--sqx-space-2);
+        font-size: 12px;
+        color: var(--sqx-color-text-light);
+        margin-bottom: 6px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        i {
+            font-size: 12px;
+            color: var(--sqx-color-muted);
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-area {
+        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+    }
+}
+
+@media (max-width: 768px) {
+    .cards-row {
+        grid-template-columns: 1fr;
+    }
+
+    .middle-section {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-area {
+        grid-template-columns: 1fr;
+    }
+}

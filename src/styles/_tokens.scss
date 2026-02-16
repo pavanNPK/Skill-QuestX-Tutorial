@@ -1,15 +1,57 @@
 :root {
-  --sqx-color-primary: #2563eb;
+  // Primary Purple Theme
+  --sqx-color-primary: #6C5CE7;
+  --sqx-color-primary-dark: #5847D0;
+  --sqx-color-primary-light: #A29BFE;
+
+  // Sidebar
+  --sqx-color-sidebar-bg: #6C5CE7;
+  --sqx-color-sidebar-text: #ffffff;
+  --sqx-color-sidebar-hover: rgba(255, 255, 255, 0.1);
+  --sqx-color-sidebar-active: rgba(255, 255, 255, 0.2);
+
+  // Card Colors
+  --sqx-color-card-purple: #E8E5FF;
+  --sqx-color-card-yellow: #FFF4D6;
+  --sqx-color-card-violet: #F3E5F5;
+  --sqx-color-card-icon-purple: #C8A0E0;
+  --sqx-color-card-icon-yellow: #F9D56E;
+  --sqx-color-card-icon-violet: #BA68C8;
+
+  // Status Colors
+  --sqx-color-success: #00b894;
   --sqx-color-danger: #dc2626;
+  --sqx-color-warning: #fdcb6e;
+  --sqx-color-info: #74b9ff;
+
+  // Text Colors
   --sqx-color-text: #1f2937;
-  --sqx-color-muted: #6b7280;
-  --sqx-color-border: #d1d5db;
+  --sqx-color-text-light: #6b7280;
+  --sqx-color-muted: #9ca3af;
+
+  // Background & Surface
+  --sqx-color-bg: #F5F5F5;
   --sqx-color-surface: #ffffff;
-  --sqx-radius-md: 8px;
+  --sqx-color-border: #e5e7eb;
+
+  // Border Radius
+  --sqx-radius-sm: 6px;
+  --sqx-radius-md: 12px;
+  --sqx-radius-lg: 16px;
+  --sqx-radius-xl: 20px;
+
+  // Spacing
   --sqx-space-1: 4px;
   --sqx-space-2: 8px;
   --sqx-space-3: 12px;
   --sqx-space-4: 16px;
   --sqx-space-5: 20px;
   --sqx-space-6: 24px;
+  --sqx-space-7: 28px;
+  --sqx-space-8: 32px;
+
+  // Shadows
+  --sqx-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --sqx-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --sqx-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }

@@ -1,4 +1,176 @@
-<section class="page">
-  <h1>Dashboard</h1>
-  <p>Welcome to your dashboard.</p>
-</section>
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1 class="page-title">Dashboard</h1>
+    <div class="header-actions">
+      <button class="notification-btn">
+        <i class="pi pi-bell"></i>
+        <span class="badge">3</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <!-- Main Content Area -->
+    <div class="main-area">
+      <!-- Top Cards Row -->
+      <div class="cards-row">
+        <div class="info-card card-purple">
+          <div class="card-icon" style="background-color: var(--sqx-color-card-icon-purple)">
+            <i class="pi pi-book"></i>
+          </div>
+          <h3 class="card-title">Course Materials</h3>
+        </div>
+
+        <div class="info-card card-yellow">
+          <div class="card-icon" style="background-color: var(--sqx-color-card-icon-yellow)">
+            <i class="pi pi-video"></i>
+          </div>
+          <h3 class="card-title">Classes</h3>
+        </div>
+
+        <div class="info-card card-violet">
+          <div class="card-icon" style="background-color: var(--sqx-color-card-icon-violet)">
+            <i class="pi pi-graduation-cap"></i>
+          </div>
+          <h3 class="card-title">Course Syllabus</h3>
+        </div>
+      </div>
+
+      <!-- Middle Section: Progress and Feedbacks -->
+      <div class="middle-section">
+        <!-- Course Progress -->
+        <div class="progress-card">
+          <h3 class="section-title">Course Progress</h3>
+          <div class="progress-chart">
+            <svg viewBox="0 0 200 200" class="donut-chart">
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#E8E5FF" stroke-width="20"></circle>
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#6C5CE7" stroke-width="20"
+                [attr.stroke-dasharray]="'{{progressPercentage * 5.027}} 502.7'" stroke-linecap="round"
+                transform="rotate(-90 100 100)"></circle>
+              <text x="100" y="95" text-anchor="middle" font-size="32" font-weight="700"
+                fill="#1f2937">{{courseProgress}}%</text>
+            </svg>
+            <div class="progress-legend">
+              <div class="legend-item">
+                <span class="legend-dot" style="background-color: #6C5CE7"></span>
+                <span>Completed</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background-color: #E8E5FF"></span>
+                <span>Unfinished</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedbacks -->
+        <div class="feedbacks-card">
+          <h3 class="section-title">Feedbacks</h3>
+          <div class="feedback-item">
+            <h4 class="feedback-author">Charil Polamraju</h4>
+            <p class="feedback-text">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi.
+              Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula
+              consectetur, ultrices mauris. Maecenas vitae mattis tellus.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks Table -->
+      <div class="tasks-section">
+        <h3 class="section-title">Tasks</h3>
+        <div class="tasks-table">
+          <div class="table-header">
+            <div class="th th-num">#</div>
+            <div class="th th-name">Task Name</div>
+            <div class="th th-timeline">Timeline</div>
+          </div>
+          <div class="table-body">
+            @for (task of tasks; track task.id) {
+            <div class="table-row">
+              <div class="td td-num">{{ task.id }}</div>
+              <div class="td td-name">{{ task.name }}</div>
+              <div class="td td-timeline">{{ task.timeline }}</div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Area -->
+    <div class="sidebar-area">
+      <!-- Calendar Widget -->
+      <div class="calendar-widget">
+        <div class="calendar-header">
+          <button class="calendar-nav"><i class="pi pi-angle-left"></i></button>
+          <span class="calendar-month">{{ currentMonth }}</span>
+          <button class="calendar-nav"><i class="pi pi-angle-right"></i></button>
+        </div>
+        <div class="calendar-grid">
+          <div class="calendar-day-label">Su</div>
+          <div class="calendar-day-label">Mo</div>
+          <div class="calendar-day-label">Tu</div>
+          <div class="calendar-day-label">We</div>
+          <div class="calendar-day-label">Th</div>
+          <div class="calendar-day-label">Fr</div>
+          <div class="calendar-day-label">Sa</div>
+
+          <div class="calendar-day">1</div>
+          <div class="calendar-day">2</div>
+          <div class="calendar-day">3</div>
+          <div class="calendar-day">4</div>
+          <div class="calendar-day">5</div>
+          <div class="calendar-day">6</div>
+          <div class="calendar-day">7</div>
+          <div class="calendar-day">8</div>
+          <div class="calendar-day">9</div>
+          <div class="calendar-day">10</div>
+          <div class="calendar-day active">11</div>
+          <div class="calendar-day">12</div>
+          <div class="calendar-day">13</div>
+          <div class="calendar-day">14</div>
+          <div class="calendar-day">15</div>
+          <div class="calendar-day">16</div>
+          <div class="calendar-day">17</div>
+          <div class="calendar-day">18</div>
+          <div class="calendar-day">19</div>
+          <div class="calendar-day">20</div>
+          <div class="calendar-day">21</div>
+          <div class="calendar-day">22</div>
+          <div class="calendar-day">24</div>
+          <div class="calendar-day">25</div>
+          <div class="calendar-day">26</div>
+          <div class="calendar-day">27</div>
+          <div class="calendar-day">28</div>
+          <div class="calendar-day">29</div>
+          <div class="calendar-day empty">30</div>
+          <div class="calendar-day empty">31</div>
+        </div>
+      </div>
+
+      <!-- Job Board -->
+      <div class="job-board-widget">
+        <h3 class="widget-title">Job- Board 🚀</h3>
+        @for (job of jobs; track job.title) {
+        <div class="job-card">
+          <h4 class="job-title">{{ job.title }}</h4>
+          <div class="job-detail">
+            <i class="pi pi-map-marker"></i>
+            <span>Location: {{ job.location }}</span>
+          </div>
+          <div class="job-detail">
+            <i class="pi pi-briefcase"></i>
+            <span>Type: {{ job.type }}</span>
+          </div>
+          <div class="job-detail">
+            <i class="pi pi-globe"></i>
+            <span>Website: {{ job.website }}</span>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

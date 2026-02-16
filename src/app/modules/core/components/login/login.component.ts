@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -49,7 +49,7 @@ export class LoginComponent implements OnDestroy {
 
   loginForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.buildLoginForm();
     this.rotationTimer = setInterval(() => {
       this.activeIndex = (this.activeIndex + 1) % this.carouselItems.length;
@@ -74,9 +74,14 @@ export class LoginComponent implements OnDestroy {
     }
 
     const { email, password } = this.loginForm.value;
-    // TODO: hook into auth API
-    void email;
-    void password;
+
+    // Static login - set token and user data in localStorage
+    localStorage.setItem('auth_token', 'static-token-for-development');
+    localStorage.setItem('user_name', 'Rehaan Naragund');
+    localStorage.setItem('user_email', email);
+
+    // Navigate to dashboard
+    this.router.navigate(['/dashboard']);
   }
 
   ngOnDestroy(): void {

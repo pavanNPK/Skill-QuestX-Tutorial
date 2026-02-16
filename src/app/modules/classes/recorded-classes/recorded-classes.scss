@@ -1,0 +1,325 @@
+.page-container {
+    padding: var(--sqx-space-8);
+    max-width: 1600px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--sqx-space-8);
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--sqx-color-text);
+        margin: 0;
+    }
+}
+
+.upload-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--sqx-space-2);
+    padding: 12px 24px;
+    background: var(--sqx-color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--sqx-radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--sqx-color-primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--sqx-shadow-md);
+    }
+
+    i {
+        font-size: 18px;
+    }
+}
+
+.classes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--sqx-space-6);
+}
+
+.class-card {
+    background: white;
+    border-radius: var(--sqx-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--sqx-shadow-sm);
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--sqx-shadow-lg);
+    }
+}
+
+.class-thumbnail {
+    position: relative;
+    background: linear-gradient(135deg, var(--sqx-color-primary-light), var(--sqx-color-primary));
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+        font-size: 48px;
+        color: white;
+        opacity: 0.9;
+    }
+
+    .duration {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+}
+
+.class-info {
+    padding: var(--sqx-space-5);
+}
+
+.class-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--sqx-color-text);
+    margin: 0 0 var(--sqx-space-2) 0;
+    line-height: 1.4;
+}
+
+.class-description {
+    font-size: 14px;
+    color: var(--sqx-color-text-light);
+    margin: 0 0 var(--sqx-space-3) 0;
+    line-height: 1.6;
+}
+
+.class-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--sqx-space-4);
+    font-size: 13px;
+    color: var(--sqx-color-muted);
+
+    i {
+        font-size: 12px;
+    }
+}
+
+// Modal Styles
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--sqx-radius-lg);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--sqx-space-6);
+    border-bottom: 1px solid var(--sqx-color-border);
+
+    .modal-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--sqx-color-text);
+        margin: 0;
+    }
+
+    .close-btn {
+        padding: 8px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        border-radius: var(--sqx-radius-sm);
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: var(--sqx-color-bg);
+        }
+
+        i {
+            font-size: 20px;
+            color: var(--sqx-color-text);
+        }
+    }
+}
+
+.modal-body {
+    padding: var(--sqx-space-6);
+}
+
+.form-group {
+    margin-bottom: var(--sqx-space-5);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--sqx-color-text);
+        margin-bottom: var(--sqx-space-2);
+    }
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--sqx-color-border);
+    border-radius: var(--sqx-radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--sqx-color-text);
+    transition: all 0.2s ease;
+
+    &:focus {
+        outline: none;
+        border-color: var(--sqx-color-primary);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+    }
+
+    &::placeholder {
+        color: var(--sqx-color-muted);
+    }
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.file-upload-area {
+    position: relative;
+    border: 2px dashed var(--sqx-color-border);
+    border-radius: var(--sqx-radius-md);
+    padding: var(--sqx-space-6);
+    text-align: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+        border-color: var(--sqx-color-primary);
+        background: rgba(108, 92, 231, 0.02);
+    }
+}
+
+.file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-upload-label {
+    pointer-events: none;
+
+    i {
+        font-size: 48px;
+        color: var(--sqx-color-primary);
+        margin-bottom: var(--sqx-space-3);
+    }
+
+    p {
+        font-size: 14px;
+        color: var(--sqx-color-text-light);
+        margin: 0;
+    }
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--sqx-space-3);
+    padding: var(--sqx-space-6);
+    border-top: 1px solid var(--sqx-color-border);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--sqx-radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &.btn-primary {
+        background: var(--sqx-color-primary);
+        color: white;
+
+        &:hover {
+            background: var(--sqx-color-primary-dark);
+        }
+    }
+
+    &.btn-secondary {
+        background: var(--sqx-color-bg);
+        color: var(--sqx-color-text);
+
+        &:hover {
+            background: #E5E7EB;
+        }
+    }
+}

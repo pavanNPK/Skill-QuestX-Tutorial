@@ -10,21 +10,59 @@ import { TermsAndConditionsComponent } from './modules/core/components/terms-and
 import { authGuard, authLoadGuard } from './shared/guards/auth.guards';
 import { UtilitiesDemoComponent } from './shared/components/utilities-demo/utilities-demo.component';
 import { ForgotComponent } from './modules/core/components/forgot/forgot.component';
+import { HomeComponent } from './modules/home/home.component';
 
 export const routes: Routes = [
-  {
-    path: '',
-    loadChildren: () => import('./modules/home/home.routes').then((m) => m.homeRoutes),
-    canMatch: [authLoadGuard],
-    canActivate: [authGuard]
-  },
-  { path: 'access-denied', component: AccessDeniedComponent },
+  // Auth routes (public)
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'access-denied', component: AccessDeniedComponent },
   { path: 'privacy-policy', component: PrivacyPolicyComponent },
   { path: 'terms-and-conditions', component: TermsAndConditionsComponent },
   { path: 'utilities-demo', component: UtilitiesDemoComponent },
+
+  // Protected routes (with auth guard) - at root level
+  {
+    path: '',
+    component: HomeComponent,
+    canMatch: [authLoadGuard],
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadChildren: () => import('./modules/dashboard/dashboard.routes').then((m) => m.dashboardRoutes)
+      },
+      {
+        path: 'syllabus',
+        loadChildren: () => import('./modules/syllabus/syllabus.routes').then((m) => m.syllabusRoutes)
+      },
+      {
+        path: 'materials',
+        loadChildren: () => import('./modules/materials/materials.routes').then((m) => m.materialsRoutes)
+      },
+      {
+        path: 'classes',
+        loadChildren: () => import('./modules/classes/classes.routes').then((m) => m.classesRoutes)
+      },
+      {
+        path: 'tasks',
+        loadChildren: () => import('./modules/tasks/tasks.routes').then((m) => m.tasksRoutes)
+      },
+      {
+        path: 'exams',
+        loadChildren: () => import('./modules/exams/exams.routes').then((m) => m.examsRoutes)
+      },
+      {
+        path: 'projects',
+        loadChildren: () => import('./modules/projects/projects.routes').then((m) => m.projectsRoutes)
+      }
+    ]
+  },
+
+  // 404
   { path: '**', component: PageNotFoundComponent }
 ];
+
