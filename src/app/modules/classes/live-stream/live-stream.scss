@@ -1,0 +1,25 @@
+.live-stream-container {
+    min-height: calc(100vh - 140px); // subtract header height + padding
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 0; // Remove bottom padding if handled by flex centering
+}
+
+.live-stream-content {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
+}
+
+.empty-state {
+    width: 100%;
+
+    // Icon color override if needed, otherwise inherits from shared
+    .live-icon {
+        color: var(--sqx-color-primary);
+        font-size: 64px;
+        margin-bottom: var(--sqx-space-4);
+    }
+}

@@ -13,6 +13,7 @@ interface Job {
   type: string;
   website: string;
   icon: string;
+  locked?: boolean;
 }
 
 @Component({
@@ -67,7 +68,8 @@ export class DashboardComponent implements OnInit {
       location: 'Bangalore',
       type: 'Contract/ Freelance',
       website: 'www.smart.tohands.in/',
-      icon: 'pi-briefcase'
+      icon: 'pi-briefcase',
+      locked: true
     },
     {
       title: 'Design Engineer at OIZOM',

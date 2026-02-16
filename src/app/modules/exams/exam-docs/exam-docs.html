@@ -1,6 +1,4 @@
 <div class="page-container">
-    <h1 class="page-title">Exam Documents</h1>
-
     <div class="pdf-viewer-container">
         <div class="pdf-toolbar">
             <button class="tool-btn"><i class="pi pi-download"></i> Download</button>
@@ -8,11 +6,12 @@
         </div>
 
         <div class="pdf-preview">
-            <iframe src="/assets/sample-exam.pdf" width="100%" height="800px" style="border: none; border-radius: 8px;">
-                <p>Your browser does not support PDFs.
-                    <a href="/assets/sample-exam.pdf">Download the PDF</a>
-                </p>
-            </iframe>
+            <div class="empty-state"
+                style="border: 2px dashed var(--sqx-color-border); background: #F9FAFB; box-shadow: none;">
+                <i class="pi pi-file-pdf live-icon" style="color: var(--sqx-color-muted);"></i>
+                <h2>No Document Available</h2>
+                <p>The sample exam document is currently unavailable.</p>
+            </div>
         </div>
     </div>
 </div>

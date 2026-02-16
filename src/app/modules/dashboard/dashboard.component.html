@@ -33,21 +33,21 @@
           <h3 class="section-title">Course Progress</h3>
           <div class="progress-chart">
             <svg viewBox="0 0 200 200" class="donut-chart">
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#FFE5E5" stroke-width="20"></circle>
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#D1D5DB" stroke-width="20"></circle>
               <circle cx="100" cy="100" r="80" fill="none" stroke="#6C5CE7" stroke-width="20"
-                [attr.stroke-dasharray]="'{{progressPercentage * 5.027}} 502.7'" stroke-linecap="round"
+                [attr.stroke-dasharray]="(progressPercentage * 5.027) + ' 502.7'" stroke-linecap="round"
                 transform="rotate(-90 100 100)"></circle>
-              <text x="100" y="95" text-anchor="middle" font-size="32" font-weight="700"
-                fill="#1f2937">{{courseProgress}}%</text>
+              <text x="100" y="100" dy=".3em" text-anchor="middle" font-size="32" font-weight="700"
+                fill="#1f2937">{{progressPercentage | number:'1.0-0'}}%</text>
             </svg>
             <div class="progress-legend">
               <div class="legend-item">
                 <span class="legend-dot" style="background-color: #6C5CE7"></span>
-                <span>Completed ({{courseProgress}}%)</span>
+                <span>Completed ({{progressPercentage | number:'1.0-0'}}%)</span>
               </div>
               <div class="legend-item">
-                <span class="legend-dot" style="background-color: #FFE5E5"></span>
-                <span>Remaining ({{100 - courseProgress}}%)</span>
+                <span class="legend-dot" style="background-color: #D1D5DB"></span>
+                <span>Remaining ({{100 - progressPercentage | number:'1.0-0'}}%)</span>
               </div>
             </div>
           </div>
@@ -118,9 +118,16 @@
 
       <!-- Job Board -->
       <div class="job-board-widget">
-        <h3 class="widget-title">Job- Board 🚀</h3>
+        <h3 class="widget-title">Job-Board 🚀</h3>
         @for (job of jobs; track job.title) {
-        <div class="job-card">
+        <div class="job-card" [class.locked]="job.locked">
+          @if (job.locked) {
+          <div class="lock-overlay">
+            <div class="lock-icon-wrapper">
+              <i class="pi pi-lock"></i>
+            </div>
+          </div>
+          }
           <h4 class="job-title">{{ job.title }}</h4>
           <div class="job-detail">
             <i class="pi pi-map-marker"></i>
