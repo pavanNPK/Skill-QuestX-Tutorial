@@ -3,24 +3,36 @@
         <div class="header-left">
             <div class="title-section">
                 <h1 class="page-title">{{ pageTitle }}</h1>
-                <nav class="breadcrumbs" *ngIf="breadcrumbs.length > 0">
-                    <span *ngFor="let crumb of breadcrumbs; let last = last">
-                        <a *ngIf="crumb.url && !last" [href]="crumb.url" class="breadcrumb-link">
+                @if (breadcrumbs.length > 0) {
+                <nav class="breadcrumbs">
+                    @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
+                    <span>
+                        @if (crumb.url && !last) {
+                        <a [href]="crumb.url" class="breadcrumb-link">
                             {{ crumb.label }}
                         </a>
-                        <span *ngIf="!crumb.url || last" class="breadcrumb-current">
+                        }
+                        @if (!crumb.url || last) {
+                        <span class="breadcrumb-current">
                             {{ crumb.label }}
                         </span>
-                        <i *ngIf="!last" class="pi pi-chevron-right breadcrumb-separator"></i>
+                        }
+                        @if (!last) {
+                        <i class="pi pi-chevron-right breadcrumb-separator"></i>
+                        }
                     </span>
+                    }
                 </nav>
+                }
             </div>
         </div>
 
         <div class="header-right">
             <button class="notification-btn" (click)="openNotifications()">
                 <i class="pi pi-bell"></i>
-                <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+                @if (unreadCount > 0) {
+                <span class="badge">{{ unreadCount }}</span>
+                }
             </button>
         </div>
     </div>
@@ -36,29 +48,36 @@
 
     <ng-template pTemplate="content">
         <div class="notifications-list">
-            <div *ngFor="let notification of notifications" class="notification-item"
-                [class.unread]="!notification.read" (click)="markAsRead(notification)">
-                <div class="notification-indicator" *ngIf="!notification.read"></div>
+            @for (notification of notifications; track notification.id) {
+            <div class="notification-item" [class.unread]="!notification.read" (click)="markAsRead(notification)">
+                @if (!notification.read) {
+                <div class="notification-indicator"></div>
+                }
                 <div class="notification-content">
                     <h4 class="notification-title">{{ notification.title }}</h4>
                     <p class="notification-message">{{ notification.message }}</p>
                     <span class="notification-time">{{ notification.time }}</span>
                 </div>
             </div>
+            }
 
-            <div *ngIf="notifications.length === 0" class="empty-state">
+            @if (notifications.length === 0) {
+            <div class="empty-state">
                 <i class="pi pi-inbox"></i>
                 <p>No notifications</p>
             </div>
+            }
         </div>
     </ng-template>
 
     <ng-template pTemplate="footer">
-        <div class="drawer-footer" *ngIf="unreadCount > 0">
+        @if (unreadCount > 0) {
+        <div class="drawer-footer">
             <button class="mark-all-btn" (click)="markAllAsRead()">
                 <i class="pi pi-check-circle"></i>
                 Mark all as read
             </button>
         </div>
+        }
     </ng-template>
 </p-drawer>

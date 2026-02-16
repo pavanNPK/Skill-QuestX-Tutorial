@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { Location, NgFor, NgIf } from '@angular/common';
+import { Location } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import { DrawerModule } from 'primeng/drawer';
@@ -20,7 +20,7 @@ interface Notification {
 @Component({
   selector: 'sqx-header',
   standalone: true,
-  imports: [NgIf, NgFor, DrawerModule],
+  imports: [DrawerModule],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
