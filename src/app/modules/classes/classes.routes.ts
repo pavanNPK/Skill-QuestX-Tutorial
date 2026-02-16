@@ -13,6 +13,11 @@ export const classesRoutes: Routes = [
                     import('./recorded-classes/recorded-classes').then((m) => m.RecordedClasses)
             },
             {
+                path: 'recorded/:id',
+                loadComponent: () =>
+                    import('./chapter-detail/chapter-detail').then((m) => m.ChapterDetail)
+            },
+            {
                 path: 'live',
                 loadComponent: () =>
                     import('./live-stream/live-stream').then((m) => m.LiveStream)

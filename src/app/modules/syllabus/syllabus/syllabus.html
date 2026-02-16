@@ -1,6 +1,40 @@
-<div class="page-container">
-    <h1 class="page-title">Course Syllabus</h1>
-    <div class="syllabus-content">
-        <p>Course syllabus content will be displayed here.</p>
+<div class="syllabus-container">
+    <!-- Simple Course Info -->
+    <div class="course-info">
+        <h2 class="course-title">{{ courseTitle }}</h2>
+        <p class="course-description">{{ courseDescription }}</p>
+    </div>
+
+    <!-- Syllabus Modules -->
+    <div class="modules-section">
+        <p-accordion [value]="'0'">
+            @for (module of modules; track module.title; let i = $index) {
+            <p-accordion-panel [value]="i.toString()">
+                <p-accordion-header>
+                    <ng-template #toggleicon let-active="active">
+                        @if (active) {
+                        <i class="pi pi-minus"></i>
+                        } @else {
+                        <i class="pi pi-plus"></i>
+                        }
+                    </ng-template>
+                    <span class="module-header-content">
+                        <span class="module-title-text">{{ module.title }}</span>
+                        <span class="topic-count-badge">{{ module.topics.length }}</span>
+                    </span>
+                </p-accordion-header>
+                <p-accordion-content class="syllabus-contnet-parent">
+                    <div class="topics-list">
+                        @for (topic of module.topics; track topic.number) {
+                        <div class="topic-item">
+                            <div class="topic-number">{{ topic.number }}</div>
+                            <div class="topic-title">{{ topic.title }}</div>
+                        </div>
+                        }
+                    </div>
+                </p-accordion-content>
+            </p-accordion-panel>
+            }
+        </p-accordion>
     </div>
 </div>

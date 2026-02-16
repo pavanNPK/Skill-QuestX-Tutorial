@@ -1,0 +1,66 @@
+<div class="chapter-detail-container">
+    <!-- Page Header -->
+    <h1 class="page-title">{{ chapterTitle }}</h1>
+
+    <!-- Course Info -->
+    <div class="course-info">
+        <h2 class="course-title">{{ courseTitle }}</h2>
+        <p class="course-description">{{ courseDescription }}</p>
+    </div>
+
+    <!-- Modules Accordion -->
+    <div class="modules-section">
+        <p-accordion [value]="'0'">
+            @for (module of modules; track module.id; let i = $index) {
+            <p-accordion-panel [value]="i.toString()">
+                <p-accordion-header>
+                    <ng-template #toggleicon let-active="active">
+                        @if (active) {
+                        <i class="pi pi-chevron-up"></i>
+                        } @else {
+                        <i class="pi pi-chevron-down"></i>
+                        }
+                    </ng-template>
+                    <span class="module-title-text">{{ module.title }}</span>
+                </p-accordion-header>
+                <p-accordion-content>
+                    <div class="videos-list">
+                        @for (video of module.videos; track video.id) {
+                        <div class="video-item" [class.locked]="video.locked" (click)="playVideo(video)">
+                            <div class="video-thumbnail">
+                                @if (video.thumbnail) {
+                                <img [src]="video.thumbnail" [alt]="video.title">
+                                } @else {
+                                <div class="placeholder-thumbnail">
+                                    <i class="pi pi-play"></i>
+                                </div>
+                                }
+                                @if (video.duration) {
+                                <span class="duration-badge">{{ video.duration }}</span>
+                                }
+                            </div>
+                            <div class="video-info">
+                                <h4 class="video-title">
+                                    Day {{ video.day }}: {{ video.title }}
+                                </h4>
+                                @if (video.videoCount) {
+                                <div class="video-meta">
+                                    <i class="pi pi-users"></i>
+                                    <span>+{{ video.videoCount }} Videos</span>
+                                </div>
+                                }
+                            </div>
+                            <div class="video-action">
+                                @if (video.locked) {
+                                <i class="pi pi-lock lock-icon"></i>
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </p-accordion-content>
+            </p-accordion-panel>
+            }
+        </p-accordion>
+    </div>
+</div>

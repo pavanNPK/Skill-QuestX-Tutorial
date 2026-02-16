@@ -312,7 +312,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
 
-    &:hover {
+    &:hover:not(.empty) {
         background: #F3F4F6;
     }
 
@@ -322,8 +322,19 @@
         font-weight: 600;
     }
 
+    &.today {
+        border: 2px solid #6C5CE7;
+        font-weight: 600;
+    }
+
+    &.today.active {
+        border: none;
+    }
+
     &.empty {
         color: var(--sqx-color-muted);
+        cursor: default;
+        pointer-events: none;
     }
 }
 

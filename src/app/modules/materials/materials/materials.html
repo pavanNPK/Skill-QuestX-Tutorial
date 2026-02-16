@@ -1,6 +1,22 @@
-<div class="page-container">
-    <h1 class="page-title">Course Materials</h1>
-    <div class="materials-content">
-        <p>Course materials will be displayed here.</p>
+<div class="materials-container">
+    <!-- Course Title -->
+    <div class="course-header">
+        <h2 class="course-title">{{ courseTitle }}</h2>
+    </div>
+
+    <!-- Modules List -->
+    <div class="modules-list">
+        @for (module of modules; track module.id) {
+        <div class="module-item">
+            <div class="module-info">
+                <h3 class="module-title">{{ module.title }}</h3>
+                @if (module.description) {
+                <p class="module-description">{{ module.description }}</p>
+                }
+            </div>
+            <button pButton label="View" icon="pi pi-external-link" class="view-button" (click)="viewModule(module)">
+            </button>
+        </div>
+        }
     </div>
 </div>

@@ -23,8 +23,10 @@ interface Job {
 })
 export class DashboardComponent implements OnInit {
   currentDate = new Date();
-  selectedDay = 11;
-  currentMonth = 'January';
+  selectedDay: number | null = null;
+  currentMonth: string = '';
+  currentYear: number = 0;
+  calendarDays: (number | null)[] = [];
 
   tasks: Task[] = [
     {
@@ -88,7 +90,55 @@ export class DashboardComponent implements OnInit {
   unfinishedTasks = 3;
 
   ngOnInit() {
-    // Initialize any data if needed
+    this.selectedDay = this.currentDate.getDate();
+    this.updateCalendar();
+  }
+
+  updateCalendar() {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+
+    this.currentYear = year;
+    this.currentMonth = this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    this.calendarDays = [];
+
+    // Add empty cells for days before the first day
+    for (let i = 0; i < firstDay; i++) {
+      this.calendarDays.push(null);
+    }
+
+    // Add the days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      this.calendarDays.push(day);
+    }
+  }
+
+  previousMonth() {
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1);
+    this.updateCalendar();
+  }
+
+  nextMonth() {
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
+    this.updateCalendar();
+  }
+
+  selectDay(day: number | null) {
+    if (day) {
+      this.selectedDay = day;
+    }
+  }
+
+  isToday(day: number | null): boolean {
+    if (!day) return false;
+    const today = new Date();
+    return day === today.getDate() &&
+      this.currentDate.getMonth() === today.getMonth() &&
+      this.currentDate.getFullYear() === today.getFullYear();
   }
 
   get progressPercentage(): number {

@@ -1,82 +1,75 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
-interface VideoClass {
+interface Chapter {
   id: number;
+  number: number;
   title: string;
-  description: string;
-  duration: string;
-  uploadDate: Date;
-  thumbnailUrl?: string;
+  subtitle: string;
+  color: string;
 }
 
 @Component({
   selector: 'sqx-recorded-classes',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './recorded-classes.html',
   styleUrl: './recorded-classes.scss'
 })
 export class RecordedClasses {
-  showUploadModal = signal(false);
+  courseTitle = 'Python for Data Science and Machine Learning Bootcamp';
+  courseDescription = 'Description about Learn how to use NumPy, Pandas, Seaborn, Matplotlib, Plotly, Scikit-Learn, Machine Learning, Tensorflow, and more! Course';
 
-  uploadForm = {
-    title: '',
-    description: '',
-    videoFile: null as File | null
-  };
-
-  recordedClasses: VideoClass[] = [
+  chapters: Chapter[] = [
     {
       id: 1,
-      title: 'Introduction to Python Programming',
-      description: 'Learn the basics of Python programming language',
-      duration: '45:30',
-      uploadDate: new Date('2023-01-15')
+      number: 1,
+      title: 'Chapter 1',
+      subtitle: 'Python for Data Science and Machine Learning Bootcamp',
+      color: '#C7D2FE' // light blue
     },
     {
       id: 2,
-      title: 'Data Structures in Python',
-      description: 'Understanding lists, dictionaries, and more',
-      duration: '52:15',
-      uploadDate: new Date('2023-01-22')
+      number: 2,
+      title: 'Chapter 2',
+      subtitle: 'Python for Data Science and Machine Learning Bootcamp',
+      color: '#A5F3FC' // cyan
     },
     {
       id: 3,
-      title: 'Object-Oriented Programming',
-      description: 'Learn OOP concepts with practical examples',
-      duration: '48:45',
-      uploadDate: new Date('2023-01-29')
+      number: 3,
+      title: 'Chapter 3',
+      subtitle: 'Python for Data Science and Machine Learning Bootcamp',
+      color: '#DDD6FE' // purple
+    },
+    {
+      id: 4,
+      number: 4,
+      title: 'Chapter 4',
+      subtitle: 'Python for Data Science and Machine Learning Bootcamp',
+      color: '#FDE68A' // yellow
+    },
+    {
+      id: 5,
+      number: 5,
+      title: 'Chapter 5',
+      subtitle: 'Python for Data Science and Machine Learning Bootcamp',
+      color: '#BBF7D0' // green
+    },
+    {
+      id: 6,
+      number: 6,
+      title: 'Python for Data Science and Machine Learning Bootcamp',
+      subtitle: 'Python for Data Science and Machine Learning Bootcamp',
+      color: '#E5E7EB' // gray
     }
   ];
 
-  openUploadModal() {
-    this.showUploadModal.set(true);
-  }
+  constructor(private router: Router) { }
 
-  closeUploadModal() {
-    this.showUploadModal.set(false);
-    this.resetForm();
-  }
-
-  onFileSelected(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-      this.uploadForm.videoFile = target.files[0];
-    }
-  }
-
-  submitUpload() {
-    console.log('Uploading:', this.uploadForm);
-    // Handle upload logic here
-    this.closeUploadModal();
-  }
-
-  resetForm() {
-    this.uploadForm = {
-      title: '',
-      description: '',
-      videoFile: null
-    };
+  viewChapter(chapter: Chapter) {
+    console.log('Viewing chapter:', chapter);
+    this.router.navigate(['/classes/recorded', chapter.id]);
   }
 }

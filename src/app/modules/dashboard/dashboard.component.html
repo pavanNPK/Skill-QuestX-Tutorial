@@ -33,7 +33,7 @@
           <h3 class="section-title">Course Progress</h3>
           <div class="progress-chart">
             <svg viewBox="0 0 200 200" class="donut-chart">
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#E8E5FF" stroke-width="20"></circle>
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#FFE5E5" stroke-width="20"></circle>
               <circle cx="100" cy="100" r="80" fill="none" stroke="#6C5CE7" stroke-width="20"
                 [attr.stroke-dasharray]="'{{progressPercentage * 5.027}} 502.7'" stroke-linecap="round"
                 transform="rotate(-90 100 100)"></circle>
@@ -43,11 +43,11 @@
             <div class="progress-legend">
               <div class="legend-item">
                 <span class="legend-dot" style="background-color: #6C5CE7"></span>
-                <span>Completed</span>
+                <span>Completed ({{courseProgress}}%)</span>
               </div>
               <div class="legend-item">
-                <span class="legend-dot" style="background-color: #E8E5FF"></span>
-                <span>Unfinished</span>
+                <span class="legend-dot" style="background-color: #FFE5E5"></span>
+                <span>Remaining ({{100 - courseProgress}}%)</span>
               </div>
             </div>
           </div>
@@ -94,9 +94,9 @@
       <!-- Calendar Widget -->
       <div class="calendar-widget">
         <div class="calendar-header">
-          <button class="calendar-nav"><i class="pi pi-angle-left"></i></button>
+          <button class="calendar-nav" (click)="previousMonth()"><i class="pi pi-angle-left"></i></button>
           <span class="calendar-month">{{ currentMonth }}</span>
-          <button class="calendar-nav"><i class="pi pi-angle-right"></i></button>
+          <button class="calendar-nav" (click)="nextMonth()"><i class="pi pi-angle-right"></i></button>
         </div>
         <div class="calendar-grid">
           <div class="calendar-day-label">Su</div>
@@ -107,36 +107,12 @@
           <div class="calendar-day-label">Fr</div>
           <div class="calendar-day-label">Sa</div>
 
-          <div class="calendar-day">1</div>
-          <div class="calendar-day">2</div>
-          <div class="calendar-day">3</div>
-          <div class="calendar-day">4</div>
-          <div class="calendar-day">5</div>
-          <div class="calendar-day">6</div>
-          <div class="calendar-day">7</div>
-          <div class="calendar-day">8</div>
-          <div class="calendar-day">9</div>
-          <div class="calendar-day">10</div>
-          <div class="calendar-day active">11</div>
-          <div class="calendar-day">12</div>
-          <div class="calendar-day">13</div>
-          <div class="calendar-day">14</div>
-          <div class="calendar-day">15</div>
-          <div class="calendar-day">16</div>
-          <div class="calendar-day">17</div>
-          <div class="calendar-day">18</div>
-          <div class="calendar-day">19</div>
-          <div class="calendar-day">20</div>
-          <div class="calendar-day">21</div>
-          <div class="calendar-day">22</div>
-          <div class="calendar-day">24</div>
-          <div class="calendar-day">25</div>
-          <div class="calendar-day">26</div>
-          <div class="calendar-day">27</div>
-          <div class="calendar-day">28</div>
-          <div class="calendar-day">29</div>
-          <div class="calendar-day empty">30</div>
-          <div class="calendar-day empty">31</div>
+          @for (day of calendarDays; track $index) {
+          <div class="calendar-day" [class.empty]="!day" [class.active]="day === selectedDay"
+            [class.today]="isToday(day)" (click)="selectDay(day)">
+            {{ day || '' }}
+          </div>
+          }
         </div>
       </div>
 
