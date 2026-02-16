@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { PopoverModule } from 'primeng/popover';
 
 @Component({
   selector: 'sqx-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, PopoverModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -21,6 +22,25 @@ export class NavbarComponent {
 
   toggleExamsDropdown() {
     this.examsDropdownOpen.update((val) => !val);
+  }
+
+  showProfileMenu() {
+    // Popover will handle showing
+  }
+
+  goToProfile() {
+    console.log('Navigate to profile settings');
+    // TODO: Navigate to profile page
+  }
+
+  changePassword() {
+    console.log('Navigate to change password');
+    // TODO: Navigate to change password page
+  }
+
+  userPreferences() {
+    console.log('Navigate to user preferences');
+    // TODO: Navigate to preferences page
   }
 
   logout() {

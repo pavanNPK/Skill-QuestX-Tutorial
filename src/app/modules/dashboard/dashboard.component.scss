@@ -24,7 +24,6 @@
     border: none;
     background: white;
     cursor: pointer;
-    box-shadow: var(--sqx-shadow-sm);
     transition: all 0.2s ease;
 
     i {
@@ -33,7 +32,7 @@
     }
 
     &:hover {
-        box-shadow: var(--sqx-shadow-md);
+        background: #F9FAFB;
     }
 
     .badge {
@@ -72,16 +71,12 @@
 
 .info-card {
     padding: var(--sqx-space-6);
-    border-radius: var(--sqx-radius-lg);
+    border-radius: 8px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     gap: var(--sqx-space-4);
-    transition: transform 0.2s ease;
-
-    &:hover {
-        transform: translateY(-4px);
-    }
 
     &.card-purple {
         background-color: var(--sqx-color-card-purple);
@@ -96,15 +91,16 @@
     }
 
     .card-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
 
         i {
-            font-size: 28px;
+            font-size: 20px;
             color: white;
         }
     }
@@ -114,7 +110,8 @@
         font-weight: 600;
         color: var(--sqx-color-text);
         margin: 0;
-        text-align: center;
+        text-align: left;
+        flex: 1;
     }
 }
 
@@ -130,7 +127,6 @@
     background: white;
     padding: var(--sqx-space-6);
     border-radius: var(--sqx-radius-lg);
-    box-shadow: var(--sqx-shadow-sm);
 }
 
 .section-title {
@@ -192,7 +188,6 @@
     background: white;
     padding: var(--sqx-space-6);
     border-radius: var(--sqx-radius-lg);
-    box-shadow: var(--sqx-shadow-sm);
 }
 
 .tasks-table {
@@ -259,7 +254,6 @@
     background: white;
     padding: var(--sqx-space-5);
     border-radius: var(--sqx-radius-lg);
-    box-shadow: var(--sqx-shadow-sm);
 }
 
 .calendar-header {
@@ -346,14 +340,9 @@
     background: #F9FAFB;
     border-radius: var(--sqx-radius-md);
     margin-bottom: var(--sqx-space-3);
-    transition: all 0.2s ease;
 
     &:last-child {
         margin-bottom: 0;
-    }
-
-    &:hover {
-        box-shadow: var(--sqx-shadow-sm);
     }
 
     .job-title {
