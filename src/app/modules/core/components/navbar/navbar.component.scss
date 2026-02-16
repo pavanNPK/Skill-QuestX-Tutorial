@@ -225,6 +225,11 @@
     &:hover {
         background: var(--sqx-color-sidebar-hover);
     }
+
+    &.active {
+        background: var(--sqx-color-sidebar-active);
+        font-weight: 600;
+    }
 }
 
 .nav-item-content {

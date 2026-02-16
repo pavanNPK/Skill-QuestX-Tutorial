@@ -24,6 +24,10 @@ export class NavbarComponent {
     this.examsDropdownOpen.update((val) => !val);
   }
 
+  isActive(route: string): boolean {
+    return this.router.url.startsWith(route);
+  }
+
   showProfileMenu() {
     // Popover will handle showing
   }

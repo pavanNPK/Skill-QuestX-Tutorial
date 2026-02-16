@@ -1,42 +1,36 @@
-<div class="page-container">
-    <h1 class="page-title">Online</h1>
-
+<div class="assessment-page">
     <div class="assessment-container">
         <div class="question-card">
             <div class="question-header">
-                <span class="question-number">Question 1 of 10</span>
+                <span class="question-number">Question {{ currentQuestionIndex() + 1 }} of {{ questions.length }}</span>
                 <span class="time-remaining"><i class="pi pi-clock"></i> 45:00</span>
             </div>
 
             <div class="question-content">
-                <h3>What is the correct way to declare a variable in Python?</h3>
+                <h3>{{ currentQuestion.text }}</h3>
 
                 <div class="options-list">
+                    @for (option of currentQuestion.options; track option.value) {
                     <label class="option">
-                        <input type="radio" name="q1" value="a" />
-                        <span>var x = 5</span>
+                        <input type="radio" [name]="'q' + currentQuestion.id" [value]="option.value"
+                            [(ngModel)]="currentQuestion.selectedOption" />
+                        <span>{{ option.label }}</span>
                     </label>
-
-                    <label class="option">
-                        <input type="radio" name="q1" value="b" />
-                        <span>x = 5</span>
-                    </label>
-
-                    <label class="option">
-                        <input type="radio" name="q1" value="c" />
-                        <span>int x = 5</span>
-                    </label>
-
-                    <label class="option">
-                        <input type="radio" name="q1" value="d" />
-                        <span>declare x = 5</span>
-                    </label>
+                    }
                 </div>
             </div>
 
             <div class="question-actions">
-                <button class="btn btn-secondary">Previous</button>
-                <button class="btn btn-primary">Next</button>
+                <button class="btn btn-secondary" (click)="prevQuestion()" [disabled]="isFirstQuestion"
+                    [class.disabled]="isFirstQuestion">
+                    Previous
+                </button>
+
+                @if (isLastQuestion) {
+                <button class="btn btn-primary submit-btn" (click)="submitAssessment()">Submit</button>
+                } @else {
+                <button class="btn btn-primary" (click)="nextQuestion()">Next</button>
+                }
             </div>
         </div>
     </div>

@@ -1,0 +1,71 @@
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sqx-space-4);
+}
+
+.task-item {
+    background: white;
+    padding: var(--sqx-space-6);
+    border-radius: var(--sqx-radius-lg); // Matches the new card style request
+    border: 1px solid var(--sqx-color-border); // Add border like other cards
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); // Add hover effect
+        border-color: var(--sqx-color-primary-light);
+    }
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--sqx-space-2);
+
+    h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--sqx-color-text);
+    }
+}
+
+.task-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &.pending {
+        background-color: #FFF4E5;
+        color: #FF9800; // Orange for pending
+    }
+
+    &.completed {
+        background-color: #E8F5E9;
+        color: #4CAF50; // Green for completed
+    }
+}
+
+.task-description {
+    color: var(--sqx-color-text-light); // gray-500 equivalent
+    margin-bottom: var(--sqx-space-4);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    color: var(--sqx-color-text-light);
+    font-size: 13px;
+
+    i {
+        margin-right: var(--sqx-space-2);
+        color: var(--sqx-color-primary); // Icon color
+    }
+}

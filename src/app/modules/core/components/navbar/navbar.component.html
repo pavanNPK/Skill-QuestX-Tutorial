@@ -28,7 +28,7 @@
 
     <!-- Classes Dropdown -->
     <div class="nav-item dropdown" [class.open]="classesDropdownOpen()">
-      <div class="nav-item-header" (click)="toggleClassesDropdown()">
+      <div class="nav-item-header" (click)="toggleClassesDropdown()" [class.active]="isActive('/classes')">
         <div class="nav-item-content">
           <i class="pi pi-video"></i>
           <span>Classes</span>
@@ -55,7 +55,7 @@
 
     <!-- Exams Dropdown -->
     <div class="nav-item dropdown" [class.open]="examsDropdownOpen()">
-      <div class="nav-item-header" (click)="toggleExamsDropdown()">
+      <div class="nav-item-header" (click)="toggleExamsDropdown()" [class.active]="isActive('/exams')">
         <div class="nav-item-content">
           <i class="pi pi-file-edit"></i>
           <span>Exams</span>
