@@ -186,13 +186,20 @@
     }
 }
 
-// Courses Grid (Popular Courses)
-.courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem; // Decreased gap
-    margin-bottom: 2rem; // Decreased gap
+// Courses Carousel
+.courses-carousel {
+    margin-bottom: 2rem;
+
+    ::ng-deep .p-carousel-item {
+        padding: 0 0.75rem; // Add gap between items
+    }
+
+    ::ng-deep .p-carousel-indicators {
+        display: none !important; // Hide indicators if not needed or style them
+    }
 }
+
+// .courses-grid removed
 
 .course-card {
     background: white;
@@ -359,6 +366,7 @@
     padding: 1.5rem 0; // Remove side padding to let lines touch edges
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     overflow: hidden; // Ensure radius clips content
+    margin-bottom: 3rem; // Added gap as requested
 }
 
 .list-header {

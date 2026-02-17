@@ -70,53 +70,55 @@
     <!-- Popular Courses Section -->
     <div class="section-header">
         <h2 class="section-title">Popular Courses</h2>
-        <div class="view-all">
-            <span>View all popular courses</span>
-            <i class="pi pi-chevron-right"></i>
-        </div>
+        <!-- Removed View All link as requested -->
     </div>
 
-    <div class="courses-grid">
-        <div *ngFor="let course of courses" class="course-card">
-            <div class="card-top">
-                <span class="tag">Popular in week</span>
-                <button class="bookmark-btn" pTooltip="Bookmark Course" tooltipPosition="top">
-                    <i class="pi pi-bookmark"></i>
-                </button>
-            </div>
-
-            <div class="card-body">
-                <div class="accent-bar" [style.background-color]="course.accentColor || '#FFC107'"></div>
-                <div class="content">
-                    <h3 class="course-title">{{course.title}}</h3>
-                    <p class="course-description">{{course.description}}</p>
-                </div>
-            </div>
-
-            <div class="card-divider"></div>
-
-            <div class="card-footer">
-                <div class="rating">
-                    <i class="pi pi-star-fill"></i>
-                    <span>4.2</span>
-                </div>
-
-                <div class="price-action">
-                    <div class="price-info">
-                        <span class="current-price">${{calculateDiscountedPrice(course.price, course.discount)}}</span>
-                        <span class="original-price" *ngIf="course.discount">${{course.price}}</span>
+    <div class="courses-carousel">
+        <p-carousel [value]="courses" [numVisible]="3" [numScroll]="1" [circular]="true">
+            <ng-template let-course pTemplate="item">
+                <div class="course-card">
+                    <div class="card-top">
+                        <span class="tag">Popular in week</span>
+                        <button class="bookmark-btn" pTooltip="Bookmark Course" tooltipPosition="top">
+                            <i class="pi pi-bookmark"></i>
+                        </button>
                     </div>
 
-                    <button class="get-course-btn" *ngIf="!course.unavailable">
-                        <span>Get Course</span>
-                        <i class="pi pi-chevron-right"></i>
-                    </button>
-                    <button class="unavailable-btn" *ngIf="course.unavailable">
-                        <span>Unavailable</span>
-                    </button>
+                    <div class="card-body">
+                        <div class="accent-bar" [style.background-color]="course.accentColor || '#FFC107'"></div>
+                        <div class="content">
+                            <h3 class="course-title">{{course.title}}</h3>
+                            <p class="course-description">{{course.description}}</p>
+                        </div>
+                    </div>
+
+                    <div class="card-divider"></div>
+
+                    <div class="card-footer">
+                        <div class="rating">
+                            <i class="pi pi-star-fill"></i>
+                            <span>4.2</span>
+                        </div>
+
+                        <div class="price-action">
+                            <div class="price-info">
+                                <span class="current-price">${{calculateDiscountedPrice(course.price,
+                                    course.discount)}}</span>
+                                <span class="original-price" *ngIf="course.discount">${{course.price}}</span>
+                            </div>
+
+                            <button class="get-course-btn" *ngIf="!course.unavailable">
+                                <span>Get Course</span>
+                                <i class="pi pi-chevron-right"></i>
+                            </button>
+                            <button class="unavailable-btn" *ngIf="course.unavailable">
+                                <span>Unavailable</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </ng-template>
+        </p-carousel>
     </div>
 
 </div>

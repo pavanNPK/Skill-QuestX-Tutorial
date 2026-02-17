@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { CarouselModule } from 'primeng/carousel';
 
 interface Course {
     id: number;
@@ -29,7 +30,7 @@ interface MyCourse {
 @Component({
     selector: 'app-courses-list',
     standalone: true,
-    imports: [CommonModule, ButtonModule, TooltipModule],
+    imports: [CommonModule, ButtonModule, TooltipModule, CarouselModule],
     templateUrl: './courses-list.component.html',
     styleUrls: ['./courses-list.component.scss']
 })

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { MenuItem } from 'primeng/api';
 
 @Component({
     selector: 'app-add-course',
@@ -14,14 +15,16 @@ import { TextareaModule } from 'primeng/textarea';
         ReactiveFormsModule,
         ButtonModule,
         InputTextModule,
-        TextareaModule
+        BreadcrumbModule
     ],
     templateUrl: './add-course.component.html',
-    styleUrls: ['./add-course.component.scss']
+    styleUrl: './add-course.component.scss'
 })
-export class AddCourseComponent {
+export class AddCourseComponent implements OnInit {
     courseForm: FormGroup;
-    selectedFileName: string | null = null;
+    selectedFileName: string = '';
+    breadcrumbItems: MenuItem[] = [];
+    home: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
 
     constructor(
         private fb: FormBuilder,
@@ -30,10 +33,17 @@ export class AddCourseComponent {
         this.courseForm = this.fb.group({
             title: ['', Validators.required],
             description: ['', Validators.required],
-            price: [0, [Validators.required, Validators.min(0)]],
-            discount: [0, [Validators.min(0), Validators.max(100)]],
+            price: [0],
+            discount: [0],
             video: [null]
         });
+    }
+
+    ngOnInit() {
+        this.breadcrumbItems = [
+            { label: 'Courses', routerLink: '/courses' },
+            { label: 'Create New Course' }
+        ];
     }
 
     onFileSelected(event: any) {

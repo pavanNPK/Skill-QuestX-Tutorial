@@ -1,20 +1,31 @@
 <div class="add-course-container">
-    <div class="form-card">
-        <h2>Create New Course</h2>
+
+    <!-- Header with Breadcrumb -->
+    <div class="page-header">
+        <button class="back-icon-btn" (click)="onCancel()">
+            <i class="pi pi-arrow-left"></i>
+        </button>
+        <p-breadcrumb [model]="breadcrumbItems" [home]="home"></p-breadcrumb>
+    </div>
+
+    <!-- Full Width Form Card -->
+    <div class="form-card-premium">
+        <h2 class="form-title">Course Details</h2>
 
         <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
 
             <div class="form-group">
                 <label for="title">Course Title</label>
-                <input pInputText id="title" formControlName="title" placeholder="Enter course title">
+                <input pInputText id="title" formControlName="title" placeholder="Enter course title"
+                    class="premium-input">
                 <small class="error" *ngIf="courseForm.get('title')?.invalid && courseForm.get('title')?.touched">Title
                     is required.</small>
             </div>
 
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea pInputTextarea id="description" formControlName="description" rows="5"
-                    placeholder="Enter course description"></textarea>
+                <textarea pInputText id="description" formControlName="description" rows="6"
+                    placeholder="Enter course description" class="premium-input"></textarea>
                 <small class="error"
                     *ngIf="courseForm.get('description')?.invalid && courseForm.get('description')?.touched">Description
                     is required.</small>
@@ -23,12 +34,14 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="price">Price ($)</label>
-                    <input pInputText type="number" id="price" formControlName="price" placeholder="0.00">
+                    <input pInputText type="number" id="price" formControlName="price" placeholder="0.00"
+                        class="premium-input">
                 </div>
 
                 <div class="form-group">
                     <label for="discount">Discount (%)</label>
-                    <input pInputText type="number" id="discount" formControlName="discount" placeholder="0">
+                    <input pInputText type="number" id="discount" formControlName="discount" placeholder="0"
+                        class="premium-input">
                 </div>
             </div>
 
@@ -37,7 +50,7 @@
                 <div class="file-upload-wrapper">
                     <input type="file" id="video" (change)="onFileSelected($event)" accept="video/*">
                     <div class="upload-placeholder" *ngIf="!selectedFileName">
-                        <i class="pi pi-upload"></i>
+                        <i class="pi pi-cloud-upload"></i>
                         <span>Drag and drop or click to upload video</span>
                     </div>
                     <div class="file-info" *ngIf="selectedFileName">
@@ -48,8 +61,10 @@
             </div>
 
             <div class="form-actions">
-                <button pButton type="button" label="Cancel" class="p-button-secondary" (click)="onCancel()"></button>
-                <button pButton type="submit" label="Create Course" [disabled]="courseForm.invalid"></button>
+                <button pButton type="button" label="Cancel" class="p-button-text cancel-btn"
+                    (click)="onCancel()"></button>
+                <button pButton type="submit" label="Create Course" [disabled]="courseForm.invalid"
+                    class="create-btn"></button>
             </div>
 
         </form>
