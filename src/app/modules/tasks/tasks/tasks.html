@@ -164,56 +164,57 @@
 </div>
 
 <!-- Create Task Drawer -->
-<p-drawer [(visible)]="isCreateDrawerOpen" position="right"
-    styleClass="!w-full md:!w-80 lg:!w-[30rem] create-task-drawer" [modal]="true" [closable]="true">
+<p-drawer [(visible)]="isCreateDrawerOpen" position="right" styleClass="create-task-drawer" [modal]="true"
+    [closable]="true">
     <ng-template #header>
-        <div class="flex items-center justify-between w-full">
-            <span class="font-bold text-xl">{{ isEditing() ? 'Edit Task' : 'Create New Task' }}</span>
+        <div class="create-task-drawer-header">
+            <span class="create-task-drawer-title">{{ isEditing() ? 'Edit Task' : 'Create New Task' }}</span>
         </div>
     </ng-template>
 
-    <div class="flex flex-col gap-4 h-full">
-        <div class="flex flex-col gap-2">
-            <label class="font-semibold text-gray-600">Task Title</label>
-            <input type="text" pInputText [(ngModel)]="newTask.title" placeholder="Enter task title" class="w-full" />
+    <div class="create-task-form">
+        <div class="form-field">
+            <label class="form-label">Task Title</label>
+            <input type="text" pInputText [(ngModel)]="newTask.title" placeholder="Enter task title"
+                class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2">
-            <label class="font-semibold text-gray-600">Description</label>
+        <div class="form-field">
+            <label class="form-label">Description</label>
             <textarea pInputTextarea [(ngModel)]="newTask.description" rows="4" placeholder="Enter task description"
-                class="w-full resize-none"></textarea>
+                class="form-textarea"></textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-2">
-                <label class="font-semibold text-gray-600">Batch</label>
+        <div class="form-row form-row-2">
+            <div class="form-field">
+                <label class="form-label">Batch</label>
                 <p-select [options]="batches" [(ngModel)]="newTask.batch" optionLabel="name" placeholder="Select Batch"
-                    styleClass="w-full" [checkmark]="true" [showClear]="true"></p-select>
+                    class="create-task-select w-full" [checkmark]="true" [showClear]="true"></p-select>
             </div>
-            <div class="flex flex-col gap-2">
-                <label class="font-semibold text-gray-600">Due Date</label>
+            <div class="form-field">
+                <label class="form-label">Due Date</label>
                 <p-datepicker [(ngModel)]="newTask.dueDate" [showTime]="true" placeholder="Select due date"
-                    appendTo="body" styleClass="w-full"></p-datepicker>
+                    appendTo="body" styleClass="form-datepicker"></p-datepicker>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-2">
-                <label class="font-semibold text-gray-600">Duration</label>
+        <div class="form-row form-row-2">
+            <div class="form-field">
+                <label class="form-label">Duration</label>
                 <input type="text" pInputText [(ngModel)]="newTask.duration" placeholder="e.g. 2 hours"
-                    class="w-full" />
+                    class="form-input" />
             </div>
-            <div class="flex flex-col gap-2">
-                <label class="font-semibold text-gray-600">Priority</label>
+            <div class="form-field">
+                <label class="form-label">Priority</label>
                 <p-select [options]="priorityOptions" [(ngModel)]="newTask.priority" placeholder="Select Priority"
-                    styleClass="w-full" [checkmark]="true" [showClear]="true"></p-select>
+                    class="create-task-select w-full" [checkmark]="true" [showClear]="true"></p-select>
             </div>
         </div>
 
         @if (newTask.batch) {
-        <div class="flex flex-col gap-2 mt-2">
-            <label class="font-semibold text-gray-600">Assigned Students ({{ newTask.batch.students.length }})</label>
-            <div class="flex items-center -space-x-2">
+        <div class="form-field form-field-avatars">
+            <label class="form-label">Assigned Students ({{ newTask.batch.students.length }})</label>
+            <div class="avatar-group-wrap">
                 <p-avatarGroup>
                     @for (student of newTask.batch.students.slice(0, 5); track student.id) {
                     <p-avatar [image]="student.avatar" shape="circle" size="normal"
@@ -230,7 +231,7 @@
     </div>
 
     <ng-template #footer>
-        <div class="flex items-center justify-end gap-2 w-full">
+        <div class="create-task-drawer-footer">
             <button pButton label="Cancel" class="p-button-outlined p-button-secondary"
                 (click)="closeCreateDrawer()"></button>
             <button pButton [label]="isEditing() ? 'Save Changes' : 'Create Task'" icon="pi pi-check"
@@ -243,72 +244,102 @@
 <p-drawer [(visible)]="isDetailsDrawerOpen" position="right" styleClass="task-details-drawer" [modal]="true"
     [closable]="true">
     <ng-template #header>
-        <div class="flex items-center justify-between w-full pt-4 px-2">
-            <div class="flex items-center gap-4">
-                <span class="font-bold text-2xl text-gray-800">{{ selectedTask()?.title }}</span>
-                <p-tag [value]="selectedTask()?.priority"
-                    [severity]="selectedTask()?.priority === 'High' ? 'danger' : (selectedTask()?.priority === 'Medium' ? 'warn' : 'success')"
-                    styleClass="uppercase text-xs font-bold"></p-tag>
+        <div class="premium-drawer-header w-full">
+            <div class="title-section">
+                <h2>{{ selectedTask()?.title }}</h2>
+                <div class="meta-badges">
+                    <p-tag [value]="selectedTask()?.priority"
+                        [severity]="selectedTask()?.priority === 'High' ? 'danger' : (selectedTask()?.priority === 'Medium' ? 'warn' : 'success')"
+                        class="uppercase text-[10px] font-bold tracking-wider px-2 py-0.5"></p-tag>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button pButton icon="pi pi-pencil"
-                    class="p-button-text p-button-rounded text-gray-500 hover:text-gray-700"
-                    (click)="editTask()"></button>
-                <button pButton icon="pi pi-trash" class="p-button-text p-button-rounded p-button-danger"
-                    (click)="confirmDelete($event)"></button>
-            </div>
+            <!-- Actions moved to footer -->
         </div>
     </ng-template>
 
     @if (selectedTask(); as task) {
-    <div class="flex flex-col gap-8 h-full px-2 py-4">
-        <!-- Meta Info Row -->
-        <div
-            class="flex flex-col gap-3 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm items-start">
-            <div class="flex items-center gap-2">
-                <i class="pi pi-clock text-[#6c5ce7]"></i>
-                <span class="font-medium">{{ task.dueDate | date:'medium' }}</span>
-            </div>
+    <div class="task-details-content h-full overflow-y-auto custom-scrollbar">
 
-            <div class="flex items-center gap-2">
-                <i class="pi pi-hourglass text-[#6c5ce7]"></i>
-                <span class="font-medium">{{ task.duration }}</span>
-            </div>
+        <!-- Properties Panel -->
+        <div class="properties-panel">
+            <h3>Properties</h3>
 
-            <div class="flex items-center gap-2">
-                <i class="pi pi-users text-[#6c5ce7]"></i>
-                <span class="font-medium">{{ task.batchName }}</span>
+            <div class="property-grid">
+                <!-- Due Date -->
+                <div class="property-item">
+                    <label>Due Date</label>
+                    <div class="value">
+                        <i class="pi pi-calendar"></i>
+                        <span>{{ task.dueDate | date:'medium' }}</span>
+                    </div>
+                </div>
+
+                <!-- Duration -->
+                <div class="property-item">
+                    <label>Duration</label>
+                    <div class="value">
+                        <i class="pi pi-clock"></i>
+                        <span>{{ task.duration }}</span>
+                    </div>
+                </div>
+
+                <!-- Batch -->
+                <div class="property-item">
+                    <label>Batch</label>
+                    <div class="value">
+                        <i class="pi pi-users"></i>
+                        <span>{{ task.batchName }}</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="property-item">
+                    <label>Description</label>
+                    <p class="description-text">
+                        {{ task.description }}
+                    </p>
+                </div>
             </div>
         </div>
 
-        <div class="flex flex-col gap-3">
-            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Description</label>
-            <p class="text-gray-700 leading-relaxed text-base bg-white">{{ task.description }}</p>
-        </div>
 
-        <!-- Submissions Section -->
-        <div class="flex flex-col gap-4">
-            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Student Submissions</h3>
 
-            <div class="grid grid-cols-1 gap-3">
+        <!-- Activity Feed -->
+        <div class="activity-feed">
+            <div class="feed-header">
+                <h3>Student Activity</h3>
+                <span class="count-badge">{{ getTaskSubmissions(task).length }}</span>
+            </div>
+
+            <div class="feed-list">
                 @for (sub of getTaskSubmissions(task); track sub.student.id) {
-                <div
-                    class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md hover:border-[#6c5ce7] transition-all duration-200">
-                    <div class="flex items-center gap-4">
-                        <p-avatar [image]="sub.student.avatar" shape="circle" size="large"></p-avatar>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-gray-800 text-sm">{{ sub.student.name }}</span>
-                            <span class="text-xs font-medium"
-                                [ngClass]="{'text-green-500': sub.status === 'Submitted', 'text-gray-400': sub.status === 'Pending'}">
-                                {{ sub.status }} @if(sub.status === 'Submitted') { • {{ sub.submittedAt |
-                                date:'shortDate' }} }
-                            </span>
+                <div class="feed-item">
+                    <div class="avatar-wrapper">
+                        <p-avatar [image]="sub.student.avatar" shape="circle" size="normal"></p-avatar>
+                    </div>
+
+                    <div class="feed-content">
+                        <div class="top-row">
+                            <span class="student-name">{{ sub.student.name }}</span>
+                            <span class="timestamp">{{ sub.submittedAt ? (sub.submittedAt | date:'MMM d') : '' }}</span>
                         </div>
+
+                        @if(sub.status === 'Submitted') {
+                        <div class="status-badge submitted">
+                            <i class="pi pi-check-circle" style="font-size: 0.7rem"></i>
+                            <span>Submitted</span>
+                        </div>
+                        } @else {
+                        <div class="status-badge pending">
+                            <i class="pi pi-clock" style="font-size: 0.7rem"></i>
+                            <span>Pending</span>
+                        </div>
+                        }
                     </div>
 
                     @if (sub.status === 'Submitted') {
-                    <button pButton label="View" size="small" outlined
-                        class="p-button-sm !px-4 !py-1 !text-xs"></button>
+                    <button pButton icon="pi pi-external-link" [text]="true" [rounded]="true" size="small"
+                        class="action-btn"></button>
                     }
                 </div>
                 }
@@ -316,6 +347,15 @@
         </div>
     </div>
     }
+
+    <ng-template #footer>
+        <div class="drawer-footer">
+            <button pButton label="Delete Task" icon="pi pi-trash" class="p-button-outlined p-button-danger"
+                (click)="confirmDelete($event)"></button>
+            <button pButton label="Edit Task" icon="pi pi-pencil" class="p-button-primary"
+                (click)="editTask()"></button>
+        </div>
+    </ng-template>
 </p-drawer>
 
 <p-toast></p-toast>

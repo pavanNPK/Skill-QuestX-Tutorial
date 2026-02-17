@@ -50,29 +50,667 @@
 
 // ... existing filters ...
 
-// Drawer Width Overrides
+// Create Task Drawer - full UI overhaul
 ::ng-deep .create-task-drawer {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100%;
 
     @media (min-width: 768px) {
-        width: 20rem !important; // 320px
+        width: 28rem !important; // 448px - room for 2 columns
     }
 
     @media (min-width: 1024px) {
-        width: 30rem !important; // 480px
+        width: 32rem !important; // 512px
+    }
+
+    .p-drawer-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fafafa;
+    }
+
+    .p-drawer-content {
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .p-drawer-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+        gap: 0.75rem;
     }
 }
 
-::ng-deep .task-details-drawer {
+.create-task-drawer-header {
     width: 100%;
+}
+
+.create-task-drawer-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.create-task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+    min-width: 0;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-row-2 {
+    @media (min-width: 768px) {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+}
+
+.form-field-avatars {
+    margin-top: 0.25rem;
+}
+
+.avatar-group-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.create-task-drawer-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+// Shared input look for drawer (padding, font, radius)
+$drawer-input-padding: 0.75rem 1rem;
+$drawer-input-radius: 8px;
+$drawer-input-border: 1px solid #d1d5db;
+$drawer-input-font: 'Sen', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+// Force full width and consistent styling for all form controls inside create-task-drawer
+::ng-deep .create-task-drawer {
+
+    .form-input,
+    .form-textarea {
+        width: 100% !important;
+        min-width: 0;
+        box-sizing: border-box;
+        border-radius: $drawer-input-radius;
+        border: $drawer-input-border;
+        padding: $drawer-input-padding;
+        font-size: 0.875rem;
+        font-family: $drawer-input-font;
+        transition: border-color 0.2s, box-shadow 0.2s;
+
+        &::placeholder {
+            font-family: $drawer-input-font;
+            color: #9ca3af;
+        }
+
+        &:focus {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            outline: none;
+        }
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 6rem;
+        line-height: 1.5;
+        padding: 0.75rem 1rem !important;
+    }
+
+    // PrimeNG Select – follow demo pattern (class="create-task-select w-full"), premium dropdown styling
+    .create-task-select,
+    .p-drawer-content p-select.create-task-select,
+    .p-drawer-content .create-task-select {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0;
+        font-family: $drawer-input-font;
+
+        // Trigger (input-like box)
+        .p-select-trigger,
+        [role="combobox"],
+        .p-select-label-container {
+            width: 100% !important;
+            min-width: 0;
+            min-height: 2.75rem;
+            padding: 0.625rem 1rem !important;
+            padding-right: 2.5rem !important;
+            border-radius: $drawer-input-radius;
+            border: $drawer-input-border;
+            font-size: 0.875rem;
+            font-family: $drawer-input-font;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .p-select-trigger {
+            display: flex;
+            align-items: center;
+        }
+
+        .p-select-label {
+            padding: 0;
+            font-family: $drawer-input-font;
+            font-size: 0.875rem;
+        }
+
+        .p-select-label-empty,
+        .p-placeholder {
+            color: #9ca3af;
+            font-family: $drawer-input-font;
+        }
+
+        &.p-focus .p-select-trigger,
+        &.p-focus [role="combobox"],
+        &.p-inputwrapper-focus .p-select-trigger {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            outline: none;
+        }
+
+        // Clear icon – space from label
+        .p-select-clear-icon,
+        .p-select-clear-button,
+        [data-p-select-clear] {
+            right: 2.25rem !important;
+            margin-right: 0.25rem;
+            color: #6b7280;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        // Dropdown chevron
+        .p-select-dropdown-icon,
+        .p-select-dropdown,
+        [data-p-select-dropdown] {
+            right: 0.75rem !important;
+            color: #6b7280;
+        }
+    }
+
+    // PrimeNG DatePicker – same look as inputs and selects
+    .form-datepicker.p-datepicker,
+    .p-datepicker.form-datepicker,
+    .p-drawer-content p-datepicker,
+    .p-drawer-content .p-datepicker {
+        display: block;
+        width: 100% !important;
+        min-width: 0;
+        font-family: $drawer-input-font;
+
+        .p-inputtext {
+            width: 100% !important;
+            min-width: 0;
+            min-height: 2.75rem;
+            padding: $drawer-input-padding !important;
+            box-sizing: border-box;
+            border-radius: $drawer-input-radius;
+            border: $drawer-input-border;
+            font-size: 0.875rem;
+            font-family: $drawer-input-font;
+            transition: border-color 0.2s, box-shadow 0.2s;
+
+            &::placeholder {
+                font-family: $drawer-input-font;
+                color: #9ca3af;
+            }
+        }
+
+        &.p-focus .p-inputtext,
+        .p-inputtext:focus {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            outline: none;
+        }
+    }
+
+    // All text inputs in drawer content – padding and font
+    .p-drawer-content {
+        .p-inputtext {
+            width: 100% !important;
+            min-width: 0;
+            box-sizing: border-box;
+            padding: $drawer-input-padding !important;
+            font-family: $drawer-input-font;
+
+            &::placeholder {
+                font-family: $drawer-input-font;
+            }
+        }
+
+        .p-inputtextarea {
+            width: 100% !important;
+            min-width: 0;
+            box-sizing: border-box;
+            padding: 0.75rem 1rem !important;
+            font-family: $drawer-input-font;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 6rem;
+            border-radius: $drawer-input-radius;
+            border: $drawer-input-border;
+            transition: border-color 0.2s, box-shadow 0.2s;
+
+            &::placeholder {
+                font-family: $drawer-input-font;
+                color: #9ca3af;
+            }
+
+            &:focus {
+                border-color: #6c5ce7;
+                box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+                outline: none;
+            }
+        }
+    }
+}
+
+// Select dropdown overlay (panel) – premium list when opened from Create Task drawer
+:host ::ng-deep .p-select-overlay,
+:host ::ng-deep .p-select-panel,
+:host ::ng-deep [role="listbox"] {
+    font-family: $drawer-input-font !important;
+    border-radius: $drawer-input-radius !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 0.25rem 0 !important;
+
+    .p-select-option,
+    .p-select-option-label,
+    [role="option"] {
+        font-family: $drawer-input-font !important;
+        font-size: 0.875rem !important;
+        padding: 0.625rem 1rem !important;
+        margin: 0 0.25rem;
+        border-radius: 6px;
+    }
+
+    .p-select-option.p-select-option-active,
+    .p-select-option.p-highlight,
+    [role="option"][aria-selected="true"] {
+        background: rgba(108, 92, 231, 0.08) !important;
+        color: #6c5ce7 !important;
+    }
+}
+
+// ========== Task Details Drawer – Premium Design ==========
+$task-details-font: 'Sen', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$task-details-radius: 12px;
+$task-details-radius-sm: 8px;
+$task-details-accent: #6c5ce7;
+$task-details-accent-soft: rgba(108, 92, 231, 0.08);
+$task-details-surface: #f8fafc;
+$task-details-border: #e2e8f0;
+$task-details-text: #1e293b;
+$task-details-muted: #64748b;
+$task-details-success: #059669;
+$task-details-success-bg: #ecfdf5;
+$task-details-pending-bg: #f1f5f9;
+
+::ng-deep .task-details-drawer {
+    width: 100% !important;
+    max-width: 100%;
+    font-family: $task-details-font;
 
     @media (min-width: 768px) {
-        width: 40rem !important;
+        width: 28rem !important;
     }
 
     @media (min-width: 1024px) {
-        width: 50rem !important;
+        width: 32rem !important;
     }
+
+    .p-drawer-header {
+        padding: 0;
+        border: none;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 1px solid $task-details-border;
+    }
+
+    .p-drawer-content {
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: $task-details-surface;
+    }
+}
+
+.task-details-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 1.5rem 1.25rem;
+    width: 100%;
+}
+
+.task-details-header-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-details-title {
+    margin: 0 0 0.75rem 0;
+    font-family: $task-details-font;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    color: $task-details-text;
+}
+
+.task-details-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.task-details-priority-tag {
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 6px !important;
+}
+
+.task-details-id {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: $task-details-muted;
+    background: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid $task-details-border;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.task-details-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.task-details-action-btn {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    border-radius: $task-details-radius-sm !important;
+    color: $task-details-muted !important;
+    transition: color 0.2s, background 0.2s !important;
+
+    &.task-details-action-edit:hover {
+        color: $task-details-accent !important;
+        background: $task-details-accent-soft !important;
+    }
+
+    &.task-details-action-delete:hover {
+        color: #dc2626 !important;
+        background: rgba(220, 38, 38, 0.08) !important;
+    }
+}
+
+.task-details-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem 1.5rem;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+}
+
+.task-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.task-details-section {
+    background: white;
+    border-radius: $task-details-radius;
+    border: 1px solid $task-details-border;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.task-details-section-title {
+    margin: 0 0 1rem 0;
+    font-family: $task-details-font;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $task-details-muted;
+}
+
+.task-details-properties {
+    padding: 1.25rem 1.25rem 1.5rem;
+}
+
+.task-details-props-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.task-details-prop {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.task-details-prop-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $task-details-muted;
+}
+
+.task-details-prop-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $task-details-text;
+
+    span {
+        font-family: $task-details-font;
+    }
+}
+
+.task-details-prop-icon {
+    color: $task-details-accent;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.task-details-description-block {
+    padding-top: 1.25rem;
+    border-top: 1px solid $task-details-border;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.task-details-description {
+    margin: 0;
+    font-family: $task-details-font;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #475569;
+    padding: 1rem;
+    background: $task-details-surface;
+    border-radius: $task-details-radius-sm;
+    border: 1px solid $task-details-border;
+}
+
+// Student Activity
+.task-details-activity {
+    padding: 1.25rem 1.25rem 1.5rem;
+}
+
+.task-details-activity-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.task-details-activity-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $task-details-muted;
+    background: $task-details-pending-bg;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    border: 1px solid $task-details-border;
+}
+
+.task-details-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.task-details-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1rem;
+    border-radius: $task-details-radius-sm;
+    border: 1px solid transparent;
+    background: $task-details-surface;
+    transition: background 0.2s, border-color 0.2s;
+
+    &:hover {
+        background: white;
+        border-color: $task-details-border;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+}
+
+.task-details-activity-avatar {
+    border: 2px solid white !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    flex-shrink: 0;
+}
+
+.task-details-activity-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.task-details-activity-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.task-details-activity-name {
+    font-family: $task-details-font;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $task-details-text;
+}
+
+.task-details-activity-date {
+    font-size: 0.75rem;
+    color: $task-details-muted;
+    flex-shrink: 0;
+}
+
+.task-details-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    width: fit-content;
+
+    i {
+        font-size: 0.6875rem;
+    }
+}
+
+.task-details-status-submitted {
+    color: $task-details-success;
+    background: $task-details-success-bg;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.task-details-status-pending {
+    color: $task-details-muted;
+    background: $task-details-pending-bg;
+    border: 1px solid $task-details-border;
+}
+
+.task-details-activity-link {
+    opacity: 0.5;
+    color: $task-details-muted !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 6px !important;
+    transition: opacity 0.2s, color 0.2s, background 0.2s !important;
+    flex-shrink: 0;
+}
+
+.task-details-activity-item:hover .task-details-activity-link {
+    opacity: 1;
+}
+
+.task-details-activity-link:hover {
+    color: $task-details-accent !important;
+    background: $task-details-accent-soft !important;
 }
 
 // Premium Filters
@@ -353,5 +991,325 @@
                 gap: 0.25rem;
             }
         }
+    }
+}
+
+// Custom Scrollbar for Drawer
+.custom-scrollbar {
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 3px;
+
+        &:hover {
+            background: #cbd5e1;
+        }
+    }
+}
+
+// Premium Drawer Styles
+::ng-deep .p-drawer-header {
+    background: #fff !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+}
+
+::ng-deep .p-drawer-content {
+    background: #f9fafb !important;
+    padding: 0 !important;
+}
+
+.premium-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+    border-bottom: 1px solid #f8f9fa;
+    margin-bottom: 0;
+    background: #fff;
+    width: 100%;
+
+    .title-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .meta-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            .id-badge {
+                font-size: 0.75rem;
+                color: #9ca3af;
+                background: #f9fafb;
+                padding: 0.125rem 0.5rem;
+                border-radius: 4px;
+                border: 1px solid #f3f4f6;
+                font-family: monospace;
+            }
+        }
+    }
+}
+
+.task-details-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .properties-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        background: #fff;
+        border-radius: 8px;
+        padding: 1.25rem;
+        border: 1px solid #f3f4f6;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        h3 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .property-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .property-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+
+            label {
+                font-size: 0.7rem;
+                font-weight: 700;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .value {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: #1f2937;
+
+                i {
+                    color: #6c5ce7;
+                    font-size: 0.875rem;
+                }
+            }
+
+            p.description-text {
+                font-size: 0.875rem;
+                line-height: 1.6;
+                color: #374151;
+                background: #f9fafb;
+                padding: 1rem;
+                border-radius: 8px;
+                border: 1px solid #f3f4f6;
+                margin: 0;
+            }
+        }
+    }
+
+    .divider {
+        height: 1px;
+        background-color: #f3f4f6;
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+
+    .activity-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        background: #fff;
+        border-radius: 8px;
+        padding: 1.25rem;
+        border: 1px solid #f3f4f6;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            h3 {
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin: 0;
+            }
+
+            .count-badge {
+                font-size: 0.75rem;
+                color: #6b7280;
+                background: #f3f4f6;
+                padding: 0.125rem 0.5rem;
+                border-radius: 999px;
+                font-weight: 600;
+            }
+        }
+
+        .feed-list {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+
+            // Vertical Line
+            &::before {
+                content: '';
+                position: absolute;
+                left: 20px;
+                top: 1rem;
+                bottom: 1rem;
+                width: 1px;
+                background: #e5e7eb;
+                z-index: 0;
+            }
+
+            .feed-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 0.75rem;
+                border-radius: 8px;
+                position: relative;
+                z-index: 1;
+                background: transparent;
+                transition: all 0.2s;
+                margin: 0 -0.75rem; // Negative margin to align content with grid but allow hover bg
+
+                &:hover {
+                    background-color: #f9fafb;
+
+                    .action-btn {
+                        opacity: 1;
+                    }
+                }
+
+                .avatar-wrapper {
+                    background: white;
+                    border-radius: 50%;
+                    padding: 2px;
+                    border: 1px solid #fff;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                    z-index: 2;
+                    flex-shrink: 0;
+                }
+
+                .feed-content {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+                    min-width: 0; // Truncation fix
+
+                    .top-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 0.5rem;
+                    }
+
+                    .student-name {
+                        font-size: 0.875rem;
+                        font-weight: 600;
+                        color: #111827;
+                    }
+
+                    .timestamp {
+                        font-size: 0.75rem;
+                        color: #9ca3af;
+                        white-space: nowrap;
+                    }
+
+                    .status-badge {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.375rem;
+                        font-size: 0.75rem;
+                        font-weight: 500;
+                        padding: 0.125rem 0.5rem;
+                        border-radius: 4px;
+                        width: fit-content;
+                        margin-top: 0.125rem;
+
+                        &.submitted {
+                            color: #059669;
+                            background: #ecfdf5;
+                            border: 1px solid #d1fae5;
+                        }
+
+                        &.pending {
+                            color: #6b7280;
+                            background: #f3f4f6;
+                            border: 1px solid #e5e7eb;
+                        }
+                    }
+                }
+
+                .action-btn {
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                    color: #9ca3af;
+
+                    &:hover {
+                        color: #6c5ce7;
+                        background: rgba(108, 92, 231, 0.1);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Footer Overrides
+::ng-deep .p-drawer-footer {
+    padding: 0 !important;
+    border-top: 1px solid #f3f4f6;
+}
+
+.drawer-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem 1.5rem; // Add padding inside to match drawer content
+
+    button {
+        font-size: 0.875rem;
     }
 }
