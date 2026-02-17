@@ -1,71 +1,357 @@
-.tasks-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sqx-space-4);
-}
-
-.task-item {
-    background: white;
-    padding: var(--sqx-space-6);
-    border-radius: var(--sqx-radius-lg); // Matches the new card style request
-    border: 1px solid var(--sqx-color-border); // Add border like other cards
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    transition: all 0.2s ease;
-
-    &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); // Add hover effect
-        border-color: var(--sqx-color-primary-light);
-    }
-}
-
-.task-header {
+// Header Actions
+// Header Actions
+.tasks-header-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--sqx-space-2);
+    margin-bottom: 2rem;
 
-    h3 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--sqx-color-text);
+    .view-toggles {
+        background: white;
+        padding: 0.25rem;
+        border-radius: 8px;
+        border: 1px solid #dfe6e9;
+        display: flex;
+        gap: 0.25rem;
+
+        .p-button {
+            width: 2.5rem;
+            height: 2.5rem;
+            color: #b2bec3;
+            border-radius: 6px;
+
+            &:hover {
+                background: #f1f2f6;
+                color: #636e72;
+            }
+
+            &.active {
+                background: #6c5ce7; // Brand Color
+                color: white;
+            }
+        }
+    }
+
+    .action-buttons {
+        .create-btn {
+            background: #6c5ce7; // Brand Color
+            border: 1px solid #6c5ce7;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 8px;
+
+            &:hover {
+                background: #5b4bc4; // Replaced darken
+                border-color: #5b4bc4;
+            }
+        }
     }
 }
 
-.task-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+// ... existing filters ...
 
-    &.pending {
-        background-color: #FFF4E5;
-        color: #FF9800; // Orange for pending
+// Drawer Width Overrides
+::ng-deep .create-task-drawer {
+    width: 100%;
+
+    @media (min-width: 768px) {
+        width: 20rem !important; // 320px
     }
 
-    &.completed {
-        background-color: #E8F5E9;
-        color: #4CAF50; // Green for completed
+    @media (min-width: 1024px) {
+        width: 30rem !important; // 480px
     }
 }
 
-.task-description {
-    color: var(--sqx-color-text-light); // gray-500 equivalent
-    margin-bottom: var(--sqx-space-4);
-    font-size: 14px;
-    line-height: 1.5;
+::ng-deep .task-details-drawer {
+    width: 100%;
+
+    @media (min-width: 768px) {
+        width: 40rem !important;
+    }
+
+    @media (min-width: 1024px) {
+        width: 50rem !important;
+    }
 }
 
-.task-meta {
+// Premium Filters
+.filters-section {
     display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
     align-items: center;
-    color: var(--sqx-color-text-light);
-    font-size: 13px;
 
-    i {
-        margin-right: var(--sqx-space-2);
-        color: var(--sqx-color-primary); // Icon color
+    .search-box {
+        flex: 2;
+        min-width: 300px;
+        position: relative;
+
+        i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b2bec3;
+            z-index: 1;
+        }
+
+        input {
+            width: 100%;
+            padding-left: 2.5rem;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
+            height: 42px;
+            transition: all 0.2s;
+
+            &:focus {
+                border-color: #6c5ce7;
+                box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1);
+            }
+        }
+    }
+
+    .status-filter,
+    .date-filter,
+    .batch-filter {
+        flex: 1;
+        min-width: 180px;
+
+        ::ng-deep .p-select,
+        ::ng-deep .p-datepicker {
+            width: 100%;
+            border-radius: 8px;
+            height: 42px;
+            border-color: #dfe6e9;
+            align-items: center;
+
+            &:hover {
+                border-color: #b2bec3;
+            }
+
+            &.p-focus {
+                border-color: #6c5ce7;
+                box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1);
+            }
+        }
+
+        ::ng-deep .p-inputtext {
+            border-radius: 8px;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+    }
+}
+
+// Drawer Customization (if Tailwind classes aren't enough)
+::ng-deep .p-drawer {
+    border: none;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
+
+    .p-drawer-content {
+        padding: 1.5rem;
+    }
+}
+
+.create-task-btn {
+    background: #6c5ce7 !important;
+    border: 1px solid #6c5ce7 !important;
+
+    &:hover {
+        background: #5b4bc4 !important;
+        border-color: #5b4bc4 !important;
+    }
+}
+
+// Global Overrides for Premium Feel
+::ng-deep .p-component {
+    font-family: 'Inter', sans-serif;
+}
+
+// List & Board styles remain...
+
+// List View Table
+.tasks-table-container {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #dfe6e9;
+    overflow: hidden;
+
+    .task-cell-content {
+        display: flex;
+        flex-direction: column;
+
+        .task-title {
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .task-desc-truncate {
+            font-size: 13px;
+            color: #b2bec3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+        }
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+
+        &.pending {
+            background: #FFF4E5;
+            color: #FF9800;
+        }
+
+        &.in-progress {
+            background: #E3F2FD;
+            color: #2196F3;
+        }
+
+        &.completed {
+            background: #E8F5E9;
+            color: #4CAF50;
+        }
+    }
+}
+
+// Board View
+.tasks-board {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    min-height: calc(100vh - 250px);
+
+    .board-column {
+        flex: 1;
+        min-width: 300px;
+        background: #F9FAFB;
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid #dfe6e9;
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid transparent;
+
+            h3 {
+                font-size: 16px;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            .count {
+                background: rgba(0, 0, 0, 0.05);
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            &.pending {
+                border-color: #FF9800;
+
+                h3 {
+                    color: #d97706;
+                }
+            }
+
+            &.in-progress {
+                border-color: #2196F3;
+
+                h3 {
+                    color: #0284c7;
+                }
+            }
+
+            &.completed {
+                border-color: #4CAF50;
+
+                h3 {
+                    color: #059669;
+                }
+            }
+        }
+
+        .column-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+}
+
+.kanban-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-color: #a29bfe;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+
+        .mini-tag {
+            padding: 2px 6px;
+            font-size: 10px;
+        }
+
+        .due-date {
+            font-size: 12px;
+            color: #b2bec3;
+        }
+    }
+
+    h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #2d3436;
+    }
+
+    .batch-name {
+        font-size: 12px;
+        color: #b2bec3;
+        margin: 0 0 1rem 0;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        border-top: 1px solid #f1f2f6;
+        padding-top: 0.75rem;
+        margin-top: 0.5rem;
+
+        .progress-info {
+            font-size: 0.85rem;
+            color: #636e72;
+            font-weight: 500;
+
+            span {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+        }
     }
 }

@@ -1,16 +1,322 @@
 <div class="page-container">
-    <div class="tasks-list">
-        @for (task of tasks; track task.id) {
-        <div class="task-item">
-            <div class="task-header">
-                <h3>{{ task.title }}</h3>
-                <!-- <span class="task-status" [class]="task.status.toLowerCase()">{{ task.status }}</span> -->
+    <!-- Header -->
+    <div class="tasks-header-actions">
+        <div class="view-toggles">
+            <button pButton icon="pi pi-list" class="p-button-text" [class.active]="currentView() === 'list'"
+                (click)="toggleView('list')" pTooltip="List View" tooltipPosition="bottom"></button>
+            <button pButton icon="pi pi-th-large" class="p-button-text" [class.active]="currentView() === 'board'"
+                (click)="toggleView('board')" pTooltip="Board View" tooltipPosition="bottom"></button>
+        </div>
+
+        <div class="action-buttons">
+            <button pButton label="Create Task" icon="pi pi-plus" class="create-btn"
+                (click)="openCreateDrawer()"></button>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filters-section">
+        <span class="p-input-icon-left search-box">
+            <i class="pi pi-search"></i>
+            <input type="text" pInputText placeholder="Search tasks..." [(ngModel)]="searchText" />
+        </span>
+
+        <p-select [options]="filterStatusOptions" [(ngModel)]="filterStatus" placeholder="Status" [showClear]="true"
+            class="status-filter"></p-select>
+
+        <p-datepicker [(ngModel)]="filterDateRange" selectionMode="range" [readonlyInput]="true"
+            placeholder="Date Range" class="date-filter"></p-datepicker>
+
+        <p-select [options]="batches" [(ngModel)]="filterBatch" optionLabel="name" placeholder="Filter by Batch"
+            [showClear]="true" class="batch-filter"></p-select>
+    </div>
+
+    <!-- List View -->
+    @if (currentView() === 'list') {
+    <div class="tasks-table-container">
+        <p-table [value]="filteredTasks" [tableStyle]="{ 'min-width': '50rem' }" selectionMode="single"
+            [(selection)]="selectedTask" (onRowSelect)="openTaskDetails($event.data)">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Task Name</th>
+                    <th>Batch</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-task>
+                <tr [pSelectableRow]="task" class="cursor-pointer">
+                    <td>
+                        <div class="task-cell-content">
+                            <span class="task-title">{{ task.title }}</span>
+                            <span class="task-desc-truncate">{{ task.description }}</span>
+                        </div>
+                    </td>
+                    <td>{{ task.batchName }}</td>
+                    <td>{{ task.dueDate | date:'MMM d, y' }}</td>
+                    <td>
+                        <p-tag [value]="task.priority"
+                            [severity]="task.priority === 'High' ? 'danger' : (task.priority === 'Medium' ? 'warn' : 'success')"></p-tag>
+                    </td>
+                    <td>
+                        <span class="status-badge" [class]="task.status.toLowerCase().replace(' ', '-')">{{ task.status
+                            }}</span>
+                    </td>
+                    <td>
+                        <div class="assigned-stats">
+                            <i class="pi pi-users"></i>
+                            <span>{{ task.submittedCount }}/{{ task.assignedCount }} Submitted</span>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    }
+
+    <!-- Board View -->
+    @if (currentView() === 'board') {
+    <div class="tasks-board">
+        <!-- Pending Column -->
+        <div class="board-column">
+            <div class="column-header pending">
+                <h3>Pending</h3>
+                <span class="count">{{ getTasksByStatus('Pending').length }}</span>
             </div>
-            <p class="task-description">{{ task.description }}</p>
-            <div class="task-meta">
-                <span><i class="pi pi-calendar"></i> Due: {{ task.dueDate | date:'dd/MM/yyyy h:mm a' }}</span>
+            <div class="column-content">
+                @for (task of getTasksByStatus('Pending'); track task.id) {
+                <div class="kanban-card" (click)="openTaskDetails(task)">
+                    <div class="card-header">
+                        <p-tag [value]="task.priority"
+                            [severity]="task.priority === 'High' ? 'danger' : (task.priority === 'Medium' ? 'warn' : 'success')"
+                            styleClass="mini-tag"></p-tag>
+                        <span class="due-date">{{ task.dueDate | date:'MMM d' }}</span>
+                    </div>
+                    <h4>{{ task.title }}</h4>
+                    <p class="batch-name">{{ task.batchName }}</p>
+                    <div class="card-footer">
+                        <div class="progress-info">
+                            <span>{{ task.submittedCount }}/{{ task.assignedCount }} Submitted</span>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div class="board-column">
+            <div class="column-header in-progress">
+                <h3>In Progress</h3>
+                <span class="count">{{ getTasksByStatus('In Progress').length }}</span>
+            </div>
+            <div class="column-content">
+                @for (task of getTasksByStatus('In Progress'); track task.id) {
+                <div class="kanban-card" (click)="openTaskDetails(task)">
+                    <div class="card-header">
+                        <p-tag [value]="task.priority"
+                            [severity]="task.priority === 'High' ? 'danger' : (task.priority === 'Medium' ? 'warn' : 'success')"
+                            styleClass="mini-tag"></p-tag>
+                        <span class="due-date">{{ task.dueDate | date:'MMM d' }}</span>
+                    </div>
+                    <h4>{{ task.title }}</h4>
+                    <p class="batch-name">{{ task.batchName }}</p>
+                    <div class="card-footer">
+                        <div class="progress-info">
+                            <span>{{ task.submittedCount }}/{{ task.assignedCount }} Submitted</span>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Completed Column -->
+        <div class="board-column">
+            <div class="column-header completed">
+                <h3>Completed</h3>
+                <span class="count">{{ getTasksByStatus('Completed').length }}</span>
+            </div>
+            <div class="column-content">
+                @for (task of getTasksByStatus('Completed'); track task.id) {
+                <div class="kanban-card" (click)="openTaskDetails(task)">
+                    <div class="card-header">
+                        <p-tag [value]="task.priority"
+                            [severity]="task.priority === 'High' ? 'danger' : (task.priority === 'Medium' ? 'warn' : 'success')"
+                            styleClass="mini-tag"></p-tag>
+                        <span class="due-date">{{ task.dueDate | date:'MMM d' }}</span>
+                    </div>
+                    <h4>{{ task.title }}</h4>
+                    <p class="batch-name">{{ task.batchName }}</p>
+                    <div class="card-footer">
+                        <div class="progress-info">
+                            <span>{{ task.submittedCount }}/{{ task.assignedCount }} Submitted</span>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+<!-- Create Task Drawer -->
+<p-drawer [(visible)]="isCreateDrawerOpen" position="right"
+    styleClass="!w-full md:!w-80 lg:!w-[30rem] create-task-drawer" [modal]="true" [closable]="true">
+    <ng-template #header>
+        <div class="flex items-center justify-between w-full">
+            <span class="font-bold text-xl">{{ isEditing() ? 'Edit Task' : 'Create New Task' }}</span>
+        </div>
+    </ng-template>
+
+    <div class="flex flex-col gap-4 h-full">
+        <div class="flex flex-col gap-2">
+            <label class="font-semibold text-gray-600">Task Title</label>
+            <input type="text" pInputText [(ngModel)]="newTask.title" placeholder="Enter task title" class="w-full" />
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label class="font-semibold text-gray-600">Description</label>
+            <textarea pInputTextarea [(ngModel)]="newTask.description" rows="4" placeholder="Enter task description"
+                class="w-full resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-gray-600">Batch</label>
+                <p-select [options]="batches" [(ngModel)]="newTask.batch" optionLabel="name" placeholder="Select Batch"
+                    styleClass="w-full" [checkmark]="true" [showClear]="true"></p-select>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-gray-600">Due Date</label>
+                <p-datepicker [(ngModel)]="newTask.dueDate" [showTime]="true" placeholder="Select due date"
+                    appendTo="body" styleClass="w-full"></p-datepicker>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-gray-600">Duration</label>
+                <input type="text" pInputText [(ngModel)]="newTask.duration" placeholder="e.g. 2 hours"
+                    class="w-full" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-gray-600">Priority</label>
+                <p-select [options]="priorityOptions" [(ngModel)]="newTask.priority" placeholder="Select Priority"
+                    styleClass="w-full" [checkmark]="true" [showClear]="true"></p-select>
+            </div>
+        </div>
+
+        @if (newTask.batch) {
+        <div class="flex flex-col gap-2 mt-2">
+            <label class="font-semibold text-gray-600">Assigned Students ({{ newTask.batch.students.length }})</label>
+            <div class="flex items-center -space-x-2">
+                <p-avatarGroup>
+                    @for (student of newTask.batch.students.slice(0, 5); track student.id) {
+                    <p-avatar [image]="student.avatar" shape="circle" size="normal"
+                        styleClass="border-2 border-white"></p-avatar>
+                    }
+                    @if (newTask.batch.students.length > 5) {
+                    <p-avatar [label]="'+' + (newTask.batch.students.length - 5)" shape="circle" size="normal"
+                        [style]="{'background-color': '#9c27b0', 'color': '#ffffff'}"></p-avatar>
+                    }
+                </p-avatarGroup>
             </div>
         </div>
         }
     </div>
-</div>
+
+    <ng-template #footer>
+        <div class="flex items-center justify-end gap-2 w-full">
+            <button pButton label="Cancel" class="p-button-outlined p-button-secondary"
+                (click)="closeCreateDrawer()"></button>
+            <button pButton [label]="isEditing() ? 'Save Changes' : 'Create Task'" icon="pi pi-check"
+                (click)="saveTask()" [disabled]="!newTask.title || !newTask.batch" class="create-task-btn"></button>
+        </div>
+    </ng-template>
+</p-drawer>
+
+<!-- Task Details Drawer -->
+<p-drawer [(visible)]="isDetailsDrawerOpen" position="right" styleClass="task-details-drawer" [modal]="true"
+    [closable]="true">
+    <ng-template #header>
+        <div class="flex items-center justify-between w-full pt-4 px-2">
+            <div class="flex items-center gap-4">
+                <span class="font-bold text-2xl text-gray-800">{{ selectedTask()?.title }}</span>
+                <p-tag [value]="selectedTask()?.priority"
+                    [severity]="selectedTask()?.priority === 'High' ? 'danger' : (selectedTask()?.priority === 'Medium' ? 'warn' : 'success')"
+                    styleClass="uppercase text-xs font-bold"></p-tag>
+            </div>
+            <div class="flex gap-2">
+                <button pButton icon="pi pi-pencil"
+                    class="p-button-text p-button-rounded text-gray-500 hover:text-gray-700"
+                    (click)="editTask()"></button>
+                <button pButton icon="pi pi-trash" class="p-button-text p-button-rounded p-button-danger"
+                    (click)="confirmDelete($event)"></button>
+            </div>
+        </div>
+    </ng-template>
+
+    @if (selectedTask(); as task) {
+    <div class="flex flex-col gap-8 h-full px-2 py-4">
+        <!-- Meta Info Row -->
+        <div
+            class="flex flex-col gap-3 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm items-start">
+            <div class="flex items-center gap-2">
+                <i class="pi pi-clock text-[#6c5ce7]"></i>
+                <span class="font-medium">{{ task.dueDate | date:'medium' }}</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <i class="pi pi-hourglass text-[#6c5ce7]"></i>
+                <span class="font-medium">{{ task.duration }}</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <i class="pi pi-users text-[#6c5ce7]"></i>
+                <span class="font-medium">{{ task.batchName }}</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Description</label>
+            <p class="text-gray-700 leading-relaxed text-base bg-white">{{ task.description }}</p>
+        </div>
+
+        <!-- Submissions Section -->
+        <div class="flex flex-col gap-4">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Student Submissions</h3>
+
+            <div class="grid grid-cols-1 gap-3">
+                @for (sub of getTaskSubmissions(task); track sub.student.id) {
+                <div
+                    class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md hover:border-[#6c5ce7] transition-all duration-200">
+                    <div class="flex items-center gap-4">
+                        <p-avatar [image]="sub.student.avatar" shape="circle" size="large"></p-avatar>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-800 text-sm">{{ sub.student.name }}</span>
+                            <span class="text-xs font-medium"
+                                [ngClass]="{'text-green-500': sub.status === 'Submitted', 'text-gray-400': sub.status === 'Pending'}">
+                                {{ sub.status }} @if(sub.status === 'Submitted') { • {{ sub.submittedAt |
+                                date:'shortDate' }} }
+                            </span>
+                        </div>
+                    </div>
+
+                    @if (sub.status === 'Submitted') {
+                    <button pButton label="View" size="small" outlined
+                        class="p-button-sm !px-4 !py-1 !text-xs"></button>
+                    }
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    }
+</p-drawer>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
