@@ -2,27 +2,104 @@
   <div class="dashboard-content">
     <!-- Main Content Area -->
     <div class="main-area">
-      <!-- Top Cards Row -->
-      <div class="cards-row">
-        <!-- Courses (Moved to first) -->
-        <div class="info-card card-purple">
-          <h3 class="card-title">Courses</h3>
-          <div class="card-icon" style="background-color: var(--sqx-color-card-icon-purple)">
-            <i class="pi pi-briefcase"></i>
+      <!-- Course Overview Section -->
+      <div class="overview-grid">
+        @for (card of courseOverview; track card.title) {
+        <div class="premium-summary-card">
+          <div class="card-icon-wrapper" [style.color]="card.color" [style.background-color]="card.bg">
+            <i [class]="card.icon"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-count">{{card.count}}</div>
+            <div class="card-title">{{card.title}}</div>
+            <div class="card-subtitle">{{card.subtitle}}</div>
+          </div>
+          <div class="card-action">
+            <span>View</span>
+            <i class="pi pi-arrow-right"></i>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Premium Banner Carousel -->
+      <div class="banner-carousel-section">
+        <p-carousel [value]="dashboardBanners" [numVisible]="1" [numScroll]="1" [circular]="true"
+          [autoplayInterval]="5000" [showIndicators]="false">
+          <ng-template let-banner pTemplate="item">
+            <div class="premium-banner"
+              [style.background]="'linear-gradient(135deg, ' + banner.color + ' 0%, ' + adjustColor(banner.color, -30) + ' 100%)'">
+              <div class="banner-content">
+                <span class="banner-subtitle">{{banner.subtitle}}</span>
+                <h2 class="banner-title">{{banner.title}}</h2>
+                <p class="banner-desc">{{banner.description}}</p>
+                <button pButton [label]="banner.buttonText"
+                  class="banner-btn p-button-raised p-button-rounded"></button>
+              </div>
+              <div class="banner-visual">
+                <!-- abstract shapes or illustration placeholder -->
+                <div class="circle-shape"></div>
+                <div class="glass-card">
+                  <i class="pi pi-bolt" style="font-size: 2rem; color: white;"></i>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </p-carousel>
+      </div>
+
+      <!-- Extensions Grid (Exams & Projects) -->
+      <div class="extensions-grid">
+        <!-- Recent Exam Results -->
+        <div class="extension-card">
+          <div class="card-header">
+            <h3 class="section-title">Recent Exam Results</h3>
+            <button class="view-all-btn">View All</button>
+          </div>
+          <div class="exam-list">
+            @for (exam of examResults; track exam.subject) {
+            <div class="exam-item">
+              <div class="exam-icon" [style.background-color]="exam.color + '20'" [style.color]="exam.color">
+                <i [class]="exam.icon"></i>
+              </div>
+              <div class="exam-details">
+                <h4 class="exam-subject">{{exam.subject}}</h4>
+                <span class="exam-date">{{exam.date}}</span>
+              </div>
+              <div class="exam-score">
+                <span class="grade" [style.color]="exam.color">{{exam.grade}}</span>
+                <span class="score-text">{{exam.score}}/{{exam.total}}</span>
+              </div>
+            </div>
+            }
           </div>
         </div>
 
-        <div class="info-card card-yellow">
-          <h3 class="card-title">Classes</h3>
-          <div class="card-icon" style="background-color: var(--sqx-color-card-icon-yellow)">
-            <i class="pi pi-video"></i>
+        <!-- Active Projects -->
+        <div class="extension-card">
+          <div class="card-header">
+            <h3 class="section-title">Active Projects</h3>
+            <button class="view-all-btn">View All</button>
           </div>
-        </div>
-
-        <div class="info-card card-violet">
-          <h3 class="card-title">Course Materials</h3>
-          <div class="card-icon" style="background-color: var(--sqx-color-card-icon-violet)">
-            <i class="pi pi-book"></i>
+          <div class="project-list">
+            @for (project of activeProjects; track project.title) {
+            <div class="project-item">
+              <div class="project-info">
+                <h4 class="project-title">{{project.title}}</h4>
+                <span class="project-due">Due: {{project.dueDate}}</span>
+              </div>
+              <div class="project-status">
+                <div class="progress-bar">
+                  <div class="fill" [style.width.%]="project.progress" [style.background-color]="project.statusColor">
+                  </div>
+                </div>
+                <span class="status-badge" [style.background-color]="project.statusColor + '20'"
+                  [style.color]="project.statusColor">
+                  {{project.status}}
+                </span>
+              </div>
+            </div>
+            }
           </div>
         </div>
       </div>
@@ -162,6 +239,33 @@
           </div>
         </div>
         }
+      </div>
+
+      <!-- Top Students -->
+      <div class="students-widget">
+        <div class="widget-header">
+          <h3 class="widget-title">Top Students</h3>
+          <span class="view-all-text">View All</span>
+        </div>
+        <div class="student-list">
+          @for (student of students; track student.name) {
+          <div class="student-item">
+            <div class="rank-badge" [class.top-3]="student.rank <= 3">{{student.rank}}</div>
+            <div class="student-avatar">
+              <img [src]="student.image" alt="Student" onError="this.src='/assets/images/default-avatar.png'">
+            </div>
+            <div class="student-info">
+              <h4 class="student-name">{{student.name}}</h4>
+              <span class="student-points">{{student.score}} pts</span>
+            </div>
+            <div class="student-trend">
+              @if(student.trend === 'up') { <i class="pi pi-arrow-up" style="color: #10B981"></i> }
+              @if(student.trend === 'down') { <i class="pi pi-arrow-down" style="color: #EF4444"></i> }
+              @if(student.trend === 'neutral') { <i class="pi pi-minus" style="color: #9CA3AF"></i> }
+            </div>
+          </div>
+          }
+        </div>
       </div>
     </div>
   </div>

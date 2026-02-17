@@ -60,13 +60,248 @@
     display: flex;
     flex-direction: column;
     gap: var(--sqx-space-6);
+    min-width: 0; // Fix for grid overflow/overlap issues
 }
 
-// Top Cards Row
-.cards-row {
+// Course Overview Grid
+.overview-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sqx-space-5);
+}
+
+// Extensions Grid (Exams & Projects)
+.extensions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--sqx-space-6);
+    margin-bottom: var(--sqx-space-6);
+}
+
+.extension-card {
+    background: white;
+    padding: var(--sqx-space-6);
+    border-radius: var(--sqx-radius-lg);
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        .section-title {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .view-all-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+    }
+}
+
+// Exam List Styles
+.exam-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .exam-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        background: #F9FAFB;
+        transition: transform 0.2s;
+
+        &:hover {
+            transform: translateX(5px);
+        }
+
+        .exam-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+
+            i {
+                font-size: 18px;
+            }
+        }
+
+        .exam-details {
+            flex: 1;
+
+            .exam-subject {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--sqx-color-text);
+                margin: 0 0 4px 0;
+            }
+
+            .exam-date {
+                font-size: 12px;
+                color: var(--sqx-color-muted);
+            }
+        }
+
+        .exam-score {
+            text-align: right;
+
+            .grade {
+                display: block;
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .score-text {
+                font-size: 12px;
+                color: var(--sqx-color-muted);
+            }
+        }
+    }
+}
+
+// Project List Styles
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    .project-item {
+        .project-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+
+            .project-title {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--sqx-color-text);
+                margin: 0;
+            }
+
+            .project-due {
+                font-size: 11px;
+                color: var(--sqx-color-muted);
+            }
+        }
+
+        .project-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            .progress-bar {
+                flex: 1;
+                height: 6px;
+                background: #F3F4F6;
+                border-radius: 3px;
+                overflow: hidden;
+
+                .fill {
+                    height: 100%;
+                    border-radius: 3px;
+                }
+            }
+
+            .status-badge {
+                font-size: 10px;
+                font-weight: 600;
+                padding: 4px 8px;
+                border-radius: 12px;
+                text-transform: uppercase;
+            }
+        }
+    }
+}
+
+
+.premium-summary-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 160px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+        .card-action {
+            color: var(--primary-color);
+        }
+    }
+
+    .card-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+
+        i {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    }
+
+    .card-content {
+        .card-count {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--sqx-color-text);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--sqx-color-text);
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--sqx-color-muted);
+        }
+    }
+
+    .card-action {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--sqx-color-muted);
+        transition: color 0.2s;
+
+        i {
+            font-size: 10px;
+        }
+    }
 }
 
 .info-card {
@@ -487,6 +722,126 @@
     }
 }
 
+// Sidebar Common Widget Styles
+.students-widget {
+    background: white;
+    padding: var(--sqx-space-5);
+    border-radius: var(--sqx-radius-lg);
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .widget-title {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .icon-action-btn {
+        background: transparent;
+        border: none;
+        color: var(--sqx-color-muted);
+        cursor: pointer;
+        padding: 4px;
+
+        &:hover {
+            color: var(--sqx-color-text);
+        }
+    }
+
+    .view-all-text {
+        font-size: 12px;
+        color: var(--primary-color);
+        font-weight: 600;
+        cursor: pointer;
+    }
+}
+
+// Students Widget
+.student-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .student-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
+        border-radius: 12px;
+        background: #F9FAFB;
+        transition: transform 0.2s;
+
+        &:hover {
+            transform: translateX(3px);
+        }
+
+        .rank-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #E5E7EB;
+            color: #6B7280;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.top-3 {
+                background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+                color: white;
+                box-shadow: 0 2px 5px rgba(245, 158, 11, 0.3);
+            }
+        }
+
+        .student-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        .student-info {
+            flex: 1;
+
+            .student-name {
+                font-size: 14px;
+                font-weight: 600;
+                margin: 0;
+                color: var(--sqx-color-text);
+            }
+
+            .student-points {
+                font-size: 11px;
+                color: var(--primary-color);
+                font-weight: 600;
+            }
+        }
+
+        .student-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+
+            i {
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+
 // Responsive Design
 @media (max-width: 1200px) {
     .dashboard-content {
@@ -503,12 +858,140 @@
     }
 }
 
-@media (max-width: 768px) {
-    .cards-row {
-        grid-template-columns: 1fr;
+@media (max-width: 1400px) {
+    .overview-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    .sidebar-area {
+    .extensions-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Premium Banner Carousel
+.banner-carousel-section {
+    margin-bottom: var(--sqx-space-6);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.premium-banner {
+    height: 240px;
+    border-radius: 24px;
+    padding: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+
+    .banner-content {
+        z-index: 2;
+        max-width: 60%;
+
+        .banner-subtitle {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .banner-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0 0 10px 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .banner-desc {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0 0 1.5rem 0;
+            font-weight: 500;
+        }
+
+        .banner-btn {
+            background: white !important;
+            color: var(--sqx-color-text) !important;
+            border: none;
+            font-weight: 700;
+            padding: 10px 24px;
+            transition: transform 0.2s ease;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+        }
+    }
+
+    .banner-visual {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 40%;
+        height: 100%;
+        pointer-events: none;
+
+        // Decorative abstract shapes
+        .circle-shape {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+        }
+
+        .glass-card {
+            position: absolute;
+            bottom: 40px;
+            right: 60px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-10deg);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+    }
+}
+
+// Override PrimeNG carousel button styles if needed
+:host ::ng-deep .p-carousel .p-carousel-indicators {
+    display: none; // Hiding indicators as requested for cleaner look, or style them
+}
+
+:host ::ng-deep .p-carousel-prev,
+:host ::ng-deep .p-carousel-next {
+    color: white;
+    background: rgba(0, 0, 0, 0.1);
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.3);
     }
 }
