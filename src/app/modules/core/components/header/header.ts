@@ -83,6 +83,11 @@ export class HeaderComponent {
       return { title: 'Dashboard', breadcrumbs: [{ label: 'Dashboard' }] };
     }
 
+    // Courses
+    if (url.includes('/courses')) {
+      return { title: 'Courses', breadcrumbs: [{ label: 'Courses' }] };
+    }
+
     // Syllabus
     if (url.includes('/syllabus')) {
       return { title: 'Syllabus', breadcrumbs: [{ label: 'Syllabus' }] };

@@ -1,0 +1,189 @@
+<div class="courses-container">
+
+    <div class="courses-header">
+        <div class="header-left">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <i class="pi pi-search"></i>
+                <input type="text" placeholder="Search by course name">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button pButton label="Add New Course" icon="pi pi-plus" (click)="navigateToAddCourse()"></button>
+        </div>
+    </div>
+
+    <h2 class="page-title">Courses Overview</h2>
+
+    <!-- Summary Cards Row -->
+    <div class="summary-cards-row">
+        <!-- Total Courses -->
+        <div class="summary-card card-light">
+            <div class="card-icon-wrapper icon-orange">
+                <span class="icon-text">12</span>
+            </div>
+            <div class="card-info">
+                <h3>Total Courses</h3>
+                <p>Total Courses Total Courses</p>
+            </div>
+            <div class="card-action">
+                <span>View Details</span>
+                <i class="pi pi-chevron-right"></i>
+            </div>
+        </div>
+
+        <!-- Completed Courses -->
+        <div class="summary-card card-light" id="completed-courses-card">
+            <div class="card-icon-wrapper icon-orange">
+                <span class="icon-text">22</span>
+            </div>
+            <div class="card-info">
+                <h3>Completed Courses</h3>
+                <p>Total Courses Total Courses</p>
+            </div>
+            <div class="card-action">
+                <span>View Details</span>
+                <i class="pi pi-chevron-right"></i>
+            </div>
+        </div>
+
+        <!-- In Progress Courses -->
+        <div class="summary-card card-light">
+            <div class="card-icon-wrapper icon-orange">
+                <span class="icon-text">3</span>
+            </div>
+            <div class="card-info">
+                <h3>In Progress Courses</h3>
+                <p>Total Courses Total Courses</p>
+            </div>
+            <div class="card-action">
+                <span>View Details</span>
+                <i class="pi pi-chevron-right"></i>
+            </div>
+        </div>
+
+        <!-- Upcoming Live Courses -->
+        <div class="summary-card card-light">
+            <div class="card-icon-wrapper icon-orange">
+                <span class="icon-text">2</span>
+            </div>
+            <div class="card-info">
+                <h3>Upcoming Live Courses</h3>
+                <p>Total Courses Total Courses</p>
+            </div>
+            <div class="card-action">
+                <span>View Details</span>
+                <i class="pi pi-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Courses Section -->
+    <div class="section-header">
+        <h2 class="section-title">Popular Courses</h2>
+        <div class="view-all">
+            <span>View all popular courses</span>
+            <i class="pi pi-chevron-right"></i>
+        </div>
+    </div>
+
+    <div class="courses-grid">
+        <div *ngFor="let course of courses" class="course-card">
+            <div class="card-top">
+                <span class="tag">Popular in week</span>
+                <button class="bookmark-btn" pTooltip="Bookmark Course" tooltipPosition="top">
+                    <i class="pi pi-bookmark"></i>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <div class="accent-bar" [style.background-color]="course.accentColor || '#FFC107'"></div>
+                <div class="content">
+                    <h3 class="course-title">{{course.title}}</h3>
+                    <p class="course-description">{{course.description}}</p>
+                </div>
+            </div>
+
+            <div class="card-divider"></div>
+
+            <div class="card-footer">
+                <div class="rating">
+                    <i class="pi pi-star-fill"></i>
+                    <span>4.2</span>
+                </div>
+
+                <div class="price-action">
+                    <div class="price-info">
+                        <span class="current-price">${{calculateDiscountedPrice(course.price, course.discount)}}</span>
+                        <span class="original-price" *ngIf="course.discount">${{course.price}}</span>
+                    </div>
+
+                    <button class="get-course-btn" *ngIf="!course.unavailable">
+                        <span>Get Course</span>
+                        <i class="pi pi-chevron-right"></i>
+                    </button>
+                    <button class="unavailable-btn" *ngIf="course.unavailable">
+                        <span>Unavailable</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Courses Section -->
+    <div class="section-header">
+        <h2 class="section-title">My Courses</h2>
+        <div class="view-all">
+            <span>View all my courses</span>
+            <i class="pi pi-chevron-right"></i>
+        </div>
+    </div>
+
+    <div class="my-courses-list">
+        <div class="list-header">
+            <div class="col col-name">Course Name</div>
+            <div class="col col-instructor">Instructor</div>
+            <div class="col col-progress">Progress ⇅</div>
+            <div class="col col-status">Status ⇅</div>
+            <div class="col col-start">Start Date</div>
+            <div class="col col-end">End Date</div>
+            <div class="col col-next">Next Live Classes</div>
+            <div class="col col-actions">Actions</div>
+        </div>
+
+        <div class="list-body">
+            <div *ngFor="let myCourse of myCourses" class="list-row">
+                <div class="col col-name">
+                    <div class="course-icon-wrapper">
+                        <i class="pi pi-box"></i>
+                    </div>
+                    <span class="name-text">{{myCourse.name}}</span>
+                </div>
+                <div class="col col-instructor">{{myCourse.instructor}}</div>
+                <div class="col col-progress progress-col">
+                    <!-- Simple Progress Bar -->
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" [style.width.%]="myCourse.progress"
+                            [style.background-color]="myCourse.progressColor"></div>
+                    </div>
+                </div>
+                <div class="col col-status">
+                    <span class="status-dot" [class.in-progress]="myCourse.status === 'In Progress'"></span>
+                    <span>{{myCourse.status}}</span>
+                </div>
+                <div class="col col-start">{{myCourse.startDate}}</div>
+                <div class="col col-end">{{myCourse.endDate}}</div>
+                <div class="col col-next">{{myCourse.nextLiveClass}}</div>
+                <div class="col col-actions">
+                    <button class="icon-btn" pTooltip="Go to Course" tooltipPosition="top"><i
+                            class="pi pi-arrow-right"></i></button>
+                    <button class="icon-btn" pTooltip="View Details" tooltipPosition="top"><i
+                            class="pi pi-eye"></i></button>
+                    <button class="icon-btn delete" pTooltip="Remove Course" tooltipPosition="top"><i
+                            class="pi pi-times"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -4,10 +4,11 @@
     <div class="main-area">
       <!-- Top Cards Row -->
       <div class="cards-row">
+        <!-- Courses (Moved to first) -->
         <div class="info-card card-purple">
-          <h3 class="card-title">Course Materials</h3>
+          <h3 class="card-title">Courses</h3>
           <div class="card-icon" style="background-color: var(--sqx-color-card-icon-purple)">
-            <i class="pi pi-book"></i>
+            <i class="pi pi-briefcase"></i>
           </div>
         </div>
 
@@ -19,45 +20,38 @@
         </div>
 
         <div class="info-card card-violet">
-          <h3 class="card-title">Course Syllabus</h3>
+          <h3 class="card-title">Course Materials</h3>
           <div class="card-icon" style="background-color: var(--sqx-color-card-icon-violet)">
-            <i class="pi pi-graduation-cap"></i>
+            <i class="pi pi-book"></i>
           </div>
         </div>
       </div>
 
-      <!-- Middle Section: Progress and Feedbacks -->
-      <div class="middle-section">
-        <!-- Course Progress -->
-        <div class="progress-card">
-          <h3 class="section-title">Course Progress</h3>
-          <div class="progress-chart">
-            <svg viewBox="0 0 200 200" class="donut-chart">
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#D1D5DB" stroke-width="20"></circle>
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#6C5CE7" stroke-width="20"
-                [attr.stroke-dasharray]="(progressPercentage * 5.027) + ' 502.7'" stroke-linecap="round"
-                transform="rotate(-90 100 100)"></circle>
-              <text x="100" y="100" dy=".3em" text-anchor="middle" font-size="32" font-weight="700"
-                fill="#1f2937">{{progressPercentage | number:'1.0-0'}}%</text>
-            </svg>
-            <div class="progress-legend">
-              <div class="legend-item">
-                <span class="legend-dot" style="background-color: #6C5CE7"></span>
-                <span>Completed ({{progressPercentage | number:'1.0-0'}}%)</span>
+      <!-- Feedbacks (Full Width) -->
+      <div class="feedbacks-section">
+        <div class="feedbacks-card">
+          <div class="card-header">
+            <h3 class="section-title">Feedbacks</h3>
+            <button class="view-all-btn">View All</button>
+          </div>
+          <div class="feedback-item">
+            <div class="feedback-header">
+              <div class="author-info">
+                <img src="/assets/images/avatar-2.jpg" alt="Author" class="author-avatar"
+                  onError="this.src='/assets/images/default-avatar.png'">
+                <div>
+                  <h4 class="feedback-author">Charil Polamraju</h4>
+                  <span class="feedback-role">Student</span>
+                </div>
               </div>
-              <div class="legend-item">
-                <span class="legend-dot" style="background-color: #D1D5DB"></span>
-                <span>Remaining ({{100 - progressPercentage | number:'1.0-0'}}%)</span>
+              <div class="feedback-rating">
+                <i class="pi pi-star-fill"></i>
+                <i class="pi pi-star-fill"></i>
+                <i class="pi pi-star-fill"></i>
+                <i class="pi pi-star-fill"></i>
+                <i class="pi pi-star"></i>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Feedbacks -->
-        <div class="feedbacks-card">
-          <h3 class="section-title">Feedbacks</h3>
-          <div class="feedback-item">
-            <h4 class="feedback-author">Charil Polamraju</h4>
             <p class="feedback-text">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi.
               Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula
@@ -91,6 +85,31 @@
 
     <!-- Sidebar Area -->
     <div class="sidebar-area">
+      <!-- Course Progress -->
+      <div class="progress-card">
+        <h3 class="section-title">Course Progress</h3>
+        <div class="progress-chart">
+          <svg viewBox="0 0 200 200" class="donut-chart">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#F3F4F6" stroke-width="15"></circle>
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#6C5CE7" stroke-width="15"
+              [attr.stroke-dasharray]="(progressPercentage * 5.027) + ' 502.7'" stroke-linecap="round"
+              transform="rotate(-90 100 100)"></circle>
+            <text x="100" y="100" dy=".3em" text-anchor="middle" font-size="28" font-weight="700"
+              fill="#1f2937">{{progressPercentage | number:'1.0-0'}}%</text>
+          </svg>
+          <div class="progress-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background-color: #6C5CE7"></span>
+              <span>Completed</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background-color: #F3F4F6"></span>
+              <span>Remaining</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Calendar Widget -->
       <div class="calendar-widget">
         <div class="calendar-header">

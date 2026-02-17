@@ -36,8 +36,8 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/dashboard/dashboard.routes').then((m) => m.dashboardRoutes)
       },
       {
-        path: 'syllabus',
-        loadChildren: () => import('./modules/syllabus/syllabus.routes').then((m) => m.syllabusRoutes)
+        path: 'courses',
+        loadChildren: () => import('./modules/courses/courses.routes').then((m) => m.coursesRoutes)
       },
       {
         path: 'materials',

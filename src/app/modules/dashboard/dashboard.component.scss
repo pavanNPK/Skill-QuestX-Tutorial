@@ -52,7 +52,7 @@
 
 .dashboard-content {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 1fr 340px; // Slightly wider sidebar for calendar
     gap: var(--sqx-space-6);
 }
 
@@ -115,68 +115,83 @@
     }
 }
 
-// Middle Section
-.middle-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--sqx-space-6);
+// Feedbacks Section (Full Width)
+.feedbacks-section {
+    width: 100%;
 }
 
-.progress-card,
 .feedbacks-card {
     background: white;
     padding: var(--sqx-space-6);
     border-radius: var(--sqx-radius-lg);
-}
 
-.section-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--sqx-color-text);
-    margin: 0 0 var(--sqx-space-5) 0;
-}
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--sqx-space-5);
 
-.progress-chart {
-    display: flex;
-    align-items: center;
-    gap: var(--sqx-space-6);
-}
+        .section-title {
+            margin: 0;
+        }
 
-.donut-chart {
-    width: 200px;
-    height: 200px;
-}
-
-.progress-legend {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sqx-space-3);
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: var(--sqx-space-2);
-    font-size: 14px;
-    color: var(--sqx-color-text);
-}
-
-.legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+        .view-all-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    }
 }
 
 .feedback-item {
-    .feedback-author {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--sqx-color-text);
-        margin: 0 0 var(--sqx-space-2) 0;
+    background: #F9FAFB;
+    padding: 1.5rem;
+    border-radius: 12px;
+
+    .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            .author-avatar {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .feedback-author {
+                font-size: 16px;
+                font-weight: 700;
+                color: var(--sqx-color-text);
+                margin: 0 0 4px 0;
+            }
+
+            .feedback-role {
+                font-size: 13px;
+                color: var(--sqx-color-muted);
+            }
+        }
+
+        .feedback-rating {
+            color: #FFC107;
+            font-size: 14px;
+            display: flex;
+            gap: 2px;
+        }
     }
 
     .feedback-text {
-        font-size: 14px;
+        font-size: 15px;
         line-height: 1.6;
         color: var(--sqx-color-text-light);
         margin: 0;
@@ -188,6 +203,13 @@
     background: white;
     padding: var(--sqx-space-6);
     border-radius: var(--sqx-radius-lg);
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--sqx-color-text);
+    margin: 0 0 var(--sqx-space-5) 0;
 }
 
 .tasks-table {
@@ -249,6 +271,8 @@
     gap: var(--sqx-space-6);
 }
 
+// Sidebar Widgets
+.progress-card,
 .calendar-widget,
 .job-board-widget {
     background: white;
@@ -256,87 +280,130 @@
     border-radius: var(--sqx-radius-lg);
 }
 
-.calendar-header {
+// Progress Chart (Adapted for sidebar)
+.progress-chart {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    margin-bottom: var(--sqx-space-4);
+    gap: var(--sqx-space-6);
+    padding: 1rem 0;
 }
 
-.calendar-nav {
-    padding: 6px 10px;
-    border: 1px solid var(--sqx-color-border);
-    background: white;
-    border-radius: var(--sqx-radius-sm);
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-        background: #F9FAFB;
-    }
-
-    i {
-        font-size: 14px;
-        color: var(--sqx-color-text);
-    }
+.donut-chart {
+    width: 160px;
+    height: 160px;
 }
 
-.calendar-month {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--sqx-color-text);
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-}
-
-.calendar-day-label {
-    text-align: center;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--sqx-color-muted);
-    padding: 8px 0;
-}
-
-.calendar-day {
-    aspect-ratio: 1;
+.progress-legend {
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: var(--sqx-space-4);
+    width: 100%;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sqx-space-2);
     font-size: 13px;
     color: var(--sqx-color-text);
-    border-radius: var(--sqx-radius-sm);
-    cursor: pointer;
-    transition: all 0.2s ease;
+}
 
-    &:hover:not(.empty) {
-        background: #F3F4F6;
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+// Calendar Widget (Improved Design)
+.calendar-widget {
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0 0.5rem;
     }
 
-    &.active {
-        background: #6C5CE7;
-        color: white;
+    .calendar-month {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--sqx-color-text);
+    }
+
+    .calendar-nav {
+        background: transparent;
+        border: 1px solid #E5E7EB;
+        border-radius: 6px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+
+        &:hover {
+            background: #F9FAFB;
+        }
+
+        i {
+            font-size: 12px;
+            color: #6B7280;
+        }
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        row-gap: 8px;
+    }
+
+    .calendar-day-label {
+        text-align: center;
+        font-size: 12px;
         font-weight: 600;
+        color: #9CA3AF;
+        padding-bottom: 8px;
     }
 
-    &.today {
-        border: 2px solid #6C5CE7;
-        font-weight: 600;
-    }
+    .calendar-day {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        color: var(--sqx-color-text);
+        border-radius: 50%; // Rounded
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin: auto; // Center in grid cell
+        width: 32px;
+        height: 32px;
 
-    &.today.active {
-        border: none;
-    }
+        &:hover:not(.empty) {
+            background: #F3F4F6;
+        }
 
-    &.empty {
-        color: var(--sqx-color-muted);
-        cursor: default;
-        pointer-events: none;
+        &.active {
+            background: #6C5CE7;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.4);
+        }
+
+        &.today:not(.active) {
+            border: 1px solid #6C5CE7;
+            color: #6C5CE7;
+        }
+
+        &.empty {
+            pointer-events: none;
+        }
     }
 }
+
 
 // Job Board
 .widget-title {
@@ -351,7 +418,7 @@
     background: #F9FAFB;
     border-radius: var(--sqx-radius-md);
     margin-bottom: var(--sqx-space-3);
-    position: relative; // Needed for overlay positioning
+    position: relative;
 
     &:last-child {
         margin-bottom: 0;
@@ -384,7 +451,7 @@
 
     // Locked State Styles
     &.locked {
-        overflow: hidden; // Ensures blur doesn't leak
+        overflow: hidden;
 
         // Blur overlay
         .lock-overlay {
@@ -393,7 +460,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.85); // High opacity to obscure content
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(2px);
             z-index: 10;
             display: flex;
@@ -429,15 +496,15 @@
     .sidebar-area {
         grid-template-columns: repeat(2, 1fr);
         display: grid;
+
+        .progress-card {
+            height: auto;
+        }
     }
 }
 
 @media (max-width: 768px) {
     .cards-row {
-        grid-template-columns: 1fr;
-    }
-
-    .middle-section {
         grid-template-columns: 1fr;
     }
 

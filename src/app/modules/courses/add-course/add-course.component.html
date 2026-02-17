@@ -1,0 +1,57 @@
+<div class="add-course-container">
+    <div class="form-card">
+        <h2>Create New Course</h2>
+
+        <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+
+            <div class="form-group">
+                <label for="title">Course Title</label>
+                <input pInputText id="title" formControlName="title" placeholder="Enter course title">
+                <small class="error" *ngIf="courseForm.get('title')?.invalid && courseForm.get('title')?.touched">Title
+                    is required.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea pInputTextarea id="description" formControlName="description" rows="5"
+                    placeholder="Enter course description"></textarea>
+                <small class="error"
+                    *ngIf="courseForm.get('description')?.invalid && courseForm.get('description')?.touched">Description
+                    is required.</small>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="price">Price ($)</label>
+                    <input pInputText type="number" id="price" formControlName="price" placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label for="discount">Discount (%)</label>
+                    <input pInputText type="number" id="discount" formControlName="discount" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="video">Course Intro Video</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="video" (change)="onFileSelected($event)" accept="video/*">
+                    <div class="upload-placeholder" *ngIf="!selectedFileName">
+                        <i class="pi pi-upload"></i>
+                        <span>Drag and drop or click to upload video</span>
+                    </div>
+                    <div class="file-info" *ngIf="selectedFileName">
+                        <i class="pi pi-video"></i>
+                        <span>{{selectedFileName}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button pButton type="button" label="Cancel" class="p-button-secondary" (click)="onCancel()"></button>
+                <button pButton type="submit" label="Create Course" [disabled]="courseForm.invalid"></button>
+            </div>
+
+        </form>
+    </div>
+</div>
