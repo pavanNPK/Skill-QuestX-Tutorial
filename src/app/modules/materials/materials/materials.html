@@ -1,86 +1,81 @@
 <div class="materials-container">
 
-    <div class="materials-container">
+    <!-- Breadcrumb Header Removed (Using Global Header) -->
 
-        <!-- Breadcrumb Header -->
-        <div class="page-header">
-            <p-breadcrumb [model]="breadcrumbItems" [home]="home"></p-breadcrumb>
-        </div>
-
-        <!-- View 1: Enrolled Courses List -->
-        @if (!selectedCourse) {
-        <div class="view-section fade-in">
-            <!-- Removed duplicate 'My Learning Materials' header as requested -->
-            <div class="courses-list">
-                @for (course of enrolledCourses; track course.id) {
-                <div class="course-item">
-                    <div class="course-icon">
-                        <i class="pi pi-book"></i>
-                    </div>
-                    <div class="course-info">
-                        <h3 class="course-name">{{ course.title }}</h3>
-                        <p class="instructor">By {{ course.instructor }}</p>
-                        <div class="progress-wrapper">
-                            <div class="progress-bar">
-                                <div class="fill" [style.width.%]="course.progress"></div>
-                            </div>
-                            <span class="progress-text">{{ course.progress }}% Complete</span>
-                        </div>
-                    </div>
-                    <button pButton label="View Material" icon="pi pi-arrow-right" class="action-btn"
-                        (click)="selectCourse(course)"></button>
+    <!-- View 1: Enrolled Courses List -->
+    @if (!selectedCourse) {
+    <div class="view-section fade-in">
+        <!-- Removed duplicate 'My Learning Materials' header as requested -->
+        <div class="courses-list">
+            @for (course of enrolledCourses; track course.id) {
+            <div class="course-item">
+                <div class="course-icon">
+                    <i class="pi pi-book"></i>
                 </div>
-                }
-            </div>
-        </div>
-        }
-
-        <!-- View 2: Concept List for Selected Course -->
-        @if (selectedCourse) {
-        <div class="view-section fade-in">
-            <div class="concepts-grid">
-                @for (concept of selectedCourse.concepts; track concept.id) {
-                <div class="concept-card-premium" (click)="viewConcept(concept)">
-                    <div class="card-content">
-                        <h3 class="premium-title">{{ concept.title }}</h3>
-                        <p class="premium-desc">{{ concept.description }}</p>
-                    </div>
-                    <div class="card-footer">
-                        <div class="resource-badge">
-                            <i class="pi pi-folder-open"></i>
-                            <span>{{ concept.materials.length }} Resources</span>
+                <div class="course-info">
+                    <h3 class="course-name">{{ course.title }}</h3>
+                    <p class="instructor">By {{ course.instructor }}</p>
+                    <div class="progress-wrapper">
+                        <div class="progress-bar">
+                            <div class="fill" [style.width.%]="course.progress"></div>
                         </div>
-                        <i class="pi pi-chevron-right arrow-icon"></i>
+                        <span class="progress-text">{{ course.progress }}% Complete</span>
                     </div>
                 </div>
-                }
+                <button pButton label="View Material" icon="pi pi-arrow-right" class="action-btn"
+                    (click)="selectCourse(course)"></button>
             </div>
+            }
         </div>
-        }
+    </div>
+    }
 
-        <!-- Modal: Concept Details -->
-        <p-dialog [(visible)]="displayModal" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
-            [resizable]="false" header="Learning Resources" styleClass="material-modal">
-            @if (selectedConcept) {
-            <div class="modal-content">
-                <h3 class="modal-concept-title">{{ selectedConcept.title }}</h3>
-                <p class="modal-concept-desc">{{ selectedConcept.description }}</p>
-
-                <div class="resources-grid">
-                    @for (material of selectedConcept.materials; track material.title) {
-                    <div class="resource-item">
-                        <div class="res-icon" [ngClass]="material.type">
-                            <i [class]="getIconForType(material.type)"></i>
-                        </div>
-                        <div class="res-info">
-                            <h4 class="res-title">{{ material.title }}</h4>
-                            <span class="res-type">{{ material.type | titlecase }}</span>
-                        </div>
-                        <button class="open-btn" pButton icon="pi pi-external-link" label="Open"></button>
+    <!-- View 2: Concept List for Selected Course -->
+    @if (selectedCourse) {
+    <div class="view-section fade-in">
+        <div class="concepts-grid">
+            @for (concept of selectedCourse.concepts; track concept.id) {
+            <div class="concept-card-premium" (click)="viewConcept(concept)">
+                <div class="card-content">
+                    <h3 class="premium-title">{{ concept.title }}</h3>
+                    <p class="premium-desc">{{ concept.description }}</p>
+                </div>
+                <div class="card-footer">
+                    <div class="resource-badge">
+                        <i class="pi pi-folder-open"></i>
+                        <span>{{ concept.materials.length }} Resources</span>
                     </div>
-                    }
+                    <i class="pi pi-chevron-right arrow-icon"></i>
                 </div>
             </div>
             }
-        </p-dialog>
+        </div>
     </div>
+    }
+
+    <!-- Modal: Concept Details -->
+    <p-dialog [(visible)]="displayModal" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
+        [resizable]="false" header="Learning Resources" styleClass="material-modal">
+        @if (selectedConcept) {
+        <div class="modal-content">
+            <h3 class="modal-concept-title">{{ selectedConcept.title }}</h3>
+            <p class="modal-concept-desc">{{ selectedConcept.description }}</p>
+
+            <div class="resources-grid">
+                @for (material of selectedConcept.materials; track material.title) {
+                <div class="resource-item">
+                    <div class="res-icon" [ngClass]="material.type">
+                        <i [class]="getIconForType(material.type)"></i>
+                    </div>
+                    <div class="res-info">
+                        <h4 class="res-title">{{ material.title }}</h4>
+                        <span class="res-type">{{ material.type | titlecase }}</span>
+                    </div>
+                    <button class="open-btn" pButton icon="pi pi-external-link" label="Open"></button>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </p-dialog>
+</div>

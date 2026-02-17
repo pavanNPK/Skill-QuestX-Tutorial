@@ -3,27 +3,40 @@
         <div class="header-left">
             <div class="title-section">
                 <h1 class="page-title">{{ pageTitle }}</h1>
-                @if (breadcrumbs.length > 0) {
                 <nav class="breadcrumbs">
                     @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
-                    <span>
+                    <span class="breadcrumb-item">
+                        <!-- If URL exists, routerLink -->
                         @if (crumb.url && !last) {
-                        <a [href]="crumb.url" class="breadcrumb-link">
-                            {{ crumb.label }}
+                        <a [routerLink]="crumb.url" class="breadcrumb-link" [pTooltip]="crumb.title || crumb.label"
+                            tooltipPosition="bottom">
+                            @if (crumb.icon) { <i [class]="crumb.icon"></i> }
+                            <span class="crumb-text">{{ crumb.label }}</span>
                         </a>
                         }
-                        @if (!crumb.url || last) {
-                        <span class="breadcrumb-current">
-                            {{ crumb.label }}
+                        <!-- If Command exists (internal nav), click handler -->
+                        @if (crumb.command && !last) {
+                        <a (click)="crumb.command()" class="breadcrumb-link clickable"
+                            [pTooltip]="crumb.title || crumb.label" tooltipPosition="bottom">
+                            @if (crumb.icon) { <i [class]="crumb.icon"></i> }
+                            <span class="crumb-text">{{ crumb.label }}</span>
+                        </a>
+                        }
+                        <!-- If neither or last, just text -->
+                        @if ((!crumb.url && !crumb.command) || last) {
+                        <span class="breadcrumb-current" [pTooltip]="crumb.title || crumb.label"
+                            tooltipPosition="bottom">
+                            @if (crumb.icon) { <i [class]="crumb.icon"></i> }
+                            <span class="crumb-text">{{ crumb.label }}</span>
                         </span>
                         }
+
                         @if (!last) {
                         <i class="pi pi-chevron-right breadcrumb-separator"></i>
                         }
                     </span>
                     }
                 </nav>
-                }
             </div>
         </div>
 

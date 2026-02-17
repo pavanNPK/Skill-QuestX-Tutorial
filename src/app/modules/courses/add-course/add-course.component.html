@@ -1,16 +1,11 @@
 <div class="add-course-container">
 
     <!-- Header with Breadcrumb -->
-    <div class="page-header">
-        <button class="back-icon-btn" (click)="onCancel()">
-            <i class="pi pi-arrow-left"></i>
-        </button>
-        <p-breadcrumb [model]="breadcrumbItems" [home]="home"></p-breadcrumb>
-    </div>
+    <!-- Header with Breadcrumb Removed (Using Global Header) -->
 
     <!-- Full Width Form Card -->
     <div class="form-card-premium">
-        <h2 class="form-title">Course Details</h2>
+
 
         <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
 
@@ -61,7 +56,7 @@
             </div>
 
             <div class="form-actions">
-                <button pButton type="button" label="Cancel" class="p-button-text cancel-btn"
+                <button pButton type="button" label="Cancel" class="p-button-outlined cancel-btn"
                     (click)="onCancel()"></button>
                 <button pButton type="submit" label="Create Course" [disabled]="courseForm.invalid"
                     class="create-btn"></button>

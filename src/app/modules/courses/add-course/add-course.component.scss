@@ -181,23 +181,33 @@
         border-top: 1px solid #F3F4F6;
 
         .create-btn {
-            background: var(--primary-color);
+            background: #6C5CE7;
             border: none;
             padding: 12px 30px;
             font-weight: 600;
             border-radius: 8px;
+            color: white; // Ensure text is white
 
             &:disabled {
-                background: #9CA3AF;
+                background: #6C5CE7 !important;
+                opacity: 0.5 !important; // Override PrimeNG disabled opacity/bg
+                color: white !important;
+                border: none !important;
+                cursor: not-allowed;
             }
         }
 
         .cancel-btn {
             color: #6B7280;
             font-weight: 600;
+            border: 1px solid #D1D5DB !important; // Add border to make it visible
+            padding: 12px 24px; // Match padding roughly
+            border-radius: 8px;
 
             &:hover {
                 color: #374151;
+                background: #F3F4F6;
+                border-color: #9CA3AF !important;
             }
         }
     }

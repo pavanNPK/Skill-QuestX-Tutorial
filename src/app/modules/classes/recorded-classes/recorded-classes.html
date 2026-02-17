@@ -1,23 +1,93 @@
-<div class="chapters-container">
-    <!-- Course Header -->
-    <div class="course-header">
-        <h1 class="course-title">{{ courseTitle }}</h1>
-        <p class="course-description">{{ courseDescription }}</p>
-    </div>
+<div class="recorded-classes-container">
 
-    <!-- Chapters Grid -->
-    <div class="chapters-grid">
-        @for (chapter of chapters; track chapter.id) {
-        <div class="chapter-card" [style.background-color]="chapter.color" (click)="viewChapter(chapter)">
-            <div class="chapter-content">
-                <h3 class="chapter-title">{{ chapter.title }}</h3>
-                <p class="chapter-subtitle">{{ chapter.subtitle }}</p>
-                <button class="view-link">
-                    View <i class="pi pi-arrow-right"></i>
+    <!-- Global Breadcrumb is in Header. Local context is removed to avoid duplication. -->
+
+    <!-- Level 1: Enrolled Courses List -->
+    @if (currentView === 'courses') {
+    <div class="view-section fade-in">
+        <!-- Removed "My Recorded Classes" title as per user feedback about redundancy -->
+        <div class="courses-grid">
+            @for (course of courses; track course.id) {
+            <div class="course-card-premium" (click)="selectCourse(course)">
+                <div class="card-icon-wrapper">
+                    <!-- Placeholder Icon if no image -->
+                    <i class="pi pi-video" style="font-size: 2rem; color: #6C5CE7"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="course-title">{{ course.title }}</h3>
+                    <div class="course-meta">
+                        <span><i class="pi pi-folder"></i> {{ course.totalChapters }} Chapters</span>
+                        <span><i class="pi pi-clock"></i> {{ course.totalHours }}h Content</span>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-bar">
+                            <div class="fill" [style.width.%]="course.progress"
+                                [style.background-color]="getProgressColor(course.progress)">
+                            </div>
+                        </div>
+                        <span class="progress-text">{{ course.progress }}% Complete</span>
+                    </div>
+                </div>
+                <button class="action-btn">
+                    <i class="pi pi-folder-open"></i> Open
                 </button>
             </div>
-            <div class="chapter-number">{{ chapter.number }}</div>
+            }
         </div>
-        }
     </div>
+    }
+
+    <!-- Level 2: Chapters (Folder Structure) -->
+    @if (currentView === 'chapters' && selectedCourse) {
+    <div class="view-section fade-in">
+        <div class="folders-grid">
+            @for (chapter of selectedCourse.chapters; track chapter.id) {
+            <div class="folder-card" (click)="selectChapter(chapter)">
+                <div class="folder-top" [style.border-bottom-color]="chapter.color">
+                    <i class="pi pi-folder folder-icon" [style.color]="chapter.color || '#FCD34D'"></i>
+                    <span class="chapter-num-badge">0{{ chapter.number }}</span>
+                </div>
+                <div class="folder-body">
+                    <h4 class="folder-title">{{ chapter.title }}</h4>
+                    <p class="folder-subtitle">{{ chapter.concepts.length }} Concepts</p>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    }
+
+    <!-- Level 3: Concepts (Grid) -->
+    @if (currentView === 'concepts' && selectedChapter) {
+    <div class="view-section fade-in">
+        <div class="concepts-grid">
+            @for (concept of selectedChapter.concepts; track concept.id) {
+            <div class="concept-item" (click)="openConcept(concept)">
+                <div class="concept-icon" [class.completed]="concept.completed">
+                    <i [class]="concept.type === 'video' ? 'pi pi-play-circle' : 'pi pi-file'"></i>
+                </div>
+                <div class="concept-info">
+                    <h4 class="concept-title">{{ concept.title }}</h4>
+                    <span class="concept-meta">{{ concept.type | titlecase }} • {{ concept.duration || 'Reading'
+                        }}</span>
+                </div>
+                <div class="concept-action">
+                    @if(concept.completed) {
+                    <i class="pi pi-check-circle completed-icon"></i>
+                    } @else {
+                    <button pButton icon="pi pi-play" class="p-button-rounded p-button-text"></button>
+                    }
+                </div>
+            </div>
+            }
+            @if (selectedChapter.concepts.length === 0) {
+            <div class="empty-state">
+                <i class="pi pi-folder-open"></i>
+                <p>No concepts uploaded yet.</p>
+            </div>
+            }
+        </div>
+    </div>
+    }
+
 </div>

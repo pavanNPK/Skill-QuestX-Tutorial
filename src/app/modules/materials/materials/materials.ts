@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MenuItem } from 'primeng/api';
+import { HeaderService } from '../../core/services/header.service';
 
 interface MaterialContent {
   type: 'video' | 'text' | 'link' | 'doc';
@@ -36,30 +37,10 @@ interface EnrolledCourse {
   templateUrl: './materials.html',
   styleUrl: './materials.scss',
 })
-export class Materials implements OnInit {
+export class Materials implements OnInit, OnDestroy {
   selectedCourse: EnrolledCourse | null = null;
   displayModal: boolean = false;
   selectedConcept: Concept | null = null;
-
-  breadcrumbItems: MenuItem[] = [];
-  home: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
-
-  ngOnInit() {
-    this.updateBreadcrumbs();
-  }
-
-  updateBreadcrumbs() {
-    if (this.selectedCourse) {
-      this.breadcrumbItems = [
-        { label: 'Materials', command: () => this.goBack() },
-        { label: this.selectedCourse.title }
-      ];
-    } else {
-      this.breadcrumbItems = [
-        { label: 'Materials' }
-      ];
-    }
-  }
 
   // Mock Data: Enrolled Courses
   enrolledCourses: EnrolledCourse[] = [
@@ -109,14 +90,49 @@ export class Materials implements OnInit {
     }
   ];
 
+  constructor(private headerService: HeaderService) { }
+
+  ngOnInit() {
+    this.updateGlobalHeader();
+  }
+
+  ngOnDestroy() {
+    this.headerService.reset();
+  }
+
+  updateGlobalHeader() {
+    const base: any[] = [
+      { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
+      { label: 'Materials', command: () => this.goBack() }
+    ];
+
+    if (!this.selectedCourse) {
+      this.headerService.updateTitle('Materials');
+      this.headerService.updateBreadcrumbs([{ label: 'Materials' }]); // Just base materials? Or simply empty if root?
+      // Actually, header.ts logic handles "Materials" root breadcrumb.
+      // If we want to override:
+      this.headerService.updateBreadcrumbs([
+        { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
+        { label: 'Materials' }
+      ]);
+    } else {
+      this.headerService.updateTitle(this.selectedCourse.title);
+      this.headerService.updateBreadcrumbs([
+        { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
+        { label: 'Materials', command: () => this.goBack() },
+        { label: this.selectedCourse.title }
+      ]);
+    }
+  }
+
   selectCourse(course: EnrolledCourse) {
     this.selectedCourse = course;
-    this.updateBreadcrumbs();
+    this.updateGlobalHeader();
   }
 
   goBack() {
     this.selectedCourse = null;
-    this.updateBreadcrumbs();
+    this.updateGlobalHeader();
   }
 
   viewConcept(concept: Concept) {

@@ -24,7 +24,7 @@
 .title-section {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px; // Increased space between breadcrumbs and title
 }
 
 .page-title {
@@ -39,31 +39,63 @@
 .breadcrumbs {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
+    gap: 8px;
+    font-size: 14px;
     color: var(--sqx-color-text-light);
-}
+    flex-wrap: wrap; // Allow wrap on very small screens, or ellipsis? User implies ellipsis.
 
-.breadcrumb-link {
-    color: var(--sqx-color-primary);
-    text-decoration: none;
-    transition: color 0.2s ease;
-
-    &:hover {
-        color: var(--sqx-color-primary-dark, #5b4cdb);
-        text-decoration: underline;
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0; // For flex item truncation
     }
-}
 
-.breadcrumb-current {
-    color: var(--sqx-color-text);
-    font-weight: 500;
-}
+    .breadcrumb-link,
+    .breadcrumb-current {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        color: inherit;
+        transition: color 0.2s;
 
-.breadcrumb-separator {
-    font-size: 10px;
-    color: var(--sqx-color-muted);
-    margin: 0 2px;
+        &.clickable {
+            cursor: pointer;
+
+            &:hover {
+                color: var(--primary-color);
+            }
+        }
+
+        .crumb-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px; // Default max width
+            display: inline-block;
+            vertical-align: middle;
+
+            @media (max-width: 768px) {
+                max-width: 150px;
+            }
+        }
+    }
+
+    .breadcrumb-link:hover {
+        color: var(--primary-color);
+    }
+
+    .breadcrumb-current {
+        font-weight: 500;
+        color: var(--sqx-color-text);
+    }
+
+    .breadcrumb-separator {
+        font-size: 10px;
+        color: #9CA3AF;
+        flex-shrink: 0;
+    }
 }
 
 .header-right {

@@ -197,6 +197,43 @@
     ::ng-deep .p-carousel-indicators {
         display: none !important; // Hide indicators if not needed or style them
     }
+
+    // Carousel Navigation Buttons Styling
+    ::ng-deep .p-carousel-prev,
+    ::ng-deep .p-carousel-next {
+        background-color: white !important;
+        background: white !important; // redundancy for safety
+        border: 1px solid #E5E7EB !important;
+        color: #6B7280 !important;
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.2s !important;
+        opacity: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        &:hover {
+            color: var(--primary-color) !important;
+            background-color: #F9FAFB !important;
+            transform: scale(1.05);
+        }
+
+        &:disabled {
+            opacity: 0.5 !important;
+            cursor: default !important;
+            box-shadow: none !important;
+        }
+
+        // Ensure icon is visible
+        .p-icon,
+        .pi {
+            font-size: 14px !important;
+            color: inherit !important;
+        }
+    }
 }
 
 // .courses-grid removed

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HeaderService } from '../../core/services/header.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,15 +21,13 @@ import { MenuItem } from 'primeng/api';
     templateUrl: './add-course.component.html',
     styleUrl: './add-course.component.scss'
 })
-export class AddCourseComponent implements OnInit {
+export class AddCourseComponent implements OnInit, OnDestroy {
     courseForm: FormGroup;
     selectedFileName: string = '';
-    breadcrumbItems: MenuItem[] = [];
-    home: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
-
     constructor(
         private fb: FormBuilder,
-        private router: Router
+        private router: Router,
+        private headerService: HeaderService
     ) {
         this.courseForm = this.fb.group({
             title: ['', Validators.required],
@@ -40,10 +39,16 @@ export class AddCourseComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.breadcrumbItems = [
-            { label: 'Courses', routerLink: '/courses' },
+        this.headerService.updateTitle('Create New Course');
+        this.headerService.updateBreadcrumbs([
+            { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
+            { label: 'Courses', url: '/courses' },
             { label: 'Create New Course' }
-        ];
+        ]);
+    }
+
+    ngOnDestroy() {
+        this.headerService.reset();
     }
 
     onFileSelected(event: any) {

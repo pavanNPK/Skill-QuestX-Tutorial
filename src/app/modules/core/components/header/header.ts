@@ -1,15 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
-import { Location } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
+import { TooltipModule } from 'primeng/tooltip';
 import { DrawerModule } from 'primeng/drawer';
+import { BadgeModule } from 'primeng/badge';
+import { HeaderService, BreadcrumbItem } from '../../services/header.service';
 
-interface Breadcrumb {
-  label: string;
-  url?: string;
-}
-
-interface Notification {
+interface AppNotification {
   id: number;
   title: string;
   message: string;
@@ -20,19 +18,17 @@ interface Notification {
 @Component({
   selector: 'sqx-header',
   standalone: true,
-  imports: [DrawerModule],
+  imports: [CommonModule, RouterLink, TooltipModule, DrawerModule, BadgeModule],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
-export class HeaderComponent {
-  private location = inject(Location);
-  private router = inject(Router);
+export class HeaderComponent implements OnInit {
+  pageTitle = '';
+  breadcrumbs: BreadcrumbItem[] = [];
 
-  pageTitle = 'Dashboard';
-  breadcrumbs: Breadcrumb[] = [];
+  // Notification Logic
   showDrawer = signal(false);
-
-  notifications: Notification[] = [
+  notifications: AppNotification[] = [
     {
       id: 1,
       title: 'New Assignment Posted',
@@ -56,105 +52,94 @@ export class HeaderComponent {
     }
   ];
 
-  constructor() {
-    // Listen to route changes to update page title and breadcrumbs
+  constructor(private router: Router, private headerService: HeaderService) { }
+
+  ngOnInit() {
+    // Check for overridden breadcrumbs first
+    this.headerService.breadcrumbs$.subscribe(crumbs => {
+      if (crumbs.length > 0) {
+        this.breadcrumbs = crumbs;
+      } else {
+        // Fallback to Router Logic using current URL (safeguard)
+        this.updateFromRouter(this.router.url);
+      }
+    });
+
+    this.headerService.title$.subscribe(title => {
+      if (title) this.pageTitle = title;
+    });
+
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
-        map(() => {
-          const url = this.router.url;
-          return this.getPageInfo(url);
-        })
+        map(() => this.router.url)
       )
-      .subscribe(({ title, breadcrumbs }) => {
-        this.pageTitle = title;
-        this.breadcrumbs = breadcrumbs;
+      .subscribe((url) => {
+        // On navigation, reset overrides and update from router
+        this.headerService.reset();
+        this.updateFromRouter(url);
       });
 
-    // Set initial title and breadcrumbs
-    const initial = this.getPageInfo(this.router.url);
-    this.pageTitle = initial.title;
-    this.breadcrumbs = initial.breadcrumbs;
+    // Initial load
+    this.updateFromRouter(this.router.url);
   }
 
-  private getPageInfo(url: string): { title: string; breadcrumbs: Breadcrumb[] } {
-    // Dashboard
+  updateFromRouter(url: string) {
+    const info = this.getPageInfo(url);
+    // Only set if not already set by service (though we reset service on nav, so this is safe)
+    // Assuming headerService has these methods or they are placeholders for future implementation
+    // For now, we'll just assign directly as the service reset should handle it.
+    this.pageTitle = info.title;
+    this.breadcrumbs = info.breadcrumbs;
+  }
+
+  getPageInfo(url: string): { title: string, breadcrumbs: BreadcrumbItem[] } {
+    let title = 'Dashboard';
+    let breadcrumbs: BreadcrumbItem[] = [];
+
+    // Default Home
+    const home: BreadcrumbItem = { label: 'Home', icon: 'pi pi-home', url: '/dashboard' };
+
     if (url.includes('/dashboard')) {
-      return { title: 'Dashboard', breadcrumbs: [{ label: 'Dashboard' }] };
+      title = 'Dashboard';
+      breadcrumbs = [];
+    } else if (url.includes('/courses')) {
+      title = 'My Course Syllabus';
+      breadcrumbs = [{ label: 'My Course Syllabus', url: '/courses' }];
+    } else if (url.includes('/materials')) {
+      title = 'Materials';
+      breadcrumbs = [{ label: 'Materials', url: '/materials' }];
+    } else if (url.includes('/classes/recorded')) {
+      title = 'Recorded Classes';
+      breadcrumbs = [{ label: 'Classes' }, { label: 'Recorded Classes', url: '/classes/recorded' }];
+    } else if (url.includes('/classes/live')) {
+      title = 'Live Stream';
+      breadcrumbs = [{ label: 'Classes' }, { label: 'Live Stream', url: '/classes/live' }];
+    } else if (url.includes('/tasks')) {
+      title = 'Tasks';
+      breadcrumbs = [{ label: 'Tasks', url: '/tasks' }];
+    } else if (url.includes('/exams/assessment')) {
+      title = 'Online Assessment';
+      breadcrumbs = [{ label: 'Exams' }, { label: 'Online Assessment' }];
+    } else if (url.includes('/exams/docs')) {
+      title = 'Exam Documents';
+      breadcrumbs = [{ label: 'Exams' }, { label: 'Exam Documents' }];
+    } else if (url.includes('/projects')) {
+      title = 'Projects';
+      breadcrumbs = [{ label: 'Projects', url: '/projects' }];
     }
 
-    // Courses
-    if (url.includes('/courses')) {
-      return { title: 'Courses', breadcrumbs: [{ label: 'Courses' }] };
+    // Don't add home if it's dashboard (optional preference, but keeping consistent)
+    // The logic above already sets breadcrumbs to empty for dashboard.
+    // If breadcrumbs are not empty, prepend home.
+    if (breadcrumbs.length > 0) {
+      return { title, breadcrumbs: [home, ...breadcrumbs] };
     }
 
-    // Syllabus
-    if (url.includes('/syllabus')) {
-      return { title: 'Syllabus', breadcrumbs: [{ label: 'Syllabus' }] };
-    }
-
-    // Materials
-    if (url.includes('/materials')) {
-      return { title: 'Materials', breadcrumbs: [{ label: 'Materials' }] };
-    }
-
-    // Classes - Recorded
-    if (url.includes('/classes/recorded')) {
-      return {
-        title: 'Recorded Classes',
-        breadcrumbs: [
-          { label: 'Classes', url: '/classes' },
-          { label: 'Recorded Classes' }
-        ]
-      };
-    }
-
-    // Classes - Live
-    if (url.includes('/classes/live')) {
-      return {
-        title: 'Live Stream',
-        breadcrumbs: [
-          { label: 'Classes', url: '/classes' },
-          { label: 'Live Stream' }
-        ]
-      };
-    }
-
-    // Tasks
-    if (url.includes('/tasks')) {
-      return { title: 'Tasks', breadcrumbs: [{ label: 'Tasks' }] };
-    }
-
-    // Exams - Assessment
-    if (url.includes('/exams/assessment')) {
-      return {
-        title: 'Online Assessment',
-        breadcrumbs: [
-          { label: 'Exams', url: '/exams' },
-          { label: 'Online Assessment' }
-        ]
-      };
-    }
-
-    // Exams - Documents
-    if (url.includes('/exams/docs')) {
-      return {
-        title: 'Exam Documents',
-        breadcrumbs: [
-          { label: 'Exams', url: '/exams' },
-          { label: 'Exam Documents' }
-        ]
-      };
-    }
-
-    // Projects
-    if (url.includes('/projects')) {
-      return { title: 'Projects', breadcrumbs: [{ label: 'Projects' }] };
-    }
-
-    return { title: 'Dashboard', breadcrumbs: [{ label: 'Dashboard' }] };
+    return { title, breadcrumbs: [] };
   }
 
+  // Notification Methods
   openNotifications() {
     this.showDrawer.set(true);
   }
@@ -167,7 +152,7 @@ export class HeaderComponent {
     this.notifications.forEach(n => n.read = true);
   }
 
-  markAsRead(notification: Notification) {
+  markAsRead(notification: AppNotification) {
     notification.read = true;
   }
 

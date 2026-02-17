@@ -1,112 +1,301 @@
-.chapters-container {
-    width: 100%;
-    padding: var(--sqx-space-6);
+.recorded-classes-container {
+    padding: 2rem;
+    min-height: 100vh;
+    background: #F9FAFB;
 }
 
-.course-header {
-    margin-bottom: var(--sqx-space-6);
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
 
-    .course-title {
-        font-size: 22px;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--sqx-color-text);
+    margin-bottom: 1.5rem;
+}
+
+// Local Header (Back button + Context)
+.local-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .back-btn {
+        color: #6B7280;
+        padding: 0;
+
+        &:hover {
+            color: var(--primary-color);
+            background: transparent;
+        }
+    }
+
+    .current-context {
+        font-size: 18px;
         font-weight: 600;
         color: var(--sqx-color-text);
-        margin: 0 0 var(--sqx-space-2) 0;
-    }
-
-    .course-description {
-        font-size: 14px;
-        line-height: 1.6;
-        color: var(--sqx-color-text-light);
         margin: 0;
+
+        // Truncate
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 600px; // Adjust as needed
+        display: inline-block;
     }
 }
 
-.chapters-grid {
+// Level 1: Courses Grid
+.courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--sqx-space-5);
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
 }
 
-.chapter-card {
-    position: relative;
-    padding: var(--sqx-space-6);
-    border-radius: var(--sqx-radius-xl);
-    cursor: pointer;
+.course-card-premium {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); // Decreased shadow
     transition: all 0.3s ease;
-    min-height: 180px;
+    cursor: pointer;
+    border: 1px solid #E5E7EB; // Default border
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
+    height: 100%;
 
     &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        // No transform, no border change as requested (or minimal)
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+        // border-color: #E5E7EB; // Keep same as default or slightly darker
 
-        .view-link {
-            transform: translateX(4px);
-        }
+        // Button hover effect handled below
     }
 
-    .chapter-content {
-        position: relative;
-        z-index: 2;
+    .card-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        background: #F5F3FF;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
 
-        .chapter-title {
+    .card-content {
+        flex: 1;
+        margin-bottom: 1.5rem;
+
+        .course-title {
             font-size: 18px;
             font-weight: 700;
+            margin: 0 0 1rem 0;
             color: var(--sqx-color-text);
-            margin: 0 0 var(--sqx-space-2) 0;
+            line-height: 1.3;
         }
 
-        .chapter-subtitle {
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--sqx-color-text);
-            margin: 0 0 var(--sqx-space-4) 0;
-            opacity: 0.8;
+        .course-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 1.5rem;
+
+            span {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
         }
 
-        .view-link {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--sqx-space-2);
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--sqx-color-text);
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .progress-section {
+            .progress-bar {
+                height: 6px;
+                background: #F3F4F6;
+                border-radius: 10px;
+                overflow: hidden;
+                margin-bottom: 8px;
+            }
 
-            i {
+            .progress-text {
                 font-size: 12px;
+                color: #6B7280;
+                font-weight: 500;
             }
         }
     }
 
-    .chapter-number {
-        position: absolute;
-        top: var(--sqx-space-4);
-        right: var(--sqx-space-4);
-        width: 48px;
-        height: 48px;
+    .action-btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background: #EFF6FF; // Default Light Blue
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0, 0, 0, 0.1);
-        color: var(--sqx-color-text);
-        font-size: 20px;
-        font-weight: 700;
-        border-radius: 12px;
-        z-index: 1;
+        gap: 8px;
+        transition: background-color 0.2s ease, color 0.2s ease;
     }
 }
 
-// Responsive Design
-@media (max-width: 768px) {
-    .chapters-grid {
-        grid-template-columns: 1fr;
+// Level 2: Folders Grid
+.folders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.folder-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #F3F4F6;
+    display: flex;
+    flex-direction: column;
+    height: 180px;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        border-color: #E5E7EB; // Slightly darker border
+    }
+
+    .folder-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: auto;
+        border-bottom: 3px solid transparent; // For the color accent
+        padding-bottom: 10px;
+
+        .folder-icon {
+            font-size: 2rem;
+        }
+
+        .chapter-num-badge {
+            font-size: 24px;
+            font-weight: 700;
+            color: #E5E7EB; // Subtle large number
+            opacity: 0.5;
+        }
+    }
+
+    .folder-body {
+        .folder-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--sqx-color-text);
+            margin: 0 0 5px 0;
+            line-height: 1.4;
+        }
+
+        .folder-subtitle {
+            font-size: 12px;
+            color: #9CA3AF;
+            margin: 0;
+        }
+    }
+}
+
+// Level 3: Concepts Grid
+.concepts-grid {
+    display: grid;
+    grid-template-columns: 1fr; // List view by default for concepts
+    gap: 1rem;
+}
+
+.concept-item {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.2s;
+    border: 1px solid #F3F4F6;
+
+    &:hover {
+        background: #F9FAFB;
+        border-color: #E5E7EB;
+    }
+
+    .concept-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #F3F4F6;
+        color: #6B7280;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+
+        &.completed {
+            background: #D1FAE5;
+            color: #10B981;
+        }
+    }
+
+    .concept-info {
+        flex: 1;
+
+        .concept-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--sqx-color-text);
+            margin: 0 0 4px 0;
+        }
+
+        .concept-meta {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+    }
+
+    .concept-action {
+        .completed-icon {
+            color: #10B981;
+            font-size: 1.2rem;
+        }
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #9CA3AF;
+
+    i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    p {
+        margin: 0;
+        font-size: 1rem;
     }
 }
