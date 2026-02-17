@@ -55,6 +55,69 @@
         margin: 0 0 var(--sqx-space-5) 0;
         line-height: 1.5;
     }
+
+    .text-answer-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .pdf-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            i {
+                color: #dc2626; // PDF red
+                font-size: 1.1rem;
+            }
+
+            a {
+                color: var(--sqx-color-primary);
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 14px;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+
+
+        .answer-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            label {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--sqx-color-text);
+            }
+
+            textarea {
+                width: 100%;
+                padding: 1rem;
+                border: 1px solid var(--sqx-color-border);
+                border-radius: var(--sqx-radius-md);
+                font-family: inherit;
+                font-size: 14px;
+                line-height: 1.6;
+                color: var(--sqx-color-text);
+                background: #F9FAFB;
+                transition: all 0.2s;
+                resize: vertical;
+
+                &:focus {
+                    background: white;
+                    border-color: var(--sqx-color-primary);
+                    outline: none;
+                    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+                }
+            }
+        }
+    }
 }
 
 .options-list {

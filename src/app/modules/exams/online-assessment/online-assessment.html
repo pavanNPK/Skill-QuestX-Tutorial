@@ -9,6 +9,7 @@
             <div class="question-content">
                 <h3>{{ currentQuestion.text }}</h3>
 
+                @if (!currentQuestion.type || currentQuestion.type === 'mcq') {
                 <div class="options-list">
                     @for (option of currentQuestion.options; track option.value) {
                     <label class="option">
@@ -18,6 +19,23 @@
                     </label>
                     }
                 </div>
+                }
+
+                @if (currentQuestion.type === 'text') {
+                <div class="text-answer-section">
+                    @if (currentQuestion.pdfUrl) {
+                    <div class="pdf-link">
+                        <i class="pi pi-file-pdf"></i>
+                        <a [href]="currentQuestion.pdfUrl" target="_blank">View Reference Document</a>
+                    </div>
+                    }
+                    <div class="answer-area">
+                        <label>Your Answer</label>
+                        <textarea [(ngModel)]="currentQuestion.textAnswer" rows="6"
+                            placeholder="Type your answer here..." class="form-control"></textarea>
+                    </div>
+                </div>
+                }
             </div>
 
             <div class="question-actions">

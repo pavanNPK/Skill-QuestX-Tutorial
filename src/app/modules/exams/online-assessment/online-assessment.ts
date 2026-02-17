@@ -5,8 +5,11 @@ import { FormsModule } from '@angular/forms';
 interface Question {
   id: number;
   text: string;
-  options: { value: string; label: string }[];
+  type?: 'mcq' | 'text'; // Default to mcq if undefined
+  options?: { value: string; label: string }[]; // Optional for text questions
   selectedOption?: string;
+  textAnswer?: string; // For text questions
+  pdfUrl?: string; // Optional PDF reference
 }
 
 @Component({
@@ -22,6 +25,7 @@ export class OnlineAssessment {
   questions: Question[] = [
     {
       id: 1,
+      type: 'mcq',
       text: 'What is the correct way to declare a variable in Python?',
       options: [
         { value: 'a', label: 'var x = 5' },
@@ -32,6 +36,7 @@ export class OnlineAssessment {
     },
     {
       id: 2,
+      type: 'mcq',
       text: 'Which collection is ordered, changeable, and allows duplicate members?',
       options: [
         { value: 'a', label: 'Tuple' },
@@ -42,6 +47,7 @@ export class OnlineAssessment {
     },
     {
       id: 3,
+      type: 'mcq',
       text: 'How do you insert COMMENTS in Python code?',
       options: [
         { value: 'a', label: '# This is a comment' },
@@ -52,72 +58,20 @@ export class OnlineAssessment {
     },
     {
       id: 4,
+      type: 'text',
+      text: 'Explain the difference between a list and a tuple in Python. Refer to the attached document if needed.',
+      pdfUrl: 'assets/docs/python-data-structures.pdf', // Mock URL
+      textAnswer: ''
+    },
+    {
+      id: 5,
+      type: 'mcq',
       text: 'What is the correct file extension for Python files?',
       options: [
         { value: 'a', label: '.pt' },
         { value: 'b', label: '.pyt' },
         { value: 'c', label: '.py' },
         { value: 'd', label: '.python' }
-      ]
-    },
-    {
-      id: 5,
-      text: 'How do you create a variable with the numeric value 5?',
-      options: [
-        { value: 'a', label: 'x = 5' },
-        { value: 'b', label: 'x = int(5)' },
-        { value: 'c', label: 'Both the other answers are correct' },
-        { value: 'd', label: 'None of the other answers are correct' }
-      ]
-    },
-    {
-      id: 6,
-      text: 'What is the correct syntax to output the type of a variable or object in Python?',
-      options: [
-        { value: 'a', label: 'print(typeof(x))' },
-        { value: 'b', label: 'print(type(x))' },
-        { value: 'c', label: 'print(typeOf(x))' },
-        { value: 'd', label: 'print(typeof x)' }
-      ]
-    },
-    {
-      id: 7,
-      text: 'What is the correct way to create a function in Python?',
-      options: [
-        { value: 'a', label: 'function my_function():' },
-        { value: 'b', label: 'create my_function():' },
-        { value: 'c', label: 'def my_function():' },
-        { value: 'd', label: 'func my_function():' }
-      ]
-    },
-    {
-      id: 8,
-      text: 'In Python, identifying indentation (whitespace at the beginning of a line) is:',
-      options: [
-        { value: 'a', label: 'Optional' },
-        { value: 'b', label: 'For readability only' },
-        { value: 'c', label: 'Indication of a new block of code' },
-        { value: 'd', label: 'Not significant' }
-      ]
-    },
-    {
-      id: 9,
-      text: 'Which operator is used to multiply numbers?',
-      options: [
-        { value: 'a', label: '%' },
-        { value: 'b', label: '/' },
-        { value: 'c', label: '#' },
-        { value: 'd', label: '*' }
-      ]
-    },
-    {
-      id: 10,
-      text: 'Which operator can be used to compare two values?',
-      options: [
-        { value: 'a', label: '><' },
-        { value: 'b', label: '&|' },
-        { value: 'c', label: '==' },
-        { value: 'd', label: '=' }
       ]
     }
   ];
@@ -150,7 +104,8 @@ export class OnlineAssessment {
     console.log('Assessment Submitted');
     const answers = this.questions.map(q => ({
       questionId: q.id,
-      selectedOption: q.selectedOption
+      selectedOption: q.selectedOption,
+      textAnswer: q.textAnswer
     }));
     console.log('Answers:', answers);
     // Handle submission logic
