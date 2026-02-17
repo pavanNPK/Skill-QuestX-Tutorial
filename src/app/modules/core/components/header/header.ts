@@ -118,6 +118,13 @@ export class HeaderComponent implements OnInit {
     } else if (url.includes('/tasks')) {
       title = 'Tasks';
       breadcrumbs = [{ label: 'Tasks', url: '/tasks' }];
+    } else if (url.includes('/batches/')) {
+      // Batch detail page
+      title = 'Batch Details';
+      breadcrumbs = [{ label: 'Batches', url: '/batches' }, { label: 'Batch Details' }];
+    } else if (url.includes('/batches')) {
+      title = 'Batches';
+      breadcrumbs = [{ label: 'Batches', url: '/batches' }];
     } else if (url.includes('/exams/assessment')) {
       title = 'Online Assessment';
       breadcrumbs = [{ label: 'Exams' }, { label: 'Online Assessment' }];

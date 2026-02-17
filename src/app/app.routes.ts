@@ -52,6 +52,10 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/tasks/tasks.routes').then((m) => m.tasksRoutes)
       },
       {
+        path: 'batches',
+        loadChildren: () => import('./modules/batches/batches.routes').then((m) => m.batchesRoutes)
+      },
+      {
         path: 'exams',
         loadChildren: () => import('./modules/exams/exams.routes').then((m) => m.examsRoutes)
       },

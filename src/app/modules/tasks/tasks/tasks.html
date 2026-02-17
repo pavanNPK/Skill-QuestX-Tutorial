@@ -164,80 +164,95 @@
 </div>
 
 <!-- Create Task Drawer -->
-<p-drawer [(visible)]="isCreateDrawerOpen" position="right" styleClass="create-task-drawer" [modal]="true"
-    [closable]="true">
+<!-- Create Task Drawer -->
+<p-drawer [(visible)]="isCreateDrawerOpen" position="right"
+    [styleClass]="'create-task-drawer ' + (isEditing() ? 'edit-mode-drawer' : '')" [modal]="true" [closable]="true"
+    [dismissible]="false">
     <ng-template #header>
-        <div class="create-task-drawer-header">
-            <span class="create-task-drawer-title">{{ isEditing() ? 'Edit Task' : 'Create New Task' }}</span>
+        <div class="premium-drawer-header w-full">
+            <div class="title-section">
+                <h2>{{ isEditing() ? 'Edit Task' : 'Create New Task' }}</h2>
+                @if (isEditing() && newTask.priority) {
+                <div class="meta-badges">
+                    <p-tag [value]="newTask.priority"
+                        [severity]="newTask.priority === 'High' ? 'danger' : (newTask.priority === 'Medium' ? 'warn' : 'success')"
+                        class="uppercase text-[10px] font-bold tracking-wider px-2 py-0.5"></p-tag>
+                </div>
+                }
+            </div>
         </div>
     </ng-template>
 
-    <div class="create-task-form">
-        <div class="form-field">
-            <label class="form-label">Task Title</label>
-            <input type="text" pInputText [(ngModel)]="newTask.title" placeholder="Enter task title"
-                class="form-input" />
+    <div class="create-task-wrapper">
+        <div class="create-task-content custom-scrollbar">
+            <div class="create-task-form">
+                <div class="form-field">
+                    <label class="form-label">Task Title</label>
+                    <input type="text" pInputText [(ngModel)]="newTask.title" placeholder="Enter task title"
+                        class="form-input" />
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Description</label>
+                    <textarea pInputTextarea [(ngModel)]="newTask.description" rows="4"
+                        placeholder="Enter task description" class="form-textarea"></textarea>
+                </div>
+
+                <div class="form-row form-row-2">
+                    <div class="form-field">
+                        <label class="form-label">Batch</label>
+                        <p-select [options]="batches" [(ngModel)]="newTask.batch" optionLabel="name"
+                            placeholder="Select Batch" class="create-task-select w-full" [checkmark]="true"
+                            [showClear]="true"></p-select>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Due Date</label>
+                        <p-datepicker [(ngModel)]="newTask.dueDate" [showTime]="true" placeholder="Select due date"
+                            appendTo="body" styleClass="form-datepicker"></p-datepicker>
+                    </div>
+                </div>
+
+                <div class="form-row form-row-2">
+                    <div class="form-field">
+                        <label class="form-label">Duration</label>
+                        <input type="text" pInputText [(ngModel)]="newTask.duration" placeholder="e.g. 2 hours"
+                            class="form-input" />
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Priority</label>
+                        <p-select [options]="priorityOptions" [(ngModel)]="newTask.priority"
+                            placeholder="Select Priority" class="create-task-select w-full" [checkmark]="true"
+                            [showClear]="true"></p-select>
+                    </div>
+                </div>
+
+                @if (newTask.batch) {
+                <div class="form-field form-field-avatars">
+                    <label class="form-label">Assigned Students ({{ newTask.batch.students.length }})</label>
+                    <div class="avatar-group-wrap">
+                        <p-avatarGroup>
+                            @for (student of newTask.batch.students.slice(0, 5); track student.id) {
+                            <p-avatar [image]="student.avatar" shape="circle" size="normal"
+                                styleClass="border-2 border-white"></p-avatar>
+                            }
+                            @if (newTask.batch.students.length > 5) {
+                            <p-avatar [label]="'+' + (newTask.batch.students.length - 5)" shape="circle" size="normal"
+                                [style]="{'background-color': '#9c27b0', 'color': '#ffffff'}"></p-avatar>
+                            }
+                        </p-avatarGroup>
+                    </div>
+                </div>
+                }
+            </div>
         </div>
 
-        <div class="form-field">
-            <label class="form-label">Description</label>
-            <textarea pInputTextarea [(ngModel)]="newTask.description" rows="4" placeholder="Enter task description"
-                class="form-textarea"></textarea>
-        </div>
-
-        <div class="form-row form-row-2">
-            <div class="form-field">
-                <label class="form-label">Batch</label>
-                <p-select [options]="batches" [(ngModel)]="newTask.batch" optionLabel="name" placeholder="Select Batch"
-                    class="create-task-select w-full" [checkmark]="true" [showClear]="true"></p-select>
-            </div>
-            <div class="form-field">
-                <label class="form-label">Due Date</label>
-                <p-datepicker [(ngModel)]="newTask.dueDate" [showTime]="true" placeholder="Select due date"
-                    appendTo="body" styleClass="form-datepicker"></p-datepicker>
-            </div>
-        </div>
-
-        <div class="form-row form-row-2">
-            <div class="form-field">
-                <label class="form-label">Duration</label>
-                <input type="text" pInputText [(ngModel)]="newTask.duration" placeholder="e.g. 2 hours"
-                    class="form-input" />
-            </div>
-            <div class="form-field">
-                <label class="form-label">Priority</label>
-                <p-select [options]="priorityOptions" [(ngModel)]="newTask.priority" placeholder="Select Priority"
-                    class="create-task-select w-full" [checkmark]="true" [showClear]="true"></p-select>
-            </div>
-        </div>
-
-        @if (newTask.batch) {
-        <div class="form-field form-field-avatars">
-            <label class="form-label">Assigned Students ({{ newTask.batch.students.length }})</label>
-            <div class="avatar-group-wrap">
-                <p-avatarGroup>
-                    @for (student of newTask.batch.students.slice(0, 5); track student.id) {
-                    <p-avatar [image]="student.avatar" shape="circle" size="normal"
-                        styleClass="border-2 border-white"></p-avatar>
-                    }
-                    @if (newTask.batch.students.length > 5) {
-                    <p-avatar [label]="'+' + (newTask.batch.students.length - 5)" shape="circle" size="normal"
-                        [style]="{'background-color': '#9c27b0', 'color': '#ffffff'}"></p-avatar>
-                    }
-                </p-avatarGroup>
-            </div>
-        </div>
-        }
-    </div>
-
-    <ng-template #footer>
         <div class="create-task-drawer-footer">
             <button pButton label="Cancel" class="p-button-outlined p-button-secondary"
                 (click)="closeCreateDrawer()"></button>
             <button pButton [label]="isEditing() ? 'Save Changes' : 'Create Task'" icon="pi pi-check"
                 (click)="saveTask()" [disabled]="!newTask.title || !newTask.batch" class="create-task-btn"></button>
         </div>
-    </ng-template>
+    </div>
 </p-drawer>
 
 <!-- Task Details Drawer -->
@@ -353,7 +368,7 @@
             <button pButton label="Delete Task" icon="pi pi-trash" class="p-button-outlined p-button-danger"
                 (click)="confirmDelete($event)"></button>
             <button pButton label="Edit Task" icon="pi pi-pencil" class="p-button-primary"
-                (click)="editTask()"></button>
+                style="background-color: #6C5CE7; border-color: #6C5CE7;" (click)="editTask()"></button>
         </div>
     </ng-template>
 </p-drawer>

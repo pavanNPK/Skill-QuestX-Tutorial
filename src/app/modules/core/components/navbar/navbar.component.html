@@ -53,6 +53,12 @@
       <span>Tasks</span>
     </a>
 
+    <!-- Batches -->
+    <a routerLink="/batches" routerLinkActive="active" class="nav-item">
+      <i class="pi pi-users"></i>
+      <span>Batches</span>
+    </a>
+
     <!-- Exams Dropdown -->
     <div class="nav-item dropdown" [class.open]="examsDropdownOpen()">
       <div class="nav-item-header" (click)="toggleExamsDropdown()" [class.active]="isActive('/exams')">

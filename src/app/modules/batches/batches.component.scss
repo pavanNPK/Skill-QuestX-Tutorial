@@ -1,0 +1,251 @@
+.batches-container {
+    padding: var(--sqx-space-8);
+}
+
+// Simple Header like Dashboard
+.batches-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--sqx-space-6);
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--sqx-space-4);
+    }
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--sqx-color-text);
+    margin: 0;
+}
+
+// Search Input
+.search-wrapper {
+    position: relative;
+    width: 320px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+
+    .pi-search {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.875rem;
+        z-index: 1;
+    }
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem !important;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--sqx-radius-md);
+    font-size: 0.875rem;
+    transition: all 0.2s;
+
+    &:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+        outline: none;
+    }
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+}
+
+// Batch Cards Grid
+.batches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    grid-auto-rows: 1fr;
+    gap: var(--sqx-space-5);
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.batch-card {
+    background: white;
+    border-radius: var(--sqx-radius-lg);
+    padding: var(--sqx-space-5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sqx-space-4);
+    height: 100%;
+
+    &:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.12);
+    }
+}
+
+// Card Header
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.batch-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--sqx-color-text);
+    margin: 0;
+    flex: 1;
+    line-height: 1.4;
+}
+
+.student-badge {
+    flex-shrink: 0;
+    background-color: #f3f4f6 !important;
+    color: #6b7280 !important;
+    border: none !important;
+}
+
+// Description
+.batch-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// Date Row
+.date-row {
+    display: flex;
+    gap: var(--sqx-space-4);
+    flex-wrap: wrap;
+}
+
+.date-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+
+    i {
+        color: var(--primary-color);
+        font-size: 1rem;
+        margin-top: 2px;
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+}
+
+.date-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.date-value {
+    font-size: 0.875rem;
+    color: var(--sqx-color-text);
+    font-weight: 500;
+}
+
+// Students Section
+.students-section {
+    padding-top: var(--sqx-space-3);
+    border-top: 1px solid #f3f4f6;
+}
+
+.students-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--sqx-space-3);
+}
+
+.students-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.students-count {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.students-avatars {
+    ::ng-deep .p-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 2px solid white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// View Details Button
+.view-details-btn {
+    width: 100%;
+    background: #EFF6FF !important;
+    color: var(--primary-color) !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: auto;
+
+    &:hover {
+        background: #DBEAFE !important;
+    }
+}
+
+// Empty State
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.empty-text {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-subtext {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    margin: 0;
+}

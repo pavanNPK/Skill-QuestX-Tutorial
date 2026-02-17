@@ -232,6 +232,10 @@ export class Tasks {
     // Close details drawer
     this.closeTaskDetails();
 
+    // Set editing state FIRST
+    this.isEditing.set(true);
+    this.currentTaskId.set(task.id);
+
     // Populate form
     const batch = this.batches.find(b => b.id === task.batchId) || null;
     this.newTask = {
@@ -243,9 +247,7 @@ export class Tasks {
       priority: task.priority
     };
 
-    // Set editing state
-    this.isEditing.set(true);
-    this.currentTaskId.set(task.id);
+    // Open drawer (won't reset because isEditing is true)
     this.openCreateDrawer();
   }
 
@@ -285,17 +287,19 @@ export class Tasks {
   }
 
   openCreateDrawer() {
-    this.isCreateDrawerOpen.set(true);
+    // Only reset if we're starting fresh (not editing)
     if (!this.isEditing()) {
       this.resetForm();
     }
+    this.isCreateDrawerOpen.set(true);
   }
 
   closeCreateDrawer() {
     this.isCreateDrawerOpen.set(false);
-    this.resetForm();
+    // Reset editing state FIRST, then reset form
     this.isEditing.set(false);
     this.currentTaskId.set(null);
+    this.resetForm();
   }
 
   resetForm() {

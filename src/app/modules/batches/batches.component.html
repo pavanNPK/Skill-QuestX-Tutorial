@@ -1,0 +1,75 @@
+<div class="batches-container">
+    <!-- Simple Header like Dashboard -->
+    <div class="batches-header">
+        <span class="p-input-icon-left search-wrapper">
+            <i class="pi pi-search"></i>
+            <input type="text" pInputText [(ngModel)]="searchQuery" placeholder="Search batches..."
+                class="search-input" />
+        </span>
+    </div>
+
+    <!-- Batch Cards Grid -->
+    <div class="batches-grid">
+        @for (batch of filteredBatches(); track batch.id) {
+        <div class="batch-card" (click)="viewBatchDetails(batch.id)">
+            <!-- Card Header -->
+            <div class="card-header">
+                <h3 class="batch-name">{{ batch.name }}</h3>
+                <p-tag [value]="batch.studentCount + ' Students'" severity="secondary" class="student-badge"></p-tag>
+            </div>
+
+            <!-- Description -->
+            <p class="batch-description">{{ batch.description }}</p>
+
+            <!-- Date Info -->
+            <div class="date-row">
+                <div class="date-item">
+                    <i class="pi pi-calendar-plus"></i>
+                    <div>
+                        <span class="date-label">START DATE</span>
+                        <span class="date-value">{{ formatDate(batch.startDate) }}</span>
+                    </div>
+                </div>
+                @if (batch.endDate) {
+                <div class="date-item">
+                    <i class="pi pi-calendar-times"></i>
+                    <div>
+                        <span class="date-label">END DATE</span>
+                        <span class="date-value">{{ formatDate(batch.endDate!) }}</span>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- Students Section -->
+            <div class="students-section">
+                <div class="students-header">
+                    <span class="students-label">ENROLLED STUDENTS</span>
+                    <span class="students-count">{{ batch.studentCount }}</span>
+                </div>
+                <p-avatarGroup styleClass="students-avatars">
+                    @for (student of batch.students.slice(0, 5); track student.id) {
+                    <p-avatar [image]="student.avatar" shape="circle" size="normal"></p-avatar>
+                    }
+                    @if (batch.students.length > 5) {
+                    <p-avatar [label]="'+' + (batch.students.length - 5)" shape="circle" size="normal"
+                        [style]="{'background-color': '#6C5CE7', 'color': '#ffffff'}"></p-avatar>
+                    }
+                </p-avatarGroup>
+            </div>
+
+            <!-- View Details Button -->
+            <button pButton label="View Details" icon="pi pi-arrow-right" iconPos="right"
+                class="view-details-btn"></button>
+        </div>
+        }
+
+        @if (filteredBatches().length === 0) {
+        <div class="empty-state">
+            <i class="pi pi-inbox empty-icon"></i>
+            <p class="empty-text">No batches found</p>
+            <p class="empty-subtext">Try adjusting your search query</p>
+        </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,92 @@
+@if (batch()) {
+<div class="batch-detail-container">
+    <!-- Main Content -->
+    <div class="batch-detail-content">
+        <!-- Batch Header Card -->
+        <div class="batch-header-card">
+            <div class="header-main">
+                <div class="header-left">
+                    <h1 class="batch-title">{{ batch()!.name }}</h1>
+                    <p class="batch-duration">
+                        <i class="pi pi-calendar"></i>
+                        {{ getDateRange() }}
+                    </p>
+                </div>
+                <div class="header-right">
+                    <p-tag [value]="batch()!.studentCount + ' Students'" severity="secondary"
+                        class="student-count-badge"></p-tag>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Batch Information Card -->
+            <div class="info-card">
+                <div class="card-header">
+                    <i class="pi pi-info-circle"></i>
+                    <h2 class="card-title">Batch Information</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">BATCH NAME</span>
+                            <span class="info-value">{{ batch()!.name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">TOTAL STUDENTS</span>
+                            <span class="info-value">{{ batch()!.studentCount }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">START DATE</span>
+                            <span class="info-value">{{ formatDate(batch()!.startDate) }}</span>
+                        </div>
+                        @if (batch()!.endDate) {
+                        <div class="info-item">
+                            <span class="info-label">END DATE</span>
+                            <span class="info-value">{{ formatDate(batch()!.endDate!) }}</span>
+                        </div>
+                        }
+                    </div>
+                    <div class="description-section">
+                        <span class="info-label">DESCRIPTION</span>
+                        <p class="description-text">{{ batch()!.description }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students List Card -->
+            <div class="students-card">
+                <div class="card-header">
+                    <i class="pi pi-users"></i>
+                    <h2 class="card-title">Enrolled Students ({{ students().length }})</h2>
+                </div>
+                <div class="card-body">
+                    <div class="students-grid">
+                        @for (student of students(); track student.id) {
+                        <div class="student-card">
+                            <p-avatar [image]="student.avatar" shape="circle" size="large"
+                                class="student-avatar"></p-avatar>
+                            <div class="student-info">
+                                <h3 class="student-name">{{ student.name }}</h3>
+                                @if (student.email) {
+                                <p class="student-email">
+                                    <i class="pi pi-envelope"></i>
+                                    {{ student.email }}
+                                </p>
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+} @else {
+<div class="loading-state">
+    <i class="pi pi-spin pi-spinner loading-icon"></i>
+    <p>Loading batch details...</p>
+</div>
+}
