@@ -1,0 +1,72 @@
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+
+  .loader-backdrop {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  &.theme-black .loader-backdrop {
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  &.theme-white .loader-backdrop {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .loader-center {
+    position: relative;
+    z-index: 1;
+  }
+
+  .loader-svg-wrap {
+    width: 56px;
+    height: 56px;
+    color: var(--sqx-loader-color, #fff);
+  }
+
+  &.theme-white .loader-svg-wrap {
+    color: var(--sqx-loader-color, #333);
+  }
+
+  .loader-svg {
+    width: 100%;
+    height: 100%;
+    animation: sqx-loader-rotate 0.8s linear infinite;
+  }
+
+  .loader-circle {
+    stroke-dasharray: 90 150;
+    stroke-dashoffset: 0;
+    animation: sqx-loader-dash 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes sqx-loader-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sqx-loader-dash {
+  0% {
+    stroke-dasharray: 90 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 60 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90 150;
+    stroke-dashoffset: -90;
+  }
+}

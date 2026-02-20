@@ -1,0 +1,12 @@
+@if (visible()) {
+  <div class="loader-overlay" [class.theme-white]="theme() === 'white'" [class.theme-black]="theme() === 'black'">
+    <div class="loader-backdrop"></div>
+    <div class="loader-center">
+      <div class="loader-svg-wrap">
+        <svg class="loader-svg" viewBox="0 0 50 50" aria-hidden="true">
+          <circle class="loader-circle" cx="25" cy="25" r="20" fill="none" stroke-width="3" stroke="currentColor" stroke-linecap="round" />
+        </svg>
+      </div>
+    </div>
+  </div>
+}
