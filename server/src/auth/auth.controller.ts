@@ -1,10 +1,15 @@
-import { Body, Controller, Post, Get, Request } from '@nestjs/common';
+import { Body, Controller, Post, Get, Request, UseGuards } from '@nestjs/common';
 import { AuthService, AuthResult } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SetPasswordDto } from './dto/set-password.dto';
 import { Public } from './decorators/public.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { Roles } from './decorators/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -46,8 +51,25 @@ export class AuthController {
     return this.authService.resetPassword(dto.email, dto.otp, dto.newPassword);
   }
 
+  @Public()
+  @Post('set-password')
+  async setPassword(@Body() dto: SetPasswordDto): Promise<{ message: string; user: AuthResult['user'] }> {
+    return this.authService.setPassword(dto.token, dto.newPassword);
+  }
+
+  /** SA and Admin only: add Admin or Instructor. Students use public /register. No password = send set-password email. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'admin')
+  @Post('create-user')
+  async createUser(
+    @Body() dto: CreateUserDto,
+    @Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } },
+  ): Promise<AuthResult | { message: string; user: AuthResult['user'] }> {
+    return this.authService.createUser(dto, req.user);
+  }
+
   @Get('me')
-  async me(@Request() req: { user: { id: string; email: string; firstName: string; lastName: string } }) {
+  async me(@Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } }) {
     const u = req.user;
     return {
       user: {
@@ -56,7 +78,18 @@ export class AuthController {
         firstName: u.firstName,
         lastName: u.lastName,
         name: `${u.firstName} ${u.lastName}`.trim(),
+        role: u.role ?? 'student',
       },
     };
+  }
+
+  /** SA and Admin only: list Admins and Instructors. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'admin')
+  @Get('users')
+  async listUsers(
+    @Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } },
+  ) {
+    return this.authService.listUsers(req.user);
   }
 }

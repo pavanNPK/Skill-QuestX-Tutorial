@@ -1,10 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { randomBytes } from 'crypto';
 import { UserDocument } from '../user/schemas/user.schema';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { MailService } from '../mail/mail.service';
+import { CREATABLE_BY_SA_ROLES } from '../user/constants/roles';
 
 export interface JwtPayload {
   sub: string;
@@ -19,6 +23,7 @@ export interface AuthResult {
     firstName: string;
     lastName: string;
     name: string;
+    role: string;
   };
 }
 
@@ -35,6 +40,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private configService: ConfigService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<UserDocument | null> {
@@ -52,12 +58,108 @@ export class AuthService {
     return this.issueToken(user);
   }
 
+  /** Create Admin or Instructor. SA can add Admin or Instructor; Admin can only add Instructor. No password = send set-password email. */
+  async createUser(
+    dto: CreateUserDto,
+    currentUser: { role: string },
+  ): Promise<AuthResult | { message: string; user: AuthResult['user'] }> {
+    const allowed = ['super_admin', 'admin'];
+    if (!allowed.includes(currentUser.role)) {
+      throw new ForbiddenException('Only Super Admin or Admin can add users.');
+    }
+    if (currentUser.role === 'admin' && dto.role === 'admin') {
+      throw new ForbiddenException('Admins can only add Instructors, not other Admins.');
+    }
+    const hasPassword = dto.password != null && dto.password.length >= 8;
+    if (hasPassword) {
+      const user = await this.userService.create({
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        email: dto.email,
+        password: dto.password,
+        role: dto.role,
+        phoneCountry: dto.phoneCountry,
+        phoneNumber: dto.phoneNumber,
+      });
+      return this.issueToken(user);
+    }
+    const token = randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const user = await this.userService.createWithSetPasswordToken(
+      {
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        email: dto.email,
+        role: dto.role,
+        phoneCountry: dto.phoneCountry,
+        phoneNumber: dto.phoneNumber,
+      },
+      token,
+      expiresAt,
+    );
+    const clientUrl = (this.configService.get<string>('CLIENT_URL') || 'http://localhost:4200').replace(/\/$/, '');
+    const setPasswordLink = `${clientUrl}/set-password?token=${token}`;
+    await this.mailService.sendSetPasswordEmail(user.email, setPasswordLink, user.role ?? dto.role);
+    return {
+      message: 'Invitation sent. They will receive an email to set their password and can then log in.',
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        role: user.role ?? dto.role,
+      },
+    };
+  }
+
+  /** Set password using token from invite email. Public. */
+  async setPassword(token: string, newPassword: string): Promise<{ message: string; user: AuthResult['user'] }> {
+    const user = await this.userService.setPasswordByToken(token, newPassword);
+    if (!user) {
+      throw new BadRequestException('Invalid or expired set-password link. Request a new one from your admin.');
+    }
+    const name = `${user.firstName} ${user.lastName}`.trim();
+    await this.mailService.sendPasswordSetSuccess(user.email, name, user.role ?? 'student');
+    return {
+      message: 'Password set. You can now log in.',
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        name,
+        role: user.role ?? 'student',
+      },
+    };
+  }
+
+  /** List Admins and Instructors. SA and Admin only. */
+  async listUsers(currentUser: { role: string }): Promise<{ users: Array<AuthResult['user']> }> {
+    if (!['super_admin', 'admin'].includes(currentUser.role)) {
+      throw new ForbiddenException('Only Super Admin or Admin can list users.');
+    }
+    const users = await this.userService.listByRoles([...CREATABLE_BY_SA_ROLES]);
+    return {
+      users: users.map((u) => ({
+        id: u._id.toString(),
+        email: u.email,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        name: `${u.firstName} ${u.lastName}`.trim(),
+        role: u.role ?? 'student',
+      })),
+    };
+  }
+
+  /** Public registration: students only. Admin/Instructor are added by SA/A via createUser. */
   async register(dto: RegisterDto): Promise<AuthResult> {
     const user = await this.userService.create({
       firstName: dto.firstName,
       lastName: dto.lastName,
       email: dto.email,
       password: dto.password,
+      role: 'student',
       phoneCountry: dto.phoneCountry,
       phoneNumber: dto.phoneNumber,
       underGraduate: dto.underGraduate,
@@ -65,6 +167,8 @@ export class AuthService {
       resumeUrl: dto.resumeUrl,
       skills: dto.skills,
     });
+    const name = `${user.firstName} ${user.lastName}`.trim();
+    await this.mailService.sendRegistrationSuccess(user.email, name);
     return this.issueToken(user);
   }
 
@@ -100,19 +204,18 @@ export class AuthService {
     return { valid: true };
   }
 
-  /** Forgot password: only send OTP if user exists. Always return same message (no email enumeration). */
-  async sendOtpForForgotPassword(email: string): Promise<{ message: string }> {
+  /** Forgot password: send OTP only if user exists. Return specific message for client. */
+  async sendOtpForForgotPassword(email: string): Promise<{ message: string; sent: boolean }> {
     const normalized = email.toLowerCase().trim();
     const user = await this.userService.findByEmail(normalized);
-    const genericMessage = 'If an account exists with this email, you will receive an OTP.';
     if (!user) {
-      return { message: genericMessage };
+      return { message: 'No account found with this email address.', sent: false };
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 3 * 60 * 1000);
     await this.userService.setOtp(user._id.toString(), otp, expiresAt);
     await this.mailService.sendOtp(normalized, otp);
-    return { message: genericMessage };
+    return { message: 'OTP has been sent to your email. Check your inbox.', sent: true };
   }
 
   /** Reset password after OTP verified. */
@@ -141,6 +244,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         name: `${user.firstName} ${user.lastName}`.trim(),
+        role: user.role ?? 'student',
       },
     };
   }

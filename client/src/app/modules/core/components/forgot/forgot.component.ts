@@ -15,6 +15,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { getFriendlyErrorMessage } from '../../../../shared/utils/error-messages.util';
 
 @Component({
   selector: 'sqx-forgot',
@@ -74,9 +75,6 @@ export class ForgotComponent implements OnDestroy {
   private rotationTimer?: ReturnType<typeof setInterval>;
   private passwordSub?: Subscription;
 
-  /** Generic message so we never reveal whether the email exists (no email enumeration). */
-  readonly genericOtpMessage = 'If an account exists with this email, you will receive an OTP.';
-
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
@@ -117,21 +115,31 @@ export class ForgotComponent implements OnDestroy {
     const email = this.emailForm.get('email')?.value;
     this.auth.forgotPasswordSendOtp(email).subscribe({
       next: (res) => {
-        this.step = 'otp';
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Check your email',
-          detail: res.message || this.genericOtpMessage,
-          life: 5000
-        });
-        this.startOtpTimer();
+        if (res.sent) {
+          this.step = 'otp';
+          this.messageService.add({
+            severity: 'success',
+            summary: 'OTP sent',
+            detail: res.message,
+            life: 5000
+          });
+          this.startOtpTimer();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Account not found',
+            detail: res.message,
+            life: 5000
+          });
+        }
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: (err) => {
+        const msg = getFriendlyErrorMessage(err, { default: 'Something went wrong. Please try again.' });
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Something went wrong. Please try again.',
+          detail: msg,
           life: 5000
         });
         this.cdr.markForCheck();
@@ -167,11 +175,12 @@ export class ForgotComponent implements OnDestroy {
         }
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: (err) => {
+        const msg = getFriendlyErrorMessage(err, { default: 'Could not verify OTP. Please try again.' });
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Could not verify OTP. Please try again.',
+          detail: msg,
           life: 5000
         });
         this.cdr.markForCheck();
@@ -199,10 +208,11 @@ export class ForgotComponent implements OnDestroy {
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
+        const msg = getFriendlyErrorMessage(err, { default: 'Could not reset password. Please try again.' });
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: err?.error?.message || 'Could not reset password. Please try again.',
+          detail: msg,
           life: 5000
         });
         this.cdr.markForCheck();
@@ -216,20 +226,30 @@ export class ForgotComponent implements OnDestroy {
     this.otpExpired = false;
     this.auth.forgotPasswordSendOtp(email).subscribe({
       next: (res) => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Check your email',
-          detail: res.message || this.genericOtpMessage,
-          life: 5000
-        });
-        this.startOtpTimer();
+        if (res.sent) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'OTP resent',
+            detail: res.message,
+            life: 5000
+          });
+          this.startOtpTimer();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Account not found',
+            detail: res.message,
+            life: 5000
+          });
+        }
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: (err) => {
+        const msg = getFriendlyErrorMessage(err, { default: 'Could not resend OTP. Please try again.' });
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Could not resend OTP. Please try again.',
+          detail: msg,
           life: 5000
         });
         this.cdr.markForCheck();

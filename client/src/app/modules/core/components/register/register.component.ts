@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { getFriendlyErrorMessage } from '../../../../shared/utils/error-messages.util';
+import { compressImage, validateImageFile, formatFileSize } from '../../../../shared/utils/image-compress.util';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -63,8 +65,14 @@ export class RegisterComponent implements OnDestroy {
   // File uploads
   profileImage: File | null = null;
   profileImagePreview: string = '/assets/images/avatar-1.jpg';
+  /** Compressed base64 profile image to send with registration */
+  profileImageBase64: string = '';
   resumeFile: File | null = null;
   resumeFileName: string = '';
+  /** URL returned from server after resume upload */
+  resumeUploadedUrl: string = '';
+  isCompressingImage = false;
+  isUploadingResume = false;
 
   // Skills
   skills: string[] = [];
@@ -121,47 +129,63 @@ export class RegisterComponent implements OnDestroy {
     fileInput?.click();
   }
 
-  onProfileImageSelect(event: Event) {
+  async onProfileImageSelect(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
 
-      // Validate file type (JPEG, JPG, PNG only)
-      const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-      if (!validImageTypes.includes(file.type)) {
+      // Validate file
+      const validationError = validateImageFile(file, 5);
+      if (validationError) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Invalid File Type',
-          detail: 'Please select a valid image file (JPEG, JPG, or PNG)',
-          life: 3000
-        });
-        return;
-      }
-
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'File Too Large',
-          detail: 'Image size must be less than 5MB',
+          summary: 'Invalid File',
+          detail: validationError,
           life: 3000
         });
         return;
       }
 
       this.profileImage = file;
+      this.isCompressingImage = true;
+      this.cdr.markForCheck();
 
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.profileImagePreview = e.target?.result as string;
+      try {
+        // Compress image to max 400x400, ~200KB
+        const compressed = await compressImage(file, {
+          maxWidth: 400,
+          maxHeight: 400,
+          quality: 0.8,
+          maxSizeKB: 200
+        });
+
+        this.profileImageBase64 = compressed;
+        this.profileImagePreview = compressed;
+
+        const sizeKB = Math.round((compressed.split(',')[1].length * 3) / 4 / 1024);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Image Ready',
+          detail: `Compressed to ${sizeKB}KB`,
+          life: 2000
+        });
+      } catch (err) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Compression Failed',
+          detail: 'Could not process image. Try another file.',
+          life: 3000
+        });
+        this.profileImage = null;
+        this.profileImageBase64 = '';
+      } finally {
+        this.isCompressingImage = false;
         this.cdr.markForCheck();
-      };
-      reader.readAsDataURL(file);
+      }
     }
   }
 
-  // Resume Upload
+  // Resume Upload - uploads immediately to server
   onResumeSelect(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -198,7 +222,35 @@ export class RegisterComponent implements OnDestroy {
 
       this.resumeFile = file;
       this.resumeFileName = file.name;
+      this.isUploadingResume = true;
       this.cdr.markForCheck();
+
+      // Upload resume to server immediately
+      this.auth.uploadResume(file).subscribe({
+        next: (res) => {
+          this.resumeUploadedUrl = res.url;
+          this.isUploadingResume = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Resume Uploaded',
+            detail: `${formatFileSize(res.size)} uploaded`,
+            life: 2000
+          });
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.isUploadingResume = false;
+          this.resumeFile = null;
+          this.resumeFileName = '';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Upload Failed',
+            detail: getFriendlyErrorMessage(err, { default: 'Could not upload resume. Try again.' }),
+            life: 3000
+          });
+          this.cdr.markForCheck();
+        }
+      });
     }
   }
 
@@ -255,8 +307,8 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
-    // Validate profile image
-    if (!this.profileImage) {
+    // Validate profile image (must be compressed)
+    if (!this.profileImageBase64) {
       this.messageService.add({
         severity: 'error',
         summary: 'Profile Image Required',
@@ -266,12 +318,23 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
-    // Validate resume
-    if (!this.resumeFile) {
+    // Validate resume (must be uploaded)
+    if (!this.resumeUploadedUrl) {
       this.messageService.add({
         severity: 'error',
         summary: 'Resume Required',
         detail: 'Please upload your resume',
+        life: 3000
+      });
+      return;
+    }
+
+    // Check if still uploading
+    if (this.isCompressingImage || this.isUploadingResume) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Please Wait',
+        detail: 'Files are still being processed',
         life: 3000
       });
       return;
@@ -402,6 +465,8 @@ export class RegisterComponent implements OnDestroy {
       phoneCountry: phoneCountry || undefined,
       phoneNumber: phoneNumber || undefined,
       underGraduate: underGraduate || undefined,
+      profileImageUrl: this.profileImageBase64 || undefined,
+      resumeUrl: this.resumeUploadedUrl || undefined,
       skills: this.skills.length ? this.skills : undefined
     }).subscribe({
       next: () => {
@@ -414,10 +479,13 @@ export class RegisterComponent implements OnDestroy {
         setTimeout(() => this.router.navigate(['/dashboard']), 1500);
       },
       error: (err) => {
+        const msg = getFriendlyErrorMessage(err, {
+          default: 'This email may already be registered. Try logging in.'
+        });
         this.messageService.add({
           severity: 'error',
           summary: 'Registration Failed',
-          detail: err?.error?.message || 'This email may already be registered. Try logging in.',
+          detail: msg,
           life: 5000
         });
         this.cdr.markForCheck();

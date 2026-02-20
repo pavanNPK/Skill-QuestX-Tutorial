@@ -1,0 +1,154 @@
+<div class="page-container">
+  <p-toast />
+
+  <!-- Add User Form Card -->
+  <div class="form-card">
+    <div class="card-header">
+      <h3 class="card-title">
+        @if (auth.isSuperAdmin()) {
+          Add Admin or Instructor
+        } @else {
+          Add Instructor
+        }
+      </h3>
+      <p class="card-subtitle">
+        @if (auth.isSuperAdmin()) {
+          Add Admins and Instructors by name and email. They will receive an email to set their password.
+        } @else {
+          Add Instructors by name and email. They will receive an email to set their password.
+        }
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="add-form">
+      <div class="form-row">
+        <div class="form-field">
+          <p-floatlabel variant="on" class="w-full">
+            <p-iconfield class="w-full">
+              <p-inputicon class="pi pi-user"></p-inputicon>
+              <input pInputText id="firstName" formControlName="firstName" class="w-full" />
+            </p-iconfield>
+            <label for="firstName">First Name <span class="required">*</span></label>
+          </p-floatlabel>
+          @if (form.get('firstName')?.touched && form.get('firstName')?.hasError('required')) {
+            <small class="p-error">First name is required.</small>
+          }
+          @if (form.get('firstName')?.touched && form.get('firstName')?.hasError('pattern')) {
+            <small class="p-error">Enter a valid first name (letters and spaces only).</small>
+          }
+        </div>
+        <div class="form-field">
+          <p-floatlabel variant="on" class="w-full">
+            <p-iconfield class="w-full">
+              <p-inputicon class="pi pi-user"></p-inputicon>
+              <input pInputText id="lastName" formControlName="lastName" class="w-full" />
+            </p-iconfield>
+            <label for="lastName">Last Name <span class="required">*</span></label>
+          </p-floatlabel>
+          @if (form.get('lastName')?.touched && form.get('lastName')?.hasError('required')) {
+            <small class="p-error">Last name is required.</small>
+          }
+          @if (form.get('lastName')?.touched && form.get('lastName')?.hasError('pattern')) {
+            <small class="p-error">Enter a valid last name (letters and spaces only).</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <p-floatlabel variant="on" class="w-full">
+            <p-iconfield class="w-full">
+              <p-inputicon class="pi pi-envelope"></p-inputicon>
+              <input pInputText id="email" type="email" formControlName="email" class="w-full" />
+            </p-iconfield>
+            <label for="email">Email Address <span class="required">*</span></label>
+          </p-floatlabel>
+          @if (form.get('email')?.touched && form.get('email')?.hasError('required')) {
+            <small class="p-error">Email address is required.</small>
+          }
+          @if (form.get('email')?.touched && form.get('email')?.hasError('email')) {
+            <small class="p-error">Enter a valid email address.</small>
+          }
+        </div>
+        @if (roleOptions.length > 1) {
+          <div class="form-field">
+            <p-floatlabel variant="on" class="w-full">
+              <p-iconfield class="w-full">
+                <p-inputicon class="pi pi-id-card"></p-inputicon>
+                <p-select
+                  id="role"
+                  [options]="roleOptions"
+                  [(ngModel)]="selectedRole"
+                  [ngModelOptions]="{standalone: true}"
+                  optionLabel="label"
+                  class="w-full"
+                />
+              </p-iconfield>
+              <label for="role">Role <span class="required">*</span></label>
+            </p-floatlabel>
+          </div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          type="submit"
+          label="Send Invitation"
+          icon="pi pi-send"
+          [loading]="submitting()"
+          [disabled]="submitting() || form.invalid"
+        />
+      </div>
+    </form>
+  </div>
+
+  <!-- Users Table Card -->
+  <div class="table-card">
+    <div class="card-header">
+      <h3 class="card-title">Admins & Instructors</h3>
+      <p class="card-subtitle">List of all administrators and instructors in the system.</p>
+    </div>
+
+    <p-table
+      [value]="users()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+      [rowsPerPageOptions]="[5, 10, 25]"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      styleClass="p-datatable-striped"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 35%">Name</th>
+          <th style="width: 40%">Email</th>
+          <th style="width: 25%">Role</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <div class="user-name-cell">
+              <div class="user-avatar">{{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}</div>
+              <span>{{ user.name }}</span>
+            </div>
+          </td>
+          <td>{{ user.email }}</td>
+          <td>
+            <p-tag [value]="roleLabel(user.role)" [severity]="getRoleSeverity(user.role)" />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3" class="empty-message">
+            <i class="pi pi-users"></i>
+            <span>No users found. Add one using the form above.</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

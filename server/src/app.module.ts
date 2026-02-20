@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MailModule } from './mail/mail.module';
     UserModule,
     AuthModule,
     MailModule,
+    UploadModule,
   ],
   providers: [
     {

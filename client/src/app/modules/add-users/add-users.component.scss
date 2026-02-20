@@ -1,0 +1,241 @@
+.page-container {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: var(--surface-ground);
+  min-height: 100%;
+}
+
+.form-card,
+.table-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--surface-border);
+}
+
+.card-header {
+  margin-bottom: 1.5rem;
+
+  .card-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .card-subtitle {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+  }
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.required {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.p-error {
+  color: #d32f2f;
+  font-size: 12px;
+}
+
+// Input styles matching login screen exactly
+:host ::ng-deep .form-field .p-iconfield {
+  width: 100%;
+}
+
+:host ::ng-deep .form-field .p-floatlabel {
+  width: 100%;
+}
+
+:host ::ng-deep .form-field .p-inputtext {
+  width: 100%;
+  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding-left: 44px;
+  box-shadow: none;
+  font-size: 15px;
+}
+
+:host ::ng-deep .form-field .p-inputtext:focus {
+  border-color: #6b44d8;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+}
+
+:host ::ng-deep .form-field .p-inputicon {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+:host ::ng-deep .form-field .p-select {
+  width: 100%;
+  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+  font-size: 15px;
+}
+
+:host ::ng-deep .form-field .p-select .p-select-label {
+  padding-left: 44px;
+}
+
+:host ::ng-deep .form-field .p-select:not(.p-disabled):hover,
+:host ::ng-deep .form-field .p-select:not(.p-disabled).p-focus {
+  border-color: #6b44d8;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+}
+
+:host ::ng-deep .form-field .p-floatlabel label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  left: 44px;
+}
+
+:host ::ng-deep .form-field .p-floatlabel:has(.p-inputtext:focus) label,
+:host ::ng-deep .form-field .p-floatlabel:has(.p-inputtext.p-filled) label,
+:host ::ng-deep .form-field .p-floatlabel:has(.p-select.p-focus) label,
+:host ::ng-deep .form-field .p-floatlabel:has(.p-select .p-select-label:not(.p-placeholder)) label {
+  left: 12px;
+  top: 0;
+  font-size: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 0.5rem;
+}
+
+:host ::ng-deep .form-actions .p-button {
+  background: #6730de;
+  border: none;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  height: auto;
+}
+
+:host ::ng-deep .form-actions .p-button:hover:not(:disabled) {
+  background: #5d2bc9;
+}
+
+:host ::ng-deep .form-actions .p-button:focus,
+:host ::ng-deep .form-actions .p-button:active {
+  background: #6730de;
+  box-shadow: 0 0 0 3px rgba(103, 48, 222, 0.2);
+}
+
+:host ::ng-deep .form-actions .p-button:disabled {
+  background: #a78bfa;
+  opacity: 0.7;
+}
+
+// Table styles
+.user-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-600));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem 1rem !important;
+  color: var(--text-color-secondary);
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    opacity: 0.5;
+  }
+
+  span {
+    display: block;
+    font-size: 0.9rem;
+  }
+}
+
+// Override PrimeNG table styles for consistency
+::ng-deep {
+  .p-datatable {
+    .p-datatable-header {
+      background: transparent;
+      border: none;
+      padding: 0 0 1rem 0;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: var(--surface-ground);
+      color: var(--text-color-secondary);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--surface-border);
+      background: #ffffff;
+    }
+
+    .p-datatable-tbody > tr:hover > td {
+      background: var(--surface-hover);
+    }
+  }
+
+  .p-paginator {
+    background: transparent;
+    border: none;
+    padding: 1rem 0 0 0;
+  }
+}

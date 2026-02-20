@@ -134,6 +134,9 @@ export class HeaderComponent implements OnInit {
     } else if (url.includes('/projects')) {
       title = 'Projects';
       breadcrumbs = [{ label: 'Projects', url: '/projects' }];
+    } else if (url.includes('/add-users')) {
+      title = 'Users';
+      breadcrumbs = [{ label: 'Users', url: '/add-users' }];
     }
 
     // Don't add home if it's dashboard (optional preference, but keeping consistent)

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Templates Preview - SkillQuestX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a2e; min-height: 100vh; padding: 40px 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { color: #fff; text-align: center; margin-bottom: 40px; font-size: 28px; }
+    .tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; }
+    .tab { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .tab:hover { background: rgba(255,255,255,0.2); }
+    .tab.active { background: #6730de; }
+    .preview-container { display: flex; justify-content: center; }
+    .email-frame { display: none; background: #f5f5f5; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .email-frame.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📧 Email Templates Preview</h1>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="showEmail('otp')">OTP Verification</button>
+      <button class="tab" onclick="showEmail('reset')">Password Reset</button>
+      <button class="tab" onclick="showEmail('invite')">User Invitation</button>
+      <button class="tab" onclick="showEmail('registration')">Registration Success</button>
+      <button class="tab" onclick="showEmail('passwordset')">Password Set</button>
+    </div>
+    
+    <div class="preview-container">
+      <!-- OTP Email -->
+      <div id="otp" class="email-frame active">
+        <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f5f5f5;padding:20px 0;">
+          <tr>
+            <td align="center">
+              <table width="520" cellspacing="0" cellpadding="0" style="background-color:#ffffff;border-radius:4px;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#6730de;padding:24px 32px;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td>
+                          <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">SkillQuestX</span>
+                        </td>
+                        <td align="right">
+                          <span style="color:rgba(255,255,255,0.8);font-size:11px;text-transform:uppercase;letter-spacing:1px;">REDEFINE • UPSKILL • SUCCEED</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Verification Code</h1>
+                    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">Enter this code to verify your identity. It expires in 3 minutes.</p>
+                    <div style="background-color:#f8f5ff;border-radius:4px;padding:20px;text-align:center;margin-bottom:24px;">
+                      <span style="font-size:32px;font-weight:700;color:#6730de;letter-spacing:6px;">482951</span>
+                    </div>
+                    <p style="margin:0;color:#999;font-size:12px;">If you didn't request this code, please ignore this email.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background-color:#fafafa;padding:20px 32px;border-top:1px solid #eee;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="color:#888;font-size:12px;">© 2026 SkillQuestX</td>
+                        <td align="right" style="color:#888;font-size:12px;">
+                          <a href="#" style="color:#6730de;text-decoration:none;">skillquestx.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Password Reset Email -->
+      <div id="reset" class="email-frame">
+        <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f5f5f5;padding:20px 0;">
+          <tr>
+            <td align="center">
+              <table width="520" cellspacing="0" cellpadding="0" style="background-color:#ffffff;border-radius:4px;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#6730de;padding:24px 32px;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td>
+                          <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">SkillQuestX</span>
+                        </td>
+                        <td align="right">
+                          <span style="color:rgba(255,255,255,0.8);font-size:11px;text-transform:uppercase;letter-spacing:1px;">REDEFINE • UPSKILL • SUCCEED</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Reset Your Password</h1>
+                    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">Click the button below to reset your password. This link expires in 1 hour.</p>
+                    <div style="margin-bottom:24px;">
+                      <a href="#" style="display:inline-block;background-color:#6730de;color:#ffffff;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:600;font-size:14px;">Reset Password</a>
+                    </div>
+                    <p style="margin:0;color:#999;font-size:12px;">If you didn't request this, you can safely ignore this email.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background-color:#fafafa;padding:20px 32px;border-top:1px solid #eee;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="color:#888;font-size:12px;">© 2026 SkillQuestX</td>
+                        <td align="right" style="color:#888;font-size:12px;">
+                          <a href="#" style="color:#6730de;text-decoration:none;">skillquestx.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- User Invitation Email -->
+      <div id="invite" class="email-frame">
+        <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f5f5f5;padding:20px 0;">
+          <tr>
+            <td align="center">
+              <table width="520" cellspacing="0" cellpadding="0" style="background-color:#ffffff;border-radius:4px;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#6730de;padding:24px 32px;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td>
+                          <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">SkillQuestX</span>
+                        </td>
+                        <td align="right">
+                          <span style="color:rgba(255,255,255,0.8);font-size:11px;text-transform:uppercase;letter-spacing:1px;">REDEFINE • UPSKILL • SUCCEED</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Welcome to SkillQuestX</h1>
+                    <p style="margin:0 0 8px;color:#555;font-size:14px;line-height:1.5;">You've been invited to join as <strong style="color:#6730de;">Instructor</strong>.</p>
+                    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">Set your password to activate your account.</p>
+                    <div style="margin-bottom:24px;">
+                      <a href="#" style="display:inline-block;background-color:#6730de;color:#ffffff;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:600;font-size:14px;">Set Password</a>
+                    </div>
+                    <p style="margin:0;color:#999;font-size:12px;">This link expires in 24 hours.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background-color:#fafafa;padding:20px 32px;border-top:1px solid #eee;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="color:#888;font-size:12px;">© 2026 SkillQuestX</td>
+                        <td align="right" style="color:#888;font-size:12px;">
+                          <a href="#" style="color:#6730de;text-decoration:none;">skillquestx.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Registration Success Email -->
+      <div id="registration" class="email-frame">
+        <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f5f5f5;padding:20px 0;">
+          <tr>
+            <td align="center">
+              <table width="520" cellspacing="0" cellpadding="0" style="background-color:#ffffff;border-radius:4px;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#6730de;padding:24px 32px;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td>
+                          <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">SkillQuestX</span>
+                        </td>
+                        <td align="right">
+                          <span style="color:rgba(255,255,255,0.8);font-size:11px;text-transform:uppercase;letter-spacing:1px;">REDEFINE • UPSKILL • SUCCEED</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Welcome to SkillQuestX!</h1>
+                    <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.5;">Hi <strong>John Doe</strong>,</p>
+                    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">Your account has been created successfully. You're now part of the SkillQuestX community!</p>
+                    <div style="background-color:#f8f5ff;border-radius:4px;padding:20px;margin-bottom:24px;">
+                      <p style="margin:0 0 12px;color:#1a1a1a;font-size:14px;font-weight:600;">What's next?</p>
+                      <ul style="margin:0;padding-left:20px;color:#555;font-size:14px;line-height:1.8;">
+                        <li>Explore available courses</li>
+                        <li>Complete your profile</li>
+                        <li>Start learning!</li>
+                      </ul>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                      <a href="#" style="display:inline-block;background-color:#6730de;color:#ffffff;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:600;font-size:14px;">Go to Dashboard</a>
+                    </div>
+                    <p style="margin:0;color:#999;font-size:12px;">Happy learning!</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background-color:#fafafa;padding:20px 32px;border-top:1px solid #eee;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="color:#888;font-size:12px;">© 2026 SkillQuestX</td>
+                        <td align="right" style="color:#888;font-size:12px;">
+                          <a href="#" style="color:#6730de;text-decoration:none;">skillquestx.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Password Set Success Email -->
+      <div id="passwordset" class="email-frame">
+        <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f5f5f5;padding:20px 0;">
+          <tr>
+            <td align="center">
+              <table width="520" cellspacing="0" cellpadding="0" style="background-color:#ffffff;border-radius:4px;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#6730de;padding:24px 32px;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td>
+                          <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">SkillQuestX</span>
+                        </td>
+                        <td align="right">
+                          <span style="color:rgba(255,255,255,0.8);font-size:11px;text-transform:uppercase;letter-spacing:1px;">REDEFINE • UPSKILL • SUCCEED</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Password Set Successfully</h1>
+                    <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.5;">Hi <strong>Jane Smith</strong>,</p>
+                    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">Your password has been set successfully. Your account is now active and ready to use.</p>
+                    <div style="background-color:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 4px 4px 0;padding:16px 20px;margin-bottom:24px;">
+                      <p style="margin:0;color:#166534;font-size:14px;"><strong>Account Status:</strong> Active</p>
+                      <p style="margin:8px 0 0;color:#166534;font-size:14px;"><strong>Role:</strong> Instructor</p>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                      <a href="#" style="display:inline-block;background-color:#6730de;color:#ffffff;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:600;font-size:14px;">Login Now</a>
+                    </div>
+                    <p style="margin:0;color:#999;font-size:12px;">If you didn't make this change, please contact support immediately.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background-color:#fafafa;padding:20px 32px;border-top:1px solid #eee;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="color:#888;font-size:12px;">© 2026 SkillQuestX</td>
+                        <td align="right" style="color:#888;font-size:12px;">
+                          <a href="#" style="color:#6730de;text-decoration:none;">skillquestx.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showEmail(id) {
+      document.querySelectorAll('.email-frame').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

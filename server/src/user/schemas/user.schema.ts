@@ -14,8 +14,15 @@ export class User {
   @Prop({ required: true, unique: true, lowercase: true })
   email: string;
 
-  @Prop({ required: true })
-  passwordHash: string;
+  @Prop({ type: String, required: false, default: null })
+  passwordHash: string | null;
+
+  /** Set-password token for Admin/Instructor invited without password. Cleared after they set password. */
+  @Prop({ type: String, default: null })
+  setPasswordToken: string | null;
+
+  @Prop({ type: Date, default: null })
+  setPasswordTokenExpiresAt: Date | null;
 
   @Prop({ type: String, default: null })
   phoneCountry: string | null;
@@ -43,6 +50,10 @@ export class User {
 
   @Prop({ type: Date, default: null })
   otpExpiresAt: Date | null;
+
+  /** super_admin | admin | instructor | student. Super Admin (SA) created by script only. */
+  @Prop({ type: String, default: 'student' })
+  role: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

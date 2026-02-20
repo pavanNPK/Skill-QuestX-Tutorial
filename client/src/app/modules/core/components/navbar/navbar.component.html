@@ -2,7 +2,7 @@
   <!-- Logo Section -->
   <div class="sidebar-header">
     <div class="logo">
-      <img src="/core/logo_white.svg" alt="Skill QuestX" class="logo-img" />
+      <img src="/core/logo_white.svg" alt="SkillQuestX" class="logo-img" />
     </div>
   </div>
 
@@ -59,6 +59,14 @@
       <span>Batches</span>
     </a>
 
+    <!-- Users (SA & Admin only) -->
+    @if (auth.canAccessAddUsers()) {
+    <a routerLink="/add-users" routerLinkActive="active" class="nav-item">
+      <i class="pi pi-user-plus"></i>
+      <span>Users</span>
+    </a>
+    }
+
     <!-- Exams Dropdown -->
     <div class="nav-item dropdown" [class.open]="examsDropdownOpen()">
       <div class="nav-item-header" (click)="toggleExamsDropdown()" [class.active]="isActive('/exams')">
@@ -95,7 +103,7 @@
       </div>
       <div class="user-info">
         <span class="user-name">{{ auth.currentUser()?.name ?? 'User' }}</span>
-        <span class="user-role">Instructor</span>
+        <span class="user-role">{{ auth.roleLabel() }}</span>
       </div>
     </div>
 
@@ -109,7 +117,7 @@
           <div class="header-info">
             <h4 class="header-name">{{ auth.currentUser()?.name ?? 'User' }}</h4>
             <p class="header-email">{{ auth.currentUser()?.email ?? '' }}</p>
-            <p class="header-designation">Instructor</p>
+            <p class="header-designation">{{ auth.roleLabel() }}</p>
           </div>
         </div>
 

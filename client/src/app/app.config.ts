@@ -13,7 +13,9 @@ import { AuthService } from './modules/core/services/auth.service';
 function initAuth(auth: AuthService): () => Promise<void> {
   return () => {
     if (!auth.getToken()) return Promise.resolve();
-    return lastValueFrom(auth.getMe()).catch(() => undefined);
+    return lastValueFrom(auth.getMe())
+      .then(() => {})
+      .catch(() => {});
   };
 }
 

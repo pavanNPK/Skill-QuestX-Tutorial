@@ -20,6 +20,10 @@ client/.env
 *secrets*
 *credentials*
 
+# Super Admin creation script (do not push — run locally only)
+server/scripts/create-super-admin.js
+server/scripts/create-super-admin.*
+
 # ---- Compiled / build output ----
 /dist
 /tmp
@@ -27,6 +31,10 @@ client/.env
 /bazel-out
 server/dist
 client/dist
+
+# ---- Uploads (user files, do not commit) ----
+server/uploads/
+uploads/
 
 # ---- Logs & lockfiles (optional: remove if you want to commit lockfiles) ----
 npm-debug.log*

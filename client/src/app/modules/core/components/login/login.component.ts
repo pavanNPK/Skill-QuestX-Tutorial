@@ -11,6 +11,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
+import { getFriendlyErrorMessage } from '../../../../shared/utils/error-messages.util';
 
 @Component({
   selector: 'sqx-login',
@@ -86,10 +87,11 @@ export class LoginComponent implements OnDestroy {
     this.auth.login({ email, password }).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: (err) => {
+        const msg = getFriendlyErrorMessage(err, { default: 'Invalid email or password. Please try again.' });
         this.messageService.add({
           severity: 'error',
           summary: 'Login Failed',
-          detail: err?.error?.message || 'Invalid email or password. Please try again.',
+          detail: msg,
           life: 5000
         });
       }

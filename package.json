@@ -10,5 +10,5 @@
     "build:server": "npm run build --prefix server",
     "install:all": "npm install && npm install --prefix client && npm install --prefix server"
   },
-  "description": "Skill Questx – Angular client + NestJS server"
+  "description": "SkillQuestX – Angular client + NestJS server"
 }

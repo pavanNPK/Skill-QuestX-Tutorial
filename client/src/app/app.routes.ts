@@ -10,6 +10,7 @@ import { TermsAndConditionsComponent } from './modules/core/components/terms-and
 import { authGuard, authLoadGuard } from './shared/guards/auth.guards';
 import { UtilitiesDemoComponent } from './shared/components/utilities-demo/utilities-demo.component';
 import { ForgotComponent } from './modules/core/components/forgot/forgot.component';
+import { SetPasswordComponent } from './modules/core/components/set-password/set-password.component';
 import { HomeComponent } from './modules/home/home.component';
 
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'set-password', component: SetPasswordComponent },
   { path: 'access-denied', component: AccessDeniedComponent },
   { path: 'privacy-policy', component: PrivacyPolicyComponent },
   { path: 'terms-and-conditions', component: TermsAndConditionsComponent },
@@ -54,6 +56,10 @@ export const routes: Routes = [
       {
         path: 'batches',
         loadChildren: () => import('./modules/batches/batches.routes').then((m) => m.batchesRoutes)
+      },
+      {
+        path: 'add-users',
+        loadChildren: () => import('./modules/add-users/add-users.routes').then((m) => m.addUsersRoutes)
       },
       {
         path: 'exams',

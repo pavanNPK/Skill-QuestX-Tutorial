@@ -8,6 +8,7 @@ import {
   Matches,
 } from 'class-validator';
 
+/** Public registration is for students only. Admin/Instructor are added by SA (or A) via create-user. */
 export class RegisterDto {
   @IsString()
   @MinLength(1)
