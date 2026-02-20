@@ -2,7 +2,6 @@
 
     <div class="courses-header">
         <div class="header-left">
-            <!-- Search Bar -->
             <div class="search-bar">
                 <i class="pi pi-search"></i>
                 <input type="text" placeholder="Search by course name">
@@ -31,7 +30,8 @@
         </div>
 
         <div class="list-body">
-            <div *ngFor="let myCourse of myCourses" class="list-row">
+            @for (myCourse of myCourses; track myCourse.name) {
+            <div class="list-row">
                 <div class="col col-name">
                     <div class="course-icon-wrapper">
                         <i class="pi pi-box"></i>
@@ -40,7 +40,6 @@
                 </div>
                 <div class="col col-instructor">{{myCourse.instructor}}</div>
                 <div class="col col-progress progress-col">
-                    <!-- Simple Progress Bar -->
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill" [style.width.%]="myCourse.progress"
                             [style.background-color]="myCourse.progressColor"></div>
@@ -60,6 +59,7 @@
                             class="pi pi-eye"></i></button>
                 </div>
             </div>
+            }
         </div>
     </div>
 
@@ -103,16 +103,22 @@
                             <div class="price-info">
                                 <span class="current-price">${{calculateDiscountedPrice(course.price,
                                     course.discount)}}</span>
-                                <span class="original-price" *ngIf="course.discount">${{course.price}}</span>
+                                @if (course.discount) {
+                                <span class="original-price">${{course.price}}</span>
+                            }
                             </div>
 
-                            <button class="get-course-btn" *ngIf="!course.unavailable">
+                            @if (!course.unavailable) {
+                            <button class="get-course-btn">
                                 <span>Get Course</span>
                                 <i class="pi pi-chevron-right"></i>
                             </button>
-                            <button class="unavailable-btn" *ngIf="course.unavailable">
+                            }
+                            @if (course.unavailable) {
+                            <button class="unavailable-btn">
                                 <span>Unavailable</span>
                             </button>
+                            }
                         </div>
                     </div>
                 </div>

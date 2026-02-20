@@ -13,7 +13,7 @@ interface Course {
     price: number;
     discount: number;
     unavailable?: boolean;
-    accentColor?: string; // For the vertical bar
+    accentColor?: string;
 }
 
 interface MyCourse {
@@ -35,43 +35,88 @@ interface MyCourse {
     styleUrls: ['./courses-list.component.scss']
 })
 export class CoursesListComponent {
+
     courses: Course[] = [
         {
             id: 1,
-            title: 'UI Design Course',
-            description: 'Lorem ipsum dolor sit amet consectetur. Diam eget amet placerat eleifend.',
-            thumbnail: 'assets/images/ui-design.jpg',
+            title: 'Program Overview',
+            description: 'Medical Coding is a core healthcare profession that involves translating clinical documentation such as diagnoses, procedures, and services into standardized medical codes.',
+            thumbnail: 'assets/images/medical-coding.jpg',
             price: 150.00,
-            discount: 33, // approx to get $100
-            accentColor: '#F59E0B' // Orange
+            discount: 33,
+            accentColor: '#6730de'
         },
         {
             id: 2,
-            title: 'Full-Stack Web Development',
-            description: 'Lorem ipsum dolor sit amet consectetur. Diam eget amet placerat eleifend.',
-            thumbnail: 'assets/images/web-dev.jpg',
+            title: 'Course Highlights',
+            description: 'Comprehensive coverage of ICD-10-CM, ICD-10-PCS, CPT, and HCPCS Level II coding systems with trainer-led live sessions.',
+            thumbnail: 'assets/images/course-highlights.jpg',
             price: 150.00,
-            discount: 13.33, // to get $130
-            unavailable: true,
-            accentColor: '#6B7280' // Gray
+            discount: 20,
+            accentColor: '#f59e0b'
         },
         {
             id: 3,
-            title: 'Machine Learning With Python',
-            description: 'Lorem ipsum dolor sit amet consectetur. Diam eget amet placerat eleifend.',
-            thumbnail: 'assets/images/ml.jpg',
+            title: 'Who Should Enroll',
+            description: 'Life Science graduates, Pharmacy, Nursing, Allied Health professionals, and those transitioning into healthcare IT and RCM roles.',
+            thumbnail: 'assets/images/who-enroll.jpg',
             price: 150.00,
             discount: 0,
-            accentColor: '#3B82F6' // Blue
+            accentColor: '#10b981'
         },
         {
             id: 4,
-            title: 'Motion Graphics In After Effects',
-            description: 'Lorem ipsum dolor sit amet consectetur. Diam eget amet placerat eleifend.',
-            thumbnail: 'assets/images/motion.jpg',
+            title: 'Curriculum Summary',
+            description: 'Healthcare fundamentals, medical terminology, anatomy, diagnosis coding using ICD-10-CM, inpatient procedure coding using ICD-10-PCS.',
+            thumbnail: 'assets/images/curriculum.jpg',
+            price: 150.00,
+            discount: 15,
+            accentColor: '#3b82f6'
+        },
+        {
+            id: 5,
+            title: 'Certification Prepared',
+            description: 'CPC – Certified Professional Coder (AAPC), CIC – Certified Inpatient Coder, CCS – Certified Coding Specialist (AHIMA).',
+            thumbnail: 'assets/images/certification.jpg',
             price: 150.00,
             discount: 0,
-            accentColor: '#F97316' // Orange
+            accentColor: '#8b5cf6'
+        },
+        {
+            id: 6,
+            title: 'Career Opportunities',
+            description: 'Medical Coder, Inpatient/Outpatient Coder, Coding Auditor, Medical Billing Analyst, AR Analyst, Clinical Documentation Specialist.',
+            thumbnail: 'assets/images/career.jpg',
+            price: 150.00,
+            discount: 25,
+            accentColor: '#ec4899'
+        },
+        {
+            id: 7,
+            title: 'Specialty & Advanced Training',
+            description: 'Inpatient DRG Coding, DRG Validation, Clinical Documentation Improvement (CDI), Ambulatory & Outpatient Coding, E&M Coding.',
+            thumbnail: 'assets/images/specialty.jpg',
+            price: 150.00,
+            discount: 10,
+            accentColor: '#14b8a6'
+        },
+        {
+            id: 8,
+            title: 'Coding Best Practices & Tips',
+            description: 'Code strictly from provider documentation, ensure proper linkage between diagnosis and procedures for medical necessity.',
+            thumbnail: 'assets/images/best-practices.jpg',
+            price: 150.00,
+            discount: 0,
+            accentColor: '#f97316'
+        },
+        {
+            id: 9,
+            title: 'CMS & Industry Updates',
+            description: 'Latest CMS ICD-10-CM and ICD-10-PCS guideline updates, OPPS and APC fundamentals, Medicare compliance requirements.',
+            thumbnail: 'assets/images/cms-updates.jpg',
+            price: 150.00,
+            discount: 20,
+            accentColor: '#ef4444'
         }
     ];
 

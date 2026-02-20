@@ -69,7 +69,7 @@ export class MailService {
                 <tr>
                   <td style="color:#888;font-size:12px;">© ${new Date().getFullYear()} SkillQuestX</td>
                   <td align="right" style="color:#888;font-size:12px;">
-                    <a href="${this.clientUrl}" style="color:#6730de;text-decoration:none;">skillquestx.com</a>
+                    <a href="https://skillquestx.com" style="color:#6730de;text-decoration:none;">skillquestx.com</a>
                   </td>
                 </tr>
               </table>
