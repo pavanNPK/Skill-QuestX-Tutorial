@@ -148,6 +148,30 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px dashed #d1d5db;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  .pi {
+    font-size: 1.5rem;
+    color: #9ca3af;
+  }
+
+  span {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+}
+
 .avatar-edit-btn {
   position: absolute;
   bottom: 0;
@@ -157,7 +181,7 @@
   min-width: 28px;
   padding: 0;
   border-radius: 50%;
-  background: #6730de !important;
+  background: var(--sqx-color-primary) !important;
   border: 2px solid #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 
@@ -167,7 +191,7 @@
 }
 
 .avatar-edit-btn:hover {
-  background: #5d2bc9 !important;
+  background: var(--sqx-color-primary-dark) !important;
 }
 
 // Input fields matching login/forgot
@@ -186,9 +210,9 @@
 }
 
 :host ::ng-deep .register-form .p-inputtext:focus {
-  border-color: #6b44d8;
+  border-color: var(--sqx-color-primary);
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+  box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
 }
 
 :host ::ng-deep .register-form .p-inputicon {
@@ -209,9 +233,9 @@
   border: 1px solid #e5e7eb;
   color: #667085;
   justify-content: flex-start;
-  height: 35px;
   border-radius: 6px;
-  box-shadow: none;
+  box-shadow: none !important;
+  outline: none !important;
   font-weight: 400;
 }
 
@@ -250,7 +274,7 @@
 }
 
 :host ::ng-deep .skill-chip.p-chip {
-  background: #6730de;
+  background: var(--sqx-color-primary);
   color: #ffffff;
   font-size: 13px;
   font-weight: 500;
@@ -274,24 +298,27 @@
   margin-top: 5px;
   width: 100%;
   color: #ffffff;
-  background: #6730de;
+  background: var(--sqx-color-primary);
   border: none;
-  box-shadow: none;
+  box-shadow: none !important;
+  outline: none !important;
   transition: all 0.2s ease;
   border-radius: 6px;
 }
 
 :host ::ng-deep .login-button.p-button:hover {
-  background: #5d2bc9;
+  background: var(--sqx-color-primary-dark);
   border: none;
   box-shadow: none;
 }
 
 :host ::ng-deep .login-button.p-button:focus,
 :host ::ng-deep .login-button.p-button:active {
-  background: #6730de;
+  background: var(--sqx-color-primary);
   border: none;
   color: #ffffff;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 :host ::ng-deep .login-button.p-button:disabled {
@@ -308,7 +335,7 @@
 
 // Brand link styling (for login link)
 .brand-link {
-  color: #6730de;
+  color: var(--sqx-color-primary);
   text-decoration: none;
   font-weight: 600;
 }
@@ -368,13 +395,13 @@
 
   &.active {
     .step-number {
-      background: #6730de;
-      border-color: #6730de;
+      background: var(--sqx-color-primary);
+      border-color: var(--sqx-color-primary);
       color: white;
     }
 
     .step-label {
-      color: #6730de;
+      color: var(--sqx-color-primary);
     }
   }
 
@@ -398,7 +425,7 @@
   transition: all 0.3s ease;
 
   &.active {
-    background: #6730de;
+    background: var(--sqx-color-primary);
   }
 }
 
@@ -424,9 +451,9 @@
 
   &:focus {
     outline: none;
-    border-color: #6730de;
+    border-color: var(--sqx-color-primary);
     background: white;
-    box-shadow: 0 0 0 3px rgba(103, 48, 222, 0.1);
+    box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
   }
 
   &::placeholder {
@@ -495,12 +522,12 @@
   height: 44px;
   min-width: 44px;
   padding: 0;
-  background: #6730de;
+  background: var(--sqx-color-primary);
   border: none;
   border-radius: 6px;
 
   &:hover {
-    background: #5d2bc9;
+    background: var(--sqx-color-primary-dark);
   }
 
   &:disabled {
@@ -533,9 +560,9 @@
     font-size: 16px;
 
     &:focus {
-      border-color: #6b44d8;
+      border-color: var(--sqx-color-primary);
       background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+      box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
     }
   }
 
@@ -566,7 +593,7 @@
 
 // Knob theming
 ::ng-deep .p-knob-value {
-  stroke: #6730de;
+  stroke: var(--sqx-color-primary);
 }
 
 ::ng-deep .p-knob-range {

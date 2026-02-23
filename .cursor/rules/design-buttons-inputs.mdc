@@ -1,0 +1,33 @@
+---
+description: App-wide design rules for inputs and buttons. Apply to entire app and all future work.
+globs: **/*
+---
+
+# Design: Inputs & Buttons (entire app + future)
+
+## Primary color
+- **Primary:** `#5B4BC4` (use CSS variable `var(--sqx-color-primary)` in code).
+
+## Inputs
+- Use **PrimeNG default styles** only. Do not apply custom width/height; use PrimeNG’s default dimensions.
+- **Reference:** Follow the **login screen** input pattern app-wide (float label, icon, background, border, focus ring).
+- For focus/primary accents on inputs, use `#5B4BC4` (or `var(--sqx-color-primary)`).
+
+## Buttons
+- Use **PrimeNG default width and height**; do not set custom width/height (or padding that changes size) unless layout requires it (e.g. a single full-width CTA in a form like login).
+- **No outline and no box-shadow** on buttons (neither default nor on focus/hover).
+- **Yes / Confirm / Save / Update / Edit:**  
+  - Background: `#5B4BC4`  
+  - Text: white  
+  - Use PrimeNG primary button (e.g. `pButton` with severity `primary` or class `p-button-primary`).
+- **No / Cancel / Close:**  
+  - **Outlined** style: border and text color `#5B4BC4`, background transparent.  
+  - Use PrimeNG outlined button (e.g. `p-button-outlined`).
+
+## Cursor (interactive elements)
+- **Every action** (hover, active, click) must show **cursor: pointer** so users can see that the element is interactive.
+- Apply `cursor: pointer` to: buttons, links, clickable table rows, icon buttons, dropdown triggers, menu items, breadcrumb links, notification items, cards that open details, calendar controls, and any element with `(click)` or navigation.
+- Use the global `.cursor-pointer` class on custom clickable elements (e.g. `<tr>`, `<div>`) that do not already get pointer from a tag/component.
+- In tables: selectable rows and action cells (icons/buttons) must have cursor pointer.
+
+Keep these rules for the **entire app** and for **all future** UI work.

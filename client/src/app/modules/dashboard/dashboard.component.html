@@ -168,7 +168,7 @@
         <div class="progress-chart">
           <svg viewBox="0 0 200 200" class="donut-chart">
             <circle cx="100" cy="100" r="80" fill="none" stroke="#F3F4F6" stroke-width="15"></circle>
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#6C5CE7" stroke-width="15"
+            <circle cx="100" cy="100" r="80" fill="none" [attr.stroke]="'var(--sqx-color-primary)'" stroke-width="15"
               [attr.stroke-dasharray]="(progressPercentage * 5.027) + ' 502.7'" stroke-linecap="round"
               transform="rotate(-90 100 100)"></circle>
             <text x="100" y="100" dy=".3em" text-anchor="middle" font-size="28" font-weight="700"
@@ -176,7 +176,7 @@
           </svg>
           <div class="progress-legend">
             <div class="legend-item">
-              <span class="legend-dot" style="background-color: #6C5CE7"></span>
+              <span class="legend-dot" style="background-color: var(--sqx-color-primary)"></span>
               <span>Completed</span>
             </div>
             <div class="legend-item">

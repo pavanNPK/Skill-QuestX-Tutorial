@@ -6,6 +6,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { MailModule } from '../mail/mail.module';
+import { CourseModule } from '../course/course.module';
+import { BatchModule } from '../batch/batch.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
@@ -14,6 +16,8 @@ import { RolesGuard } from './guards/roles.guard';
   imports: [
     UserModule,
     MailModule,
+    CourseModule,
+    BatchModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

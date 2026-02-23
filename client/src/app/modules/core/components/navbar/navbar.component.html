@@ -59,8 +59,8 @@
       <span>Batches</span>
     </a>
 
-    <!-- Users (SA & Admin only) -->
-    @if (auth.canAccessAddUsers()) {
+    <!-- Users (SA, Admin, Instructor - view varies by role) -->
+    @if (auth.canAccessUsersPage()) {
     <a routerLink="/add-users" routerLinkActive="active" class="nav-item">
       <i class="pi pi-user-plus"></i>
       <span>Users</span>
@@ -95,11 +95,15 @@
     </a>
   </nav>
 
-  <!-- User Profile Section -->
+  <!-- User Profile Section: show profile image when set, else initials -->
   <div class="sidebar-footer">
     <div class="user-profile" (click)="op.toggle($event)">
       <div class="user-avatar">
-        <img src="/assets/images/avatar-1.jpg" alt="User" />
+        @if (auth.currentUser()?.profileImageUrl) {
+          <img [src]="auth.currentUser()?.profileImageUrl | safeUrl" alt="User" />
+        } @else {
+          <span class="user-avatar-initials">{{ userInitials() }}</span>
+        }
       </div>
       <div class="user-info">
         <span class="user-name">{{ auth.currentUser()?.name ?? 'User' }}</span>
@@ -112,7 +116,11 @@
         <!-- Menu Header -->
         <div class="menu-header">
           <div class="header-avatar">
-            <img src="/assets/images/avatar-1.jpg" alt="User" />
+            @if (auth.currentUser()?.profileImageUrl) {
+              <img [src]="auth.currentUser()?.profileImageUrl | safeUrl" alt="User" />
+            } @else {
+              <span class="header-avatar-initials">{{ userInitials() }}</span>
+            }
           </div>
           <div class="header-info">
             <h4 class="header-name">{{ auth.currentUser()?.name ?? 'User' }}</h4>

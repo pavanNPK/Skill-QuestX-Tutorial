@@ -8,8 +8,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 export class SafeUrlPipe implements PipeTransform {
     constructor(private sanitizer: DomSanitizer) { }
 
-    transform(url: string | undefined): SafeResourceUrl {
-        if (!url) return '';
+    transform(url: string | undefined | null): SafeResourceUrl {
+        if (!url) return this.sanitizer.bypassSecurityTrustResourceUrl('');
         return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 }

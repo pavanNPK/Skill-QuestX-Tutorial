@@ -622,15 +622,15 @@
         }
 
         &.active {
-            background: #6C5CE7;
+            background: var(--sqx-color-primary);
             color: white;
             font-weight: 600;
             box-shadow: 0 2px 8px rgba(108, 92, 231, 0.4);
         }
 
         &.today:not(.active) {
-            border: 1px solid #6C5CE7;
-            color: #6C5CE7;
+            border: 1px solid var(--sqx-color-primary);
+            color: var(--sqx-color-primary);
         }
 
         &.empty {

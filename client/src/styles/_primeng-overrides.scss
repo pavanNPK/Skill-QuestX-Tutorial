@@ -1,0 +1,57 @@
+// App-wide PrimeNG button styling. Do not add custom width/height — use PrimeNG defaults.
+// Primary: #5B4BC4. Yes/Confirm/Save/Update/Edit = filled; No/Cancel/Close = outlined.
+// No outline, no box-shadow on any button.
+
+.p-button,
+.p-button.p-button-primary,
+.p-button-primary,
+.p-button.p-button-outlined,
+.p-button-outlined,
+.p-button-text,
+.p-button-secondary,
+.p-button-danger {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.p-button.p-button-primary,
+.p-button-primary {
+  background: var(--sqx-color-primary) !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-primary:hover:not(:disabled),
+.p-button-primary:hover:not(:disabled) {
+  background: var(--sqx-color-primary-dark) !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-primary:focus,
+.p-button.p-button-primary:active,
+.p-button-primary:focus,
+.p-button-primary:active {
+  background: var(--sqx-color-primary) !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-outlined {
+  border: 1px solid var(--sqx-color-primary) !important;
+  color: var(--sqx-color-primary) !important;
+  background: transparent !important;
+}
+
+.p-button.p-button-outlined:hover:not(:disabled),
+.p-button.p-button-outlined:focus,
+.p-button.p-button-outlined:active {
+  border-color: var(--sqx-color-primary) !important;
+  color: var(--sqx-color-primary) !important;
+  background: rgba(91, 75, 196, 0.08) !important;
+}
+
+// Outlined secondary/danger (e.g. Delete, Cancel) — border only, no shadow
+.p-button.p-button-outlined.p-button-danger,
+.p-button.p-button-outlined.p-button-secondary {
+  box-shadow: none !important;
+  outline: none !important;
+}

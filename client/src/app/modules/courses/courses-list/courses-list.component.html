@@ -2,9 +2,12 @@
 
     <div class="courses-header">
         <div class="header-left">
-            <div class="search-bar">
-                <i class="pi pi-search"></i>
-                <input type="text" placeholder="Search by course name">
+            <div class="search-field">
+                <p-iconfield class="w-full">
+                    <p-inputicon class="pi pi-search" />
+                    <input pInputText type="text" [(ngModel)]="searchQuery" placeholder="Search by course name"
+                        id="course-search" class="w-full" />
+                </p-iconfield>
             </div>
         </div>
         <div class="header-actions">

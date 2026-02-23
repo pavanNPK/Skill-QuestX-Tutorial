@@ -31,6 +31,12 @@ export interface UploadResumeResponse {
   size: number;
 }
 
+/** Course option for assigning instructor (Add User). */
+export interface CourseOption {
+  id: string;
+  name: string;
+}
+
 /** SA/A only: add Admin or Instructor. Omit password to send set-password email. */
 export interface CreateUserRequest {
   firstName: string;
@@ -41,6 +47,8 @@ export interface CreateUserRequest {
   role: 'admin' | 'instructor';
   phoneCountry?: string;
   phoneNumber?: string;
+  /** When role is instructor, course IDs to assign (enroll SA-selected courses). */
+  courseIds?: string[];
 }
 
 export interface AuthUser {
@@ -50,7 +58,37 @@ export interface AuthUser {
   lastName: string;
   name: string;
   role: string;
+  isActive?: boolean;
+  /** When set, show this image as avatar; otherwise show initials. */
+  profileImageUrl?: string | null;
 }
+
+/** Instructor with course/batch counts (Admin & SA views). */
+export interface InstructorWithStats extends AuthUser {
+  courseCount: number;
+  batchCount: number;
+}
+
+/** Batch with students (SA view). */
+export interface BatchWithStudents {
+  batchId: string;
+  batchName: string;
+  courseName: string;
+  students: AuthUser[];
+}
+
+/** Course with batches (SA view). */
+export interface CourseWithBatches {
+  courseId: string;
+  courseName: string;
+  batches: BatchWithStudents[];
+}
+
+/** Role-based users list response. */
+export type ListUsersResponse =
+  | { view: 'sa'; admins: AuthUser[]; instructors: InstructorWithStats[]; students: AuthUser[]; batchesByCourse: CourseWithBatches[] }
+  | { view: 'admin'; instructors: InstructorWithStats[]; students: AuthUser[] }
+  | { view: 'instructor'; students: AuthUser[] };
 
 /** Public registration is for students only. For Add User (SA/A) use this dropdown: Admin, Instructor. */
 export const ADD_USER_ROLES = [
@@ -92,10 +130,16 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  /** True for Super Admin and Admin (can access Add Users). */
+  /** True for Super Admin and Admin (can add/invite users). */
   canAccessAddUsers(): boolean {
     const role = this.currentUser()?.role;
     return role === 'super_admin' || role === 'admin';
+  }
+
+  /** True for SA, Admin, or Instructor (can view Users page). */
+  canAccessUsersPage(): boolean {
+    const role = this.currentUser()?.role;
+    return role === 'super_admin' || role === 'admin' || role === 'instructor';
   }
 
   /** Human-readable role for UI. */
@@ -161,9 +205,19 @@ export class AuthService {
     return this.http.post<CreateUserResult>(`${this.apiUrl}/auth/create-user`, body);
   }
 
-  /** SA or Admin only: list Admins and Instructors. */
-  listUsers(): Observable<{ users: AuthUser[] }> {
-    return this.http.get<{ users: AuthUser[] }>(`${this.apiUrl}/auth/users`);
+  /** SA / Admin / Instructor: list users (role-based payload). */
+  listUsers(): Observable<ListUsersResponse> {
+    return this.http.get<ListUsersResponse>(`${this.apiUrl}/auth/users`);
+  }
+
+  /** SA or Admin: set user active status (SA: any user; Admin: instructor/student only). */
+  setUserStatus(userId: string, active: boolean): Observable<{ user: AuthUser }> {
+    return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/users/${userId}/status`, { active });
+  }
+
+  /** SA and Admin: list courses (for assigning instructors on Add User). */
+  listCourses(): Observable<CourseOption[]> {
+    return this.http.get<CourseOption[]>(`${this.apiUrl}/auth/courses`);
   }
 
   /** Set password using token from invite email (no auth). */

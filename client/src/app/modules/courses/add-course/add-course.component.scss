@@ -181,7 +181,7 @@
         border-top: 1px solid #F3F4F6;
 
         .create-btn {
-            background: #6C5CE7;
+            background: var(--sqx-color-primary);
             border: none;
             padding: 12px 30px;
             font-weight: 600;
@@ -189,7 +189,7 @@
             color: white; // Ensure text is white
 
             &:disabled {
-                background: #6C5CE7 !important;
+                background: var(--sqx-color-primary) !important;
                 opacity: 0.5 !important; // Override PrimeNG disabled opacity/bg
                 color: white !important;
                 border: none !important;

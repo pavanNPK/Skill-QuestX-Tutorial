@@ -4,11 +4,14 @@ import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
 import { UserDocument } from '../user/schemas/user.schema';
 import { UserService } from '../user/user.service';
+import { CourseService } from '../course/course.service';
+import { BatchService } from '../batch/batch.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { MailService } from '../mail/mail.service';
 import { CREATABLE_BY_SA_ROLES } from '../user/constants/roles';
+import { ROLES } from '../user/constants/roles';
 
 export interface JwtPayload {
   sub: string;
@@ -24,6 +27,7 @@ export interface AuthResult {
     lastName: string;
     name: string;
     role: string;
+    profileImageUrl?: string | null;
   };
 }
 
@@ -32,12 +36,58 @@ interface PendingOtp {
   expiresAt: Date;
 }
 
+export interface SafeUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  name: string;
+  role: string;
+  isActive: boolean;
+}
+
+export interface InstructorWithStats extends SafeUser {
+  courseCount: number;
+  batchCount: number;
+}
+
+export interface BatchWithStudents {
+  batchId: string;
+  batchName: string;
+  courseName: string;
+  students: SafeUser[];
+}
+
+export interface CourseWithBatches {
+  courseId: string;
+  courseName: string;
+  batches: BatchWithStudents[];
+}
+
+export interface ListUsersResponseSA {
+  admins: SafeUser[];
+  instructors: InstructorWithStats[];
+  students: SafeUser[];
+  batchesByCourse: CourseWithBatches[];
+}
+
+export interface ListUsersResponseAdmin {
+  instructors: InstructorWithStats[];
+  students: SafeUser[];
+}
+
+export interface ListUsersResponseInstructor {
+  students: SafeUser[];
+}
+
 @Injectable()
 export class AuthService {
   private readonly pendingOtps = new Map<string, PendingOtp>();
 
   constructor(
     private userService: UserService,
+    private courseService: CourseService,
+    private batchService: BatchService,
     private jwtService: JwtService,
     private mailService: MailService,
     private configService: ConfigService,
@@ -54,6 +104,11 @@ export class AuthService {
     const user = await this.validateUser(dto.email, dto.password);
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+    if ((user as any).isActive === false) {
+      throw new UnauthorizedException(
+        'Your account has been deactivated. Please contact your administrator to reactivate your account.',
+      );
     }
     return this.issueToken(user);
   }
@@ -81,6 +136,9 @@ export class AuthService {
         phoneCountry: dto.phoneCountry,
         phoneNumber: dto.phoneNumber,
       });
+      if (dto.role === 'instructor' && dto.courseIds?.length) {
+        await this.courseService.addInstructorToCourses(user._id.toString(), dto.courseIds);
+      }
       return this.issueToken(user);
     }
     const token = randomBytes(32).toString('hex');
@@ -100,6 +158,9 @@ export class AuthService {
     const clientUrl = (this.configService.get<string>('CLIENT_URL') || 'http://localhost:4200').replace(/\/$/, '');
     const setPasswordLink = `${clientUrl}/set-password?token=${token}`;
     await this.mailService.sendSetPasswordEmail(user.email, setPasswordLink, user.role ?? dto.role);
+    if (dto.role === 'instructor' && dto.courseIds?.length) {
+      await this.courseService.addInstructorToCourses(user._id.toString(), dto.courseIds);
+    }
     return {
       message: 'Invitation sent. They will receive an email to set their password and can then log in.',
       user: {
@@ -109,12 +170,22 @@ export class AuthService {
         lastName: user.lastName,
         name: `${user.firstName} ${user.lastName}`.trim(),
         role: user.role ?? dto.role,
+        profileImageUrl: user.profileImageUrl ?? null,
       },
     };
   }
 
   /** Set password using token from invite email. Public. */
   async setPassword(token: string, newPassword: string): Promise<{ message: string; user: AuthResult['user'] }> {
+    const userByToken = await this.userService.findBySetPasswordToken(token);
+    if (!userByToken) {
+      throw new BadRequestException('Invalid or expired set-password link. Request a new one from your admin.');
+    }
+    if ((userByToken as any).isActive === false) {
+      throw new BadRequestException(
+        'Your account has been deactivated. Please contact your administrator to reactivate your account.',
+      );
+    }
     const user = await this.userService.setPasswordByToken(token, newPassword);
     if (!user) {
       throw new BadRequestException('Invalid or expired set-password link. Request a new one from your admin.');
@@ -130,25 +201,148 @@ export class AuthService {
         lastName: user.lastName,
         name,
         role: user.role ?? 'student',
+        profileImageUrl: user.profileImageUrl ?? null,
       },
     };
   }
 
-  /** List Admins and Instructors. SA and Admin only. */
-  async listUsers(currentUser: { role: string }): Promise<{ users: Array<AuthResult['user']> }> {
-    if (!['super_admin', 'admin'].includes(currentUser.role)) {
-      throw new ForbiddenException('Only Super Admin or Admin can list users.');
+  /** List users by role: SA sees all + batchesByCourse; Admin sees instructors + students; Instructor sees only their students. */
+  async listUsers(
+    currentUser: { id: string; role: string },
+  ): Promise<
+    | ({ view: 'sa' } & ListUsersResponseSA)
+    | ({ view: 'admin' } & ListUsersResponseAdmin)
+    | ({ view: 'instructor' } & ListUsersResponseInstructor)
+  > {
+    if (![ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.INSTRUCTOR].includes(currentUser.role as any)) {
+      throw new ForbiddenException('You do not have permission to view users.');
     }
-    const users = await this.userService.listByRoles([...CREATABLE_BY_SA_ROLES]);
-    return {
-      users: users.map((u) => ({
-        id: u._id.toString(),
-        email: u.email,
-        firstName: u.firstName,
-        lastName: u.lastName,
-        name: `${u.firstName} ${u.lastName}`.trim(),
-        role: u.role ?? 'student',
+
+    if (currentUser.role === ROLES.INSTRUCTOR) {
+      const studentIds = await this.batchService.getStudentIdsForInstructor(currentUser.id);
+      const students = await this.userService.listByIdsSafe(studentIds);
+      return { view: 'instructor', students };
+    }
+
+    if (currentUser.role === ROLES.ADMIN) {
+      const [instructorsSafe, studentsSafe] = await Promise.all([
+        this.userService.listByRolesSafe([ROLES.INSTRUCTOR]),
+        this.userService.listByRolesSafe([ROLES.STUDENT]),
+      ]);
+      const instructorStats = await Promise.all(
+        instructorsSafe.map(async (u) => ({
+          ...u,
+          courseCount: await this.courseService.countByInstructorId(u.id),
+          batchCount: await this.batchService.countBatchesByInstructorId(u.id),
+        })),
+      );
+      return { view: 'admin', instructors: instructorStats, students: studentsSafe };
+    }
+
+    // Super Admin: admins, instructors (with stats), students, batchesByCourse
+    const [adminsSafe, instructorsSafe, studentsSafe, allBatches, allCourses] = await Promise.all([
+      this.userService.listByRolesSafe([ROLES.ADMIN]),
+      this.userService.listByRolesSafe([ROLES.INSTRUCTOR]),
+      this.userService.listByRolesSafe([ROLES.STUDENT]),
+      this.batchService.findAll(),
+      this.courseService.findAll(),
+    ]);
+
+    const instructorStats = await Promise.all(
+      instructorsSafe.map(async (u) => ({
+        ...u,
+        courseCount: await this.courseService.countByInstructorId(u.id),
+        batchCount: await this.batchService.countBatchesByInstructorId(u.id),
       })),
+    );
+
+    const courseMap = new Map(allCourses.map((c: any) => [c._id.toString(), c]));
+    const batchesByCourse: CourseWithBatches[] = [];
+    const processedBatches = new Set<string>();
+
+    for (const b of allBatches as any[]) {
+      const batchId = b._id.toString();
+      if (processedBatches.has(batchId)) continue;
+      processedBatches.add(batchId);
+      const courseId = (b.courseId?._id ?? b.courseId)?.toString?.() ?? b.courseId?.toString?.();
+      const course = courseId ? courseMap.get(courseId) : null;
+      const courseName = course?.name ?? 'Unknown';
+      const studentIds = b.studentIds ?? [];
+      const students = await this.userService.listByIdsSafe(studentIds);
+      const batchEntry: BatchWithStudents = {
+        batchId,
+        batchName: b.name ?? 'Batch',
+        courseName,
+        students,
+      };
+      let group = batchesByCourse.find((g) => g.courseId === courseId);
+      if (!group) {
+        group = { courseId: courseId ?? batchId, courseName, batches: [] };
+        batchesByCourse.push(group);
+      }
+      group.batches.push(batchEntry);
+    }
+
+    return {
+      view: 'sa',
+      admins: adminsSafe,
+      instructors: instructorStats,
+      students: studentsSafe,
+      batchesByCourse,
+    };
+  }
+
+  /** List courses (id, name) for SA/Admin to assign instructors. */
+  async listCourses(): Promise<Array<{ id: string; name: string }>> {
+    const courses = await this.courseService.findAll();
+    return courses.map((c) => ({ id: c._id.toString(), name: c.name }));
+  }
+
+  /** SA only: create a course by name. */
+  async createCourse(name: string): Promise<{ id: string; name: string }> {
+    const course = await this.courseService.create(name);
+    return { id: course._id.toString(), name: course.name };
+  }
+
+  /** SA: can activate/deactivate any user. Admin: only instructor and student. */
+  async setUserStatus(
+    userId: string,
+    active: boolean,
+    currentUser: { id: string; role: string },
+  ): Promise<{ user: SafeUser }> {
+    if (currentUser.role !== ROLES.SUPER_ADMIN && currentUser.role !== ROLES.ADMIN) {
+      throw new ForbiddenException('Only Super Admin or Admin can activate or deactivate users.');
+    }
+    const target = await this.userService.findById(userId);
+    if (!target) {
+      throw new BadRequestException('User not found.');
+    }
+    const targetRole = (target as any).role ?? 'student';
+    if (currentUser.role === ROLES.ADMIN) {
+      if (targetRole === ROLES.SUPER_ADMIN || targetRole === ROLES.ADMIN) {
+        throw new ForbiddenException('Admins can only activate or deactivate Instructors and Students.');
+      }
+    }
+    const updated = await this.userService.setActive(userId, active);
+    if (!updated) {
+      throw new BadRequestException('User not found.');
+    }
+    const name = `${updated.firstName} ${updated.lastName}`.trim();
+    if (active) {
+      await this.mailService.sendAccountActivated(updated.email, name);
+    } else {
+      await this.mailService.sendAccountDeactivated(updated.email, name);
+    }
+    return {
+      user: {
+        id: updated._id.toString(),
+        email: updated.email,
+        firstName: updated.firstName,
+        lastName: updated.lastName,
+        name,
+        role: targetRole,
+        isActive: (updated as any).isActive !== false,
+      },
     };
   }
 
@@ -172,7 +366,16 @@ export class AuthService {
     return this.issueToken(user);
   }
 
+  /** Remove expired OTPs from in-memory map to avoid unbounded growth. */
+  private purgeExpiredPendingOtps(): void {
+    const now = new Date();
+    for (const [email, entry] of this.pendingOtps.entries()) {
+      if (entry.expiresAt < now) this.pendingOtps.delete(email);
+    }
+  }
+
   async sendOtp(email: string): Promise<{ message: string }> {
+    this.purgeExpiredPendingOtps();
     const normalized = email.toLowerCase().trim();
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
@@ -204,12 +407,18 @@ export class AuthService {
     return { valid: true };
   }
 
-  /** Forgot password: send OTP only if user exists. Return specific message for client. */
+  /** Forgot password: send OTP only if user exists and is active. */
   async sendOtpForForgotPassword(email: string): Promise<{ message: string; sent: boolean }> {
     const normalized = email.toLowerCase().trim();
     const user = await this.userService.findByEmail(normalized);
     if (!user) {
       return { message: 'No account found with this email address.', sent: false };
+    }
+    if ((user as any).isActive === false) {
+      return {
+        message: 'Your account has been deactivated. Please contact your administrator to reactivate your account before resetting your password.',
+        sent: false,
+      };
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 3 * 60 * 1000);
@@ -224,6 +433,11 @@ export class AuthService {
     const user = await this.userService.findByEmail(normalized);
     if (!user || !user.otpCode || !user.otpExpiresAt) {
       throw new UnauthorizedException('Invalid or expired OTP');
+    }
+    if ((user as any).isActive === false) {
+      throw new UnauthorizedException(
+        'Your account has been deactivated. Please contact your administrator to reactivate your account.',
+      );
     }
     if (user.otpExpiresAt < new Date() || user.otpCode !== otp) {
       throw new UnauthorizedException('Invalid or expired OTP');
@@ -245,6 +459,7 @@ export class AuthService {
         lastName: user.lastName,
         name: `${user.firstName} ${user.lastName}`.trim(),
         role: user.role ?? 'student',
+        profileImageUrl: user.profileImageUrl ?? null,
       },
     };
   }

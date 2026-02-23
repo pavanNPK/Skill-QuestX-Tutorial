@@ -142,7 +142,7 @@ export class RecordedClasses implements OnDestroy {
   // Helpers
   getProgressColor(progress: number): string {
     if (progress >= 75) return '#10B981'; // Green
-    if (progress >= 40) return '#6C5CE7'; // Purple (Primary)
+    if (progress >= 40) return '#5B4BC4'; // Primary
     return '#F59E0B'; // Orange
   }
 

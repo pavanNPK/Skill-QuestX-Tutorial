@@ -54,6 +54,10 @@ export class User {
   /** super_admin | admin | instructor | student. Super Admin (SA) created by script only. */
   @Prop({ type: String, default: 'student' })
   role: string;
+
+  /** When false, user cannot login or use forgot password until reactivated by SA/Admin. */
+  @Prop({ type: Boolean, default: true })
+  isActive: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

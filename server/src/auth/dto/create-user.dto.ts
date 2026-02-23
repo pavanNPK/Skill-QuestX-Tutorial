@@ -4,6 +4,7 @@ import {
   MinLength,
   IsOptional,
   IsIn,
+  IsArray,
   MaxLength,
   Matches,
 } from 'class-validator';
@@ -44,4 +45,10 @@ export class CreateUserDto {
   @IsString()
   @Matches(/^[0-9]{10}$/, { message: 'Phone number must be 10 digits' })
   phoneNumber?: string;
+
+  /** When role is instructor, course IDs to assign this instructor to (enroll SA-selected courses). */
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  courseIds?: string[];
 }

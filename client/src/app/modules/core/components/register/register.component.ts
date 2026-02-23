@@ -15,6 +15,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ChipModule } from 'primeng/chip';
 import { KnobModule } from 'primeng/knob';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'sqx-register',
@@ -32,7 +33,8 @@ import { KnobModule } from 'primeng/knob';
     PasswordModule,
     ToastModule,
     ChipModule,
-    KnobModule
+    KnobModule,
+    TooltipModule
   ],
   providers: [MessageService],
   templateUrl: './register.component.html',
@@ -64,7 +66,8 @@ export class RegisterComponent implements OnDestroy {
 
   // File uploads
   profileImage: File | null = null;
-  profileImagePreview: string = '/assets/images/avatar-1.jpg';
+  /** Empty by default; show placeholder until user uploads. */
+  profileImagePreview: string = '';
   /** Compressed base64 profile image to send with registration */
   profileImageBase64: string = '';
   resumeFile: File | null = null;

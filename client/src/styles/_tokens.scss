@@ -1,11 +1,11 @@
 :root {
-  // Primary Purple Theme
-  --sqx-color-primary: #6C5CE7;
-  --sqx-color-primary-dark: #5847D0;
-  --sqx-color-primary-light: #A29BFE;
+  // Primary Purple Theme (#5B4BC4 - app standard)
+  --sqx-color-primary: #5B4BC4;
+  --sqx-color-primary-dark: #4a3da3;
+  --sqx-color-primary-light: #8b7dd4;
 
   // Sidebar
-  --sqx-color-sidebar-bg: #6C5CE7;
+  --sqx-color-sidebar-bg: #5B4BC4;
   --sqx-color-sidebar-text: #ffffff;
   --sqx-color-sidebar-hover: rgba(255, 255, 255, 0.1);
   --sqx-color-sidebar-active: rgba(255, 255, 255, 0.2);

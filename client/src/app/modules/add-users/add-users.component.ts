@@ -10,9 +10,19 @@ import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
-import { AuthService, AuthUser } from '../core/services/auth.service';
+import {
+  AuthService,
+  AuthUser,
+  CreateUserRequest,
+  InstructorWithStats,
+  CourseWithBatches,
+  ListUsersResponse,
+  CourseOption,
+} from '../core/services/auth.service';
 import { getFriendlyErrorMessage } from '../../shared/utils/error-messages.util';
+import { ChipModule } from 'primeng/chip';
 
 interface RoleOption {
   value: string;
@@ -35,6 +45,8 @@ interface RoleOption {
     SelectModule,
     ToastModule,
     TagModule,
+    TooltipModule,
+    ChipModule,
   ],
   providers: [MessageService],
   templateUrl: './add-users.component.html',
@@ -46,12 +58,20 @@ export class AddUsersComponent implements OnInit {
   readonly auth = inject(AuthService);
   private messageService = inject(MessageService);
 
-  readonly users = signal<AuthUser[]>([]);
   readonly loading = signal(false);
   readonly submitting = signal(false);
+  readonly view = signal<'sa' | 'admin' | 'instructor' | null>(null);
+  readonly admins = signal<AuthUser[]>([]);
+  readonly instructors = signal<InstructorWithStats[]>([]);
+  readonly students = signal<AuthUser[]>([]);
+  readonly batchesByCourse = signal<CourseWithBatches[]>([]);
 
   roleOptions: RoleOption[] = [];
   selectedRole: RoleOption | null = null;
+
+  readonly courses = signal<CourseOption[]>([]);
+  selectedCourses: CourseOption[] = [];
+  courseToAdd: CourseOption | null = null;
 
   form: FormGroup;
 
@@ -69,13 +89,56 @@ export class AddUsersComponent implements OnInit {
       this.selectedRole = this.roleOptions[this.roleOptions.length - 1];
     }
     this.loadUsers();
+    if (this.auth.canAccessAddUsers()) {
+      this.auth.listCourses().subscribe({
+        next: (list) => this.courses.set(list),
+        error: () => this.courses.set([]),
+      });
+    }
+  }
+
+  /** Courses not yet selected (for dropdown when adding instructor). */
+  get coursesForDropdown(): CourseOption[] {
+    const selectedIds = new Set(this.selectedCourses.map((c) => c.id));
+    return this.courses().filter((c) => !selectedIds.has(c.id));
+  }
+
+  addCourse(course: CourseOption | null): void {
+    if (course && !this.selectedCourses.some((c) => c.id === course.id)) {
+      this.selectedCourses = [...this.selectedCourses, course];
+    }
+  }
+
+  onCourseSelected(course: CourseOption | null): void {
+    this.addCourse(course);
+    this.courseToAdd = null;
+  }
+
+  removeCourse(course: CourseOption): void {
+    this.selectedCourses = this.selectedCourses.filter((c) => c.id !== course.id);
   }
 
   loadUsers(): void {
     this.loading.set(true);
     this.auth.listUsers().subscribe({
-      next: (res) => {
-        this.users.set(res.users);
+      next: (res: ListUsersResponse) => {
+        this.view.set(res.view);
+        if (res.view === 'sa') {
+          this.admins.set(res.admins);
+          this.instructors.set(res.instructors);
+          this.students.set(res.students);
+          this.batchesByCourse.set(res.batchesByCourse);
+        } else if (res.view === 'admin') {
+          this.instructors.set(res.instructors);
+          this.students.set(res.students);
+          this.admins.set([]);
+          this.batchesByCourse.set([]);
+        } else {
+          this.students.set(res.students);
+          this.admins.set([]);
+          this.instructors.set([]);
+          this.batchesByCourse.set([]);
+        }
         this.loading.set(false);
       },
       error: (err) => {
@@ -89,19 +152,58 @@ export class AddUsersComponent implements OnInit {
     });
   }
 
+  /** True if current role can add users (SA or Admin). */
+  get showAddUserForm(): boolean {
+    return this.auth.canAccessAddUsers();
+  }
+
+  /** True if current role can activate/deactivate users (SA or Admin). Instructors have no actions. */
+  get showActions(): boolean {
+    return this.auth.canAccessAddUsers();
+  }
+
+  setUserStatus(userId: string, active: boolean): void {
+    this.auth.setUserStatus(userId, active).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: active ? 'User activated' : 'User deactivated',
+          detail: active ? 'The user can sign in again.' : 'The user has been deactivated and cannot sign in until reactivated.',
+        });
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: getFriendlyErrorMessage(err),
+        });
+      },
+    });
+  }
+
+  isActive(user: AuthUser | InstructorWithStats): boolean {
+    return user.isActive !== false;
+  }
+
   submit(): void {
     if (this.form.invalid || !this.selectedRole) {
       this.form.markAllAsTouched();
       return;
     }
     const value = this.form.getRawValue();
+    const role = this.selectedRole.value as 'admin' | 'instructor';
     this.submitting.set(true);
-    this.auth.createUser({
+    const body: CreateUserRequest = {
       firstName: value.firstName,
       lastName: value.lastName,
       email: value.email,
-      role: this.selectedRole.value as 'admin' | 'instructor',
-    }).subscribe({
+      role,
+    };
+    if (role === 'instructor' && this.selectedCourses.length > 0) {
+      body.courseIds = this.selectedCourses.map((c) => c.id);
+    }
+    this.auth.createUser(body).subscribe({
       next: (res) => {
         this.submitting.set(false);
         if ('access_token' in res) {
@@ -118,6 +220,7 @@ export class AddUsersComponent implements OnInit {
           });
         }
         this.form.reset();
+        this.selectedCourses = [];
         if (this.roleOptions.length > 0) {
           this.selectedRole = this.roleOptions[this.roleOptions.length - 1];
         }

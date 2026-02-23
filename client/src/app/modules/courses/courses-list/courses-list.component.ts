@@ -1,9 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { CarouselModule } from 'primeng/carousel';
+import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 
 interface Course {
     id: number;
@@ -30,11 +34,13 @@ interface MyCourse {
 @Component({
     selector: 'app-courses-list',
     standalone: true,
-    imports: [CommonModule, ButtonModule, TooltipModule, CarouselModule],
+    imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, CarouselModule, InputTextModule, IconFieldModule, InputIconModule],
     templateUrl: './courses-list.component.html',
     styleUrls: ['./courses-list.component.scss']
 })
 export class CoursesListComponent {
+
+    searchQuery = '';
 
     courses: Course[] = [
         {
@@ -44,7 +50,7 @@ export class CoursesListComponent {
             thumbnail: 'assets/images/medical-coding.jpg',
             price: 150.00,
             discount: 33,
-            accentColor: '#6730de'
+            accentColor: '#5B4BC4'
         },
         {
             id: 2,

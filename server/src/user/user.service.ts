@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from './schemas/user.schema';
 import { REGISTRABLE_ROLES, isRegistrableRole } from './constants/roles';
@@ -86,6 +86,7 @@ export class UserService {
             passwordHash,
             setPasswordToken: null,
             setPasswordTokenExpiresAt: null,
+            emailVerified: true,
           },
         },
       )
@@ -93,8 +94,61 @@ export class UserService {
     return this.findById(user._id.toString());
   }
 
+  /** Safe fields only - never exposes passwordHash, setPasswordToken, otpCode, etc. */
+  private readonly SAFE_USER_FIELDS =
+    'firstName lastName email role isActive';
+
   async listByRoles(roles: string[]): Promise<UserDocument[]> {
     return this.userModel.find({ role: { $in: roles } }).sort({ createdAt: -1 }).exec();
+  }
+
+  /** List users by IDs (string or ObjectId); returns only safe, non-sensitive fields. */
+  async listByIdsSafe(ids: (string | Types.ObjectId)[]): Promise<Array<{ id: string; email: string; firstName: string; lastName: string; name: string; role: string; isActive: boolean }>> {
+    if (!ids?.length) return [];
+    const objectIds = ids
+      .filter(Boolean)
+      .map((id) => (typeof id === 'string' ? new Types.ObjectId(id) : id));
+    const users = await this.userModel
+      .find({ _id: { $in: objectIds } })
+      .select(this.SAFE_USER_FIELDS)
+      .lean()
+      .exec();
+    return users.map((u: any) => ({
+      id: u._id.toString(),
+      email: u.email ?? '',
+      firstName: u.firstName ?? '',
+      lastName: u.lastName ?? '',
+      name: `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim(),
+      role: u.role ?? 'student',
+      isActive: u.isActive !== false,
+    }));
+  }
+
+  /** List users by role with only safe fields (no secrets). */
+  async listByRolesSafe(roles: string[]): Promise<Array<{ id: string; email: string; firstName: string; lastName: string; name: string; role: string; isActive: boolean }>> {
+    const users = await this.userModel
+      .find({ role: { $in: roles } })
+      .select(this.SAFE_USER_FIELDS)
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+    return users.map((u: any) => ({
+      id: u._id.toString(),
+      email: u.email ?? '',
+      firstName: u.firstName ?? '',
+      lastName: u.lastName ?? '',
+      name: `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim(),
+      role: u.role ?? 'student',
+      isActive: u.isActive !== false,
+    }));
+  }
+
+  /** Set user active status. Returns updated user or null if not found. */
+  async setActive(userId: string, active: boolean): Promise<UserDocument | null> {
+    const result = await this.userModel
+      .findByIdAndUpdate(userId, { $set: { isActive: active } }, { new: true })
+      .exec();
+    return result ?? null;
   }
 
   /** Create user without password and set a set-password token (for Admin/Instructor invite). */

@@ -60,6 +60,15 @@
   font-weight: 600;
 }
 
+.course-chips {
+  :host ::ng-deep .course-chip {
+    .p-chip {
+      background: #f3f4f6;
+      border-radius: 6px;
+    }
+  }
+}
+
 .p-error {
   color: #d32f2f;
   font-size: 12px;
@@ -85,9 +94,9 @@
 }
 
 :host ::ng-deep .form-field .p-inputtext:focus {
-  border-color: #6b44d8;
+  border-color: var(--sqx-color-primary);
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+  box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
 }
 
 :host ::ng-deep .form-field .p-inputicon {
@@ -110,9 +119,9 @@
 
 :host ::ng-deep .form-field .p-select:not(.p-disabled):hover,
 :host ::ng-deep .form-field .p-select:not(.p-disabled).p-focus {
-  border-color: #6b44d8;
+  border-color: var(--sqx-color-primary);
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+  box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
 }
 
 :host ::ng-deep .form-field .p-floatlabel label {
@@ -137,29 +146,25 @@
 }
 
 :host ::ng-deep .form-actions .p-button {
-  background: #6730de;
+  background: var(--sqx-color-primary);
   border: none;
   color: #ffffff;
-  font-weight: 500;
-  font-size: 14px;
-  padding: 0.625rem 1.25rem;
-  border-radius: 6px;
   transition: all 0.2s ease;
-  height: auto;
 }
 
 :host ::ng-deep .form-actions .p-button:hover:not(:disabled) {
-  background: #5d2bc9;
+  background: var(--sqx-color-primary-dark);
 }
 
 :host ::ng-deep .form-actions .p-button:focus,
 :host ::ng-deep .form-actions .p-button:active {
-  background: #6730de;
-  box-shadow: 0 0 0 3px rgba(103, 48, 222, 0.2);
+  background: var(--sqx-color-primary);
+  box-shadow: none;
+  outline: none;
 }
 
 :host ::ng-deep .form-actions .p-button:disabled {
-  background: #a78bfa;
+  background: var(--sqx-color-primary-light);
   opacity: 0.7;
 }
 
@@ -175,7 +180,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6730de, #5d2bc9);
+  background: linear-gradient(135deg, var(--sqx-color-primary), var(--sqx-color-primary-dark));
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -239,5 +244,36 @@
     background: transparent;
     border: none;
     padding: 1rem 0 0 0;
+  }
+}
+
+// Batches by course (SA view)
+.batches-by-course {
+  .course-group {
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .course-name {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .batch-group {
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-color);
+  }
+
+  .batch-name {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-color-secondary);
   }
 }

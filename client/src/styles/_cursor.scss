@@ -1,0 +1,68 @@
+// Cursor pointer for all interactive elements (hover, active, click) — app-wide.
+// Keeps actions visible and consistent across tables, buttons, links, and custom clickable elements.
+
+button,
+a[href],
+a[routerLink],
+a[routerlink],
+[role="button"],
+[type="button"],
+[type="submit"] {
+  cursor: pointer;
+}
+
+// PrimeNG buttons and table selectable rows
+.p-button,
+.p-button .p-button-icon,
+.p-button .p-button-label,
+.p-selectable-row,
+.p-selectable-row td,
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+// Tables: action cells and any row that is clickable
+.p-datatable .p-datatable-tbody > tr.p-selectable-row,
+.p-datatable .p-datatable-tbody > tr.p-selectable-row > td {
+  cursor: pointer;
+}
+
+// Nav, dropdowns, menus
+.nav-item,
+.nav-item-header,
+.dropdown-item,
+.menu-item,
+.breadcrumb-link,
+.notification-btn,
+.mark-all-btn,
+.notification-item {
+  cursor: pointer;
+}
+
+// Cards and list items that are clickable
+.course-card-premium,
+.folder-card,
+.concept-item,
+.concept-card-premium,
+.batch-card,
+.kanban-card,
+.table-row,
+.table-row.clickable,
+.calendar-day:not(.empty),
+.calendar-nav,
+.user-profile,
+.hero-dots button,
+.profile-avatar-wrapper,
+.resume-upload-btn,
+.add-skill-btn,
+.video-item,
+.logout-menu-btn,
+.brand-link {
+  cursor: pointer;
+}
+
+// Paginator and sortable headers
+.p-paginator .p-paginator-element,
+.p-datatable .p-sortable-column {
+  cursor: pointer;
+}

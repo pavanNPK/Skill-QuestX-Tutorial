@@ -34,15 +34,13 @@
 
     .action-buttons {
         .create-btn {
-            background: #6c5ce7; // Brand Color
-            border: 1px solid #6c5ce7;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-radius: 8px;
+            // Use PrimeNG default size; color from global primary override
+            background: var(--sqx-color-primary);
+            border: none;
+            box-shadow: none;
 
-            &:hover {
-                background: #5b4bc4; // Replaced darken
-                border-color: #5b4bc4;
+            &:hover:not(:disabled) {
+                background: var(--sqx-color-primary-dark);
             }
         }
     }
@@ -194,11 +192,11 @@ $drawer-input-font: 'Sen', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe 
             width: 100%;
 
             &:hover:not(.p-disabled) {
-                border-color: #6C5CE7;
+                border-color: var(--sqx-color-primary);
             }
 
             &.p-focus {
-                border-color: #6C5CE7;
+                border-color: var(--sqx-color-primary);
                 box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.2);
             }
         }
@@ -740,12 +738,12 @@ $task-details-pending-bg: #f1f5f9;
 }
 
 .create-task-btn {
-    background: #6c5ce7 !important;
-    border: 1px solid #6c5ce7 !important;
+    background: var(--sqx-color-primary) !important;
+    border: none !important;
+    box-shadow: none !important;
 
-    &:hover {
-        background: #5b4bc4 !important;
-        border-color: #5b4bc4 !important;
+    &:hover:not(:disabled) {
+        background: var(--sqx-color-primary-dark) !important;
     }
 }
 

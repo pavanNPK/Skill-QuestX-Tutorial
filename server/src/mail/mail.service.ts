@@ -220,4 +220,56 @@ export class MailService {
       html: this.getBaseTemplate(content),
     });
   }
+
+  async sendAccountDeactivated(to: string, name: string): Promise<void> {
+    if (!this.transporter) {
+      console.warn('Mail not configured; skipping account deactivated email to', to);
+      return;
+    }
+
+    const content = `
+      <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Account Deactivated</h1>
+      <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.5;">Hi <strong>${name}</strong>,</p>
+      <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">Your SkillQuestX account has been deactivated. You will not be able to sign in or use the forgot password feature until your account is reactivated by an administrator.</p>
+      <div style="background-color:#fef2f2;border-left:4px solid #dc2626;border-radius:0 4px 4px 0;padding:16px 20px;margin-bottom:24px;">
+        <p style="margin:0;color:#991b1b;font-size:14px;"><strong>Status:</strong> Deactivated</p>
+        <p style="margin:8px 0 0;color:#991b1b;font-size:14px;">If you believe this was done in error, please contact your administrator to reactivate your account.</p>
+      </div>
+      <p style="margin:0;color:#999;font-size:12px;">© ${new Date().getFullYear()} SkillQuestX</p>`;
+
+    await this.transporter.sendMail({
+      from: this.from,
+      to,
+      subject: 'Your SkillQuestX Account Has Been Deactivated',
+      text: `Hi ${name}, Your SkillQuestX account has been deactivated. Contact your administrator to reactivate.`,
+      html: this.getBaseTemplate(content),
+    });
+  }
+
+  async sendAccountActivated(to: string, name: string): Promise<void> {
+    if (!this.transporter) {
+      console.warn('Mail not configured; skipping account activated email to', to);
+      return;
+    }
+
+    const content = `
+      <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Account Reactivated</h1>
+      <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.5;">Hi <strong>${name}</strong>,</p>
+      <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">Your SkillQuestX account has been reactivated. You can now sign in and use all features as before.</p>
+      <div style="background-color:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 4px 4px 0;padding:16px 20px;margin-bottom:24px;">
+        <p style="margin:0;color:#166534;font-size:14px;"><strong>Status:</strong> Active</p>
+      </div>
+      <div style="margin-bottom:24px;">
+        ${this.getButton('Sign In', this.clientUrl + '/login')}
+      </div>
+      <p style="margin:0;color:#999;font-size:12px;">Welcome back!</p>`;
+
+    await this.transporter.sendMail({
+      from: this.from,
+      to,
+      subject: 'Your SkillQuestX Account Has Been Reactivated',
+      text: `Hi ${name}, Your SkillQuestX account has been reactivated. You can now sign in.`,
+      html: this.getBaseTemplate(content),
+    });
+  }
 }

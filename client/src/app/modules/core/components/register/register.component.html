@@ -46,8 +46,15 @@
 
             <div class="flex justify-content-center lg:justify-content-start mb-3">
               <div class="profile-avatar-wrapper" (click)="triggerProfileImageUpload()">
-                <img [src]="profileImagePreview" alt="Profile" class="profile-avatar" />
-                <button type="button" class="avatar-edit-btn" pButton icon="pi pi-pencil"></button>
+                @if (profileImagePreview) {
+                  <img [src]="profileImagePreview" alt="Profile" class="profile-avatar" />
+                } @else {
+                  <div class="profile-avatar-placeholder">
+                    <i class="pi pi-user-plus"></i>
+                    <span>Add Photo</span>
+                  </div>
+                }
+                <button type="button" class="avatar-edit-btn" pButton [icon]="profileImagePreview ? 'pi pi-pencil' : 'pi pi-camera'" [pTooltip]="profileImagePreview ? 'Change photo' : 'Add photo'"></button>
                 <input type="file" #profileImageInput id="profile-image-input" accept="image/jpeg,image/jpg,image/png"
                   (change)="onProfileImageSelect($event)" hidden />
               </div>

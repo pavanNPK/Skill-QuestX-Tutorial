@@ -86,7 +86,7 @@ export class DashboardComponent implements OnInit {
 
   // Mock Data for Exam Results
   examResults: ExamResult[] = [
-    { subject: 'Advanced UI Design', score: 85, total: 100, grade: 'A', date: 'Feb 10, 2025', icon: 'pi pi-palette', color: '#6C5CE7' },
+    { subject: 'Advanced UI Design', score: 85, total: 100, grade: 'A', date: 'Feb 10, 2025', icon: 'pi pi-palette', color: '#5B4BC4' },
     { subject: 'Python Basics', score: 92, total: 100, grade: 'A+', date: 'Feb 05, 2025', icon: 'pi pi-code', color: '#F59E0B' },
     { subject: 'Data Structures', score: 78, total: 100, grade: 'B+', date: 'Jan 28, 2025', icon: 'pi pi-database', color: '#10B981' }
   ];
@@ -111,7 +111,7 @@ export class DashboardComponent implements OnInit {
       subtitle: 'Premium Course',
       description: 'Master UI/UX Design with our advanced comprehensive course.',
       image: 'assets/images/banner-ui.png', // Placeholder, using CSS gradient mostly
-      color: '#6C5CE7',
+      color: '#5B4BC4',
       buttonText: 'Explore Now'
     },
     {

@@ -32,16 +32,28 @@
         .header-avatar {
             width: 60px;
             height: 60px;
+            min-width: 60px;
             border-radius: 50%;
             overflow: hidden;
             border: 3px solid white;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--sqx-color-primary) 0%, var(--sqx-color-primary-dark) 100%);
 
             img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
             }
+        }
+
+        .header-avatar-initials {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 0.02em;
         }
 
         .header-info {
@@ -326,9 +338,10 @@
 .user-avatar {
     width: 48px;
     height: 48px;
+    min-width: 48px;
     border-radius: 50%;
     overflow: hidden;
-    background: white;
+    background: linear-gradient(135deg, var(--sqx-color-primary) 0%, var(--sqx-color-primary-dark) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -338,6 +351,13 @@
         height: 100%;
         object-fit: cover;
     }
+}
+
+.user-avatar-initials {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.02em;
 }
 
 .user-info {

@@ -180,9 +180,9 @@
 }
 
 :host ::ng-deep .form-field .p-inputtext:focus {
-  border-color: #6b44d8;
+  border-color: var(--sqx-color-primary);
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(107, 68, 216, 0.1);
+  box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
 }
 
 :host ::ng-deep .form-field .p-inputicon {
@@ -194,14 +194,15 @@
   margin-top: 5px;
   width: 100%;
   color: #ffffff;
-  background: #6730de;
+  background: var(--sqx-color-primary);
   border: none;
-  box-shadow: none;
+  box-shadow: none !important;
+  outline: none !important;
   transition: all 0.2s ease;
 }
 
 :host ::ng-deep .login-button.p-button:hover {
-  background: #5d2bc9;
+  background: var(--sqx-color-primary-dark);
   border: none;
   box-shadow: none;
 }
@@ -224,7 +225,7 @@
 }
 
 .brand-link {
-  color: #6730de;
+  color: var(--sqx-color-primary);
   text-decoration: none;
   font-weight: 600;
 }
@@ -235,9 +236,11 @@
 
 ::host ::ng-deep .login-button.p-button:focus,
 ::host ::ng-deep .login-button.p-button:active {
-  background: #6730de;
+  background: var(--sqx-color-primary);
   border: none;
   color: #ffffff;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 ::host ::ng-deep .p-password .p-password-toggle,

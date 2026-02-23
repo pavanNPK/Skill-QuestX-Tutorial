@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Get, Patch, Param, Request, UseGuards } from '@nestjs/common';
 import { AuthService, AuthResult } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -69,7 +69,7 @@ export class AuthController {
   }
 
   @Get('me')
-  async me(@Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } }) {
+  async me(@Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string; profileImageUrl?: string | null } }) {
     const u = req.user;
     return {
       user: {
@@ -79,17 +79,49 @@ export class AuthController {
         lastName: u.lastName,
         name: `${u.firstName} ${u.lastName}`.trim(),
         role: u.role ?? 'student',
+        profileImageUrl: u.profileImageUrl ?? null,
       },
     };
   }
 
-  /** SA and Admin only: list Admins and Instructors. */
+  /** SA and Admin: list courses (for assigning instructors on Add User). */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'admin')
+  @Get('courses')
+  async listCourses() {
+    return this.authService.listCourses();
+  }
+
+  /** SA only: create a course (name only) so it can be assigned to instructors. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin')
+  @Post('courses')
+  async createCourse(
+    @Body() body: { name: string },
+    @Request() req: { user: { role: string } },
+  ) {
+    return this.authService.createCourse(body.name?.trim() || 'New Course');
+  }
+
+  /** SA: all users + batchesByCourse. Admin: instructors + students (with stats). Instructor: only students in their courses. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'admin', 'instructor')
   @Get('users')
   async listUsers(
     @Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } },
   ) {
     return this.authService.listUsers(req.user);
+  }
+
+  /** SA: any user. Admin: only instructor and student. Toggle active status and send email. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'admin')
+  @Patch('users/:id/status')
+  async setUserStatus(
+    @Param('id') id: string,
+    @Body() body: { active: boolean },
+    @Request() req: { user: { id: string; role: string } },
+  ) {
+    return this.authService.setUserStatus(id, body.active === true, req.user);
   }
 }

@@ -2,6 +2,8 @@
 @use './styles/tokens';
 @use './styles/utilities';
 @use './styles/shared-pages';
+@use './styles/primeng-overrides';
+@use './styles/cursor';
 
 /* Font Definitions */
 @font-face {

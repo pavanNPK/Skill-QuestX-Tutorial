@@ -1,7 +1,8 @@
 <div class="page-container">
   <p-toast />
 
-  <!-- Add User Form Card -->
+  <!-- Add User Form Card (SA & Admin only) -->
+  @if (showAddUserForm) {
   <div class="form-card">
     <div class="card-header">
       <h3 class="card-title">
@@ -90,6 +91,30 @@
         }
       </div>
 
+      @if (selectedRole?.value === 'instructor') {
+      <div class="form-row form-field">
+        <div class="form-field w-full">
+          <label class="block mb-2 font-medium text-color">Assign to courses</label>
+          <p-select
+            [options]="coursesForDropdown"
+            [(ngModel)]="courseToAdd"
+            [ngModelOptions]="{standalone: true}"
+            optionLabel="name"
+            placeholder="Select course to add"
+            class="w-full"
+            (ngModelChange)="onCourseSelected($event)"
+          />
+          @if (selectedCourses.length > 0) {
+            <div class="course-chips mt-2 flex flex-wrap gap-2">
+              @for (course of selectedCourses; track course.id) {
+                <p-chip [label]="course.name" [removable]="true" (onRemove)="removeCourse(course)" styleClass="course-chip" />
+              }
+            </div>
+          }
+        </div>
+      </div>
+      }
+
       <div class="form-actions">
         <p-button
           type="submit"
@@ -101,20 +126,21 @@
       </div>
     </form>
   </div>
+  }
 
-  <!-- Users Table Card -->
+  <!-- SA: Admins (always show section for Super Admin) -->
+  @if (view() === 'sa') {
   <div class="table-card">
     <div class="card-header">
-      <h3 class="card-title">Admins & Instructors</h3>
-      <p class="card-subtitle">List of all administrators and instructors in the system.</p>
+      <h3 class="card-title">Admins</h3>
+      <p class="card-subtitle">Super Admin and Admin users.</p>
     </div>
-
     <p-table
-      [value]="users()"
+      [value]="admins()"
       [loading]="loading()"
-      [paginator]="true"
+      [paginator]="admins().length > 0"
       [rows]="10"
-      [showCurrentPageReport]="true"
+      [showCurrentPageReport]="admins().length > 0"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
       [rowsPerPageOptions]="[5, 10, 25]"
       [tableStyle]="{ 'min-width': '50rem' }"
@@ -122,9 +148,13 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 35%">Name</th>
-          <th style="width: 40%">Email</th>
-          <th style="width: 25%">Role</th>
+          <th style="width: 28%">Name</th>
+          <th style="width: 32%">Email</th>
+          <th style="width: 15%">Role</th>
+          @if (showActions) {
+            <th style="width: 12%">Status</th>
+            <th style="width: 13%">Actions</th>
+          }
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-user>
@@ -136,19 +166,213 @@
             </div>
           </td>
           <td>{{ user.email }}</td>
-          <td>
-            <p-tag [value]="roleLabel(user.role)" [severity]="getRoleSeverity(user.role)" />
-          </td>
+          <td><p-tag [value]="roleLabel(user.role)" [severity]="getRoleSeverity(user.role)" /></td>
+          @if (showActions) {
+            <td>
+              <p-tag [value]="isActive(user) ? 'Active' : 'Inactive'" [severity]="isActive(user) ? 'success' : 'danger'" />
+            </td>
+            <td>
+              @if (isActive(user)) {
+                <p-button icon="pi pi-ban" pTooltip="Deactivate" severity="secondary" [text]="true" size="small" (click)="setUserStatus(user.id, false)" />
+              } @else {
+                <p-button icon="pi pi-check" pTooltip="Activate" severity="success" [text]="true" size="small" (click)="setUserStatus(user.id, true)" />
+              }
+            </td>
+          }
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="3" class="empty-message">
+          <td [attr.colspan]="showActions ? 5 : 3" class="empty-message">
             <i class="pi pi-users"></i>
-            <span>No users found. Add one using the form above.</span>
+            <span>No admins yet. Add one using the form above.</span>
           </td>
         </tr>
       </ng-template>
     </p-table>
   </div>
+  }
+
+  <!-- SA & Admin: Instructors (with course/batch counts) -->
+  @if ((view() === 'sa' || view() === 'admin') && instructors().length > 0) {
+  <div class="table-card">
+    <div class="card-header">
+      <h3 class="card-title">Instructors</h3>
+      <p class="card-subtitle">Instructors with course and batch counts.</p>
+    </div>
+    <p-table
+      [value]="instructors()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} instructors"
+      [rowsPerPageOptions]="[5, 10, 25]"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      styleClass="p-datatable-striped"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 22%">Name</th>
+          <th style="width: 28%">Email</th>
+          <th style="width: 10%">Courses</th>
+          <th style="width: 10%">Batches</th>
+          <th style="width: 12%">Role</th>
+          @if (showActions) {
+            <th style="width: 10%">Status</th>
+            <th style="width: 8%">Actions</th>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <div class="user-name-cell">
+              <div class="user-avatar">{{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}</div>
+              <span>{{ user.name }}</span>
+            </div>
+          </td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.courseCount }}</td>
+          <td>{{ user.batchCount }}</td>
+          <td><p-tag [value]="roleLabel(user.role)" [severity]="getRoleSeverity(user.role)" /></td>
+          @if (showActions) {
+            <td>
+              <p-tag [value]="isActive(user) ? 'Active' : 'Inactive'" [severity]="isActive(user) ? 'success' : 'danger'" />
+            </td>
+            <td>
+              @if (isActive(user)) {
+                <p-button icon="pi pi-ban" pTooltip="Deactivate" severity="secondary" [text]="true" size="small" (click)="setUserStatus(user.id, false)" />
+              } @else {
+                <p-button icon="pi pi-check" pTooltip="Activate" severity="success" [text]="true" size="small" (click)="setUserStatus(user.id, true)" />
+              }
+            </td>
+          }
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  }
+
+  <!-- SA, Admin, Instructor: Students -->
+  <div class="table-card">
+    <div class="card-header">
+      <h3 class="card-title">
+        @if (view() === 'instructor') {
+          Students (your courses)
+        } @else {
+          Students
+        }
+      </h3>
+      <p class="card-subtitle">
+        @if (view() === 'instructor') {
+          Students registered in batches of courses you teach.
+        } @else {
+          All students in the system.
+        }
+      </p>
+    </div>
+    <p-table
+      [value]="students()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} students"
+      [rowsPerPageOptions]="[5, 10, 25]"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      styleClass="p-datatable-striped"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 28%">Name</th>
+          <th style="width: 37%">Email</th>
+          <th style="width: 15%">Role</th>
+          @if (showActions) {
+            <th style="width: 12%">Status</th>
+            <th style="width: 8%">Actions</th>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <div class="user-name-cell">
+              <div class="user-avatar">{{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}</div>
+              <span>{{ user.name }}</span>
+            </div>
+          </td>
+          <td>{{ user.email }}</td>
+          <td><p-tag [value]="roleLabel(user.role)" [severity]="getRoleSeverity(user.role)" /></td>
+          @if (showActions) {
+            <td>
+              <p-tag [value]="isActive(user) ? 'Active' : 'Inactive'" [severity]="isActive(user) ? 'success' : 'danger'" />
+            </td>
+            <td>
+              @if (isActive(user)) {
+                <p-button icon="pi pi-ban" pTooltip="Deactivate" severity="secondary" [text]="true" size="small" (click)="setUserStatus(user.id, false)" />
+              } @else {
+                <p-button icon="pi pi-check" pTooltip="Activate" severity="success" [text]="true" size="small" (click)="setUserStatus(user.id, true)" />
+              }
+            </td>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="showActions ? 5 : 3" class="empty-message">
+            <i class="pi pi-users"></i>
+            <span>
+              @if (view() === 'instructor') {
+                No students in your courses yet.
+              } @else {
+                No students found.
+              }
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- SA only: Batches by Course -->
+  @if (view() === 'sa' && batchesByCourse().length > 0) {
+  <div class="table-card batches-by-course">
+    <div class="card-header">
+      <h3 class="card-title">Students by Batch & Course</h3>
+      <p class="card-subtitle">Students grouped by course and batch.</p>
+    </div>
+    @for (course of batchesByCourse(); track course.courseId) {
+      <div class="course-group">
+        <h4 class="course-name">{{ course.courseName }}</h4>
+        @for (batch of course.batches; track batch.batchId) {
+          <div class="batch-group">
+            <h5 class="batch-name">{{ batch.batchName }}</h5>
+            <p-table
+              [value]="batch.students"
+              [tableStyle]="{ 'min-width': '40rem' }"
+              styleClass="p-datatable-striped p-datatable-sm"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-user>
+                <tr>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr><td colspan="2">No students in this batch.</td></tr>
+              </ng-template>
+            </p-table>
+          </div>
+        }
+      </div>
+    }
+  </div>
+  }
 </div>
