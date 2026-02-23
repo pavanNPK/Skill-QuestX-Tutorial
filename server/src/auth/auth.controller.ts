@@ -59,13 +59,13 @@ export class AuthController {
     return this.authService.setPassword(dto.token, dto.newPassword);
   }
 
-  /** SA and Admin only: add Admin or Instructor. Students use public /register. No password = send set-password email. */
+  /** SA or Admin with head: add Admin or Instructor. No password = set-password email. */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'admin')
   @Post('create-user')
   async createUser(
     @Body() dto: CreateUserDto,
-    @Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } },
+    @Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string; canManageUsers?: boolean } },
   ): Promise<AuthResult | { message: string; user: AuthResult['user'] }> {
     return this.authService.createUser(dto, req.user);
   }
@@ -95,19 +95,19 @@ export class AuthController {
   }
 
   @Get('me')
-  async me(@Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string; profileImageUrl?: string | null } }) {
+  async me(@Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string; profileImageUrl?: string | null; canManageUsers?: boolean } }) {
     const u = req.user;
-    return {
-      user: {
-        id: u.id,
-        email: u.email,
-        firstName: u.firstName,
-        lastName: u.lastName,
-        name: `${u.firstName} ${u.lastName}`.trim(),
-        role: u.role ?? 'student',
-        profileImageUrl: u.profileImageUrl ?? null,
-      },
+    const user: Record<string, unknown> = {
+      id: u.id,
+      email: u.email,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      name: `${u.firstName} ${u.lastName}`.trim(),
+      role: u.role ?? 'student',
+      profileImageUrl: u.profileImageUrl ?? null,
     };
+    if (u.role === 'admin' && u.canManageUsers === true) (user as any).canManageUsers = true;
+    return { user };
   }
 
   /** SA and Admin: list courses (for assigning instructors on Add User). */
@@ -118,20 +118,20 @@ export class AuthController {
     return this.authService.listCourses();
   }
 
-  /** SA only: create a course (name only) so it can be assigned to instructors. */
+  /** SA or Admin with head: create a course (name only) so it can be assigned to instructors. */
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
+  @Roles('super_admin', 'admin')
   @Post('courses')
   async createCourse(
     @Body() body: { name: string },
-    @Request() req: { user: { role: string } },
+    @Request() req: { user: { role: string; canManageUsers?: boolean } },
   ) {
-    return this.authService.createCourse(body.name?.trim() || 'New Course');
+    return this.authService.createCourse(body.name?.trim() || 'New Course', req.user);
   }
 
-  /** SA: all users + batchesByCourse. Admin: instructors + students (with stats). Instructor: only students in their courses. */
+  /** SA: all users + batchesByCourse. Admin: instructors + students (view-only; no C,U,D until SA grants head option). */
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin', 'admin', 'instructor')
+  @Roles('super_admin', 'admin')
   @Get('users')
   async listUsers(
     @Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } },
@@ -139,15 +139,27 @@ export class AuthController {
     return this.authService.listUsers(req.user);
   }
 
-  /** SA: any user. Admin: only instructor and student. Toggle active status and send email. */
+  /** SA or Admin with head permission: toggle user active status and send email. */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'admin')
   @Patch('users/:id/status')
   async setUserStatus(
     @Param('id') id: string,
     @Body() body: { active: boolean },
-    @Request() req: { user: { id: string; role: string } },
+    @Request() req: { user: { id: string; role: string; canManageUsers?: boolean } },
   ) {
     return this.authService.setUserStatus(id, body.active === true, req.user);
+  }
+
+  /** SA only: grant or revoke head permission for an Admin. That Admin can then add users and set user status. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin')
+  @Patch('users/:id/head')
+  async setHeadPermission(
+    @Param('id') id: string,
+    @Body() body: { head: boolean },
+    @Request() req: { user: { role: string } },
+  ) {
+    return this.authService.setHeadPermission(id, body.head === true, req.user);
   }
 }

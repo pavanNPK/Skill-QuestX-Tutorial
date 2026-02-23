@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { HeaderService } from '../../core/services/header.service';
+import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,6 +23,8 @@ import { MenuItem } from 'primeng/api';
     styleUrl: './add-course.component.scss'
 })
 export class AddCourseComponent implements OnInit, OnDestroy {
+    private auth = inject(AuthService);
+
     courseForm: FormGroup;
     selectedFileName: string = '';
     constructor(
@@ -39,6 +42,10 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        if (!this.auth.canDoUserCUD()) {
+            this.router.navigate(['/courses']);
+            return;
+        }
         this.headerService.updateTitle('Create New Course');
         this.headerService.updateBreadcrumbs([
             { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },

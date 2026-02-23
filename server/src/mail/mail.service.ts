@@ -246,6 +246,90 @@ export class MailService {
     });
   }
 
+  async sendTaskAddedToBatch(
+    to: string,
+    studentName: string,
+    taskTitle: string,
+    courseName: string,
+    dueDate?: string | null,
+  ): Promise<void> {
+    if (!this.transporter) {
+      console.warn('Mail not configured; skipping task-added email to', to);
+      return;
+    }
+    const due = dueDate ? ` Due: ${dueDate}.` : '';
+    const content = `
+      <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">New task assigned</h1>
+      <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.5;">Hi <strong>${studentName}</strong>,</p>
+      <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">A new task has been added for your batch: <strong>${taskTitle}</strong> (Course: ${courseName}).${due}</p>
+      <div style="margin-bottom:24px;">
+        ${this.getButton('View Tasks', this.clientUrl + '/tasks')}
+      </div>`;
+
+    await this.transporter.sendMail({
+      from: this.from,
+      to,
+      subject: `New task: ${taskTitle} - SkillQuestX`,
+      text: `Hi ${studentName}, New task "${taskTitle}" for ${courseName}. View: ${this.clientUrl}/tasks`,
+      html: this.getBaseTemplate(content),
+    });
+  }
+
+  async sendTaskSubmittedToInstructor(
+    to: string,
+    instructorName: string,
+    studentName: string,
+    taskTitle: string,
+  ): Promise<void> {
+    if (!this.transporter) {
+      console.warn('Mail not configured; skipping task-submitted email to', to);
+      return;
+    }
+    const content = `
+      <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">Task submission received</h1>
+      <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.5;">Hi <strong>${instructorName}</strong>,</p>
+      <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;"><strong>${studentName}</strong> has submitted the task: <strong>${taskTitle}</strong>.</p>
+      <div style="margin-bottom:24px;">
+        ${this.getButton('View Tasks', this.clientUrl + '/tasks')}
+      </div>`;
+
+    await this.transporter.sendMail({
+      from: this.from,
+      to,
+      subject: `Task submitted: ${taskTitle} by ${studentName} - SkillQuestX`,
+      text: `${studentName} submitted "${taskTitle}". View: ${this.clientUrl}/tasks`,
+      html: this.getBaseTemplate(content),
+    });
+  }
+
+  async sendInstructorAssignedToCourse(
+    to: string,
+    instructorName: string,
+    courseNames: string[],
+  ): Promise<void> {
+    if (!this.transporter) {
+      console.warn('Mail not configured; skipping instructor-assigned email to', to);
+      return;
+    }
+    const courseList = courseNames.length ? courseNames.join(', ') : 'your assigned course(s)';
+    const content = `
+      <h1 style="margin:0 0 16px;color:#1a1a1a;font-size:20px;font-weight:600;">You've been assigned to courses</h1>
+      <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.5;">Hi <strong>${instructorName}</strong>,</p>
+      <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.5;">An administrator has assigned you to the following course(s): <strong>${courseList}</strong>.</p>
+      <div style="margin-bottom:24px;">
+        ${this.getButton('View Courses', this.clientUrl + '/courses')}
+      </div>
+      <p style="margin:0;color:#999;font-size:12px;">You can now manage tasks and batches for these courses.</p>`;
+
+    await this.transporter.sendMail({
+      from: this.from,
+      to,
+      subject: 'Course assignment - SkillQuestX',
+      text: `Hi ${instructorName}, You have been assigned to: ${courseList}. View courses: ${this.clientUrl}/courses`,
+      html: this.getBaseTemplate(content),
+    });
+  }
+
   async sendAccountActivated(to: string, name: string): Promise<void> {
     if (!this.transporter) {
       console.warn('Mail not configured; skipping account activated email to', to);

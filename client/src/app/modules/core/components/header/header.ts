@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
@@ -6,13 +6,16 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DrawerModule } from 'primeng/drawer';
 import { BadgeModule } from 'primeng/badge';
 import { HeaderService, BreadcrumbItem } from '../../services/header.service';
+import { NotificationService, AppNotification as ApiNotification } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
-interface AppNotification {
-  id: number;
+export interface AppNotification {
+  id: string;
   title: string;
   message: string;
   time: string;
   read: boolean;
+  link?: string | null;
 }
 
 @Component({
@@ -28,31 +31,15 @@ export class HeaderComponent implements OnInit {
 
   // Notification Logic
   showDrawer = signal(false);
-  notifications: AppNotification[] = [
-    {
-      id: 1,
-      title: 'New Assignment Posted',
-      message: 'Python Task 5 has been uploaded. Due date: March 20, 2024',
-      time: '2 hours ago',
-      read: false
-    },
-    {
-      id: 2,
-      title: 'Class Scheduled',
-      message: 'Live session on Advanced Python scheduled for tomorrow at 10 AM',
-      time: '5 hours ago',
-      read: false
-    },
-    {
-      id: 3,
-      title: 'Grade Updated',
-      message: 'Your Task 4 has been graded. Score: 95/100',
-      time: '1 day ago',
-      read: true
-    }
-  ];
+  notifications: AppNotification[] = [];
+  unreadCount = signal(0);
 
-  constructor(private router: Router, private headerService: HeaderService) { }
+  private router = inject(Router);
+  private headerService = inject(HeaderService);
+  private notificationService = inject(NotificationService);
+  private auth = inject(AuthService);
+
+  constructor() {}
 
   ngOnInit() {
     // Check for overridden breadcrumbs first
@@ -82,6 +69,39 @@ export class HeaderComponent implements OnInit {
 
     // Initial load
     this.updateFromRouter(this.router.url);
+    this.loadNotifications();
+  }
+
+  private formatTimeAgo(createdAt: string): string {
+    const date = new Date(createdAt);
+    const now = new Date();
+    const sec = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (sec < 60) return 'Just now';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min} minute${min !== 1 ? 's' : ''} ago`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr} hour${hr !== 1 ? 's' : ''} ago`;
+    const day = Math.floor(hr / 24);
+    if (day < 7) return `${day} day${day !== 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+  }
+
+  loadNotifications(): void {
+    if (!this.auth.isAuthenticated()) return;
+    this.notificationService.getNotifications().subscribe({
+      next: (res) => {
+        this.notifications = res.notifications.map((n: ApiNotification) => ({
+          id: n.id,
+          title: n.title,
+          message: n.message || '',
+          time: this.formatTimeAgo(n.createdAt),
+          read: n.read,
+          link: n.link ?? null,
+        }));
+        this.unreadCount.set(res.unreadCount);
+      },
+      error: () => {},
+    });
   }
 
   updateFromRouter(url: string) {
@@ -158,6 +178,7 @@ export class HeaderComponent implements OnInit {
 
   // Notification Methods
   openNotifications() {
+    this.loadNotifications();
     this.showDrawer.set(true);
   }
 
@@ -166,14 +187,23 @@ export class HeaderComponent implements OnInit {
   }
 
   markAllAsRead() {
-    this.notifications.forEach(n => n.read = true);
+    this.notificationService.markAllAsRead().subscribe({
+      next: () => {
+        this.notifications = this.notifications.map((n) => ({ ...n, read: true }));
+        this.unreadCount.set(0);
+      },
+    });
   }
 
   markAsRead(notification: AppNotification) {
-    notification.read = true;
-  }
-
-  get unreadCount(): number {
-    return this.notifications.filter(n => !n.read).length;
+    if (notification.read) return;
+    this.notificationService.markAsRead(notification.id).subscribe({
+      next: () => {
+        this.notifications = this.notifications.map((n) =>
+          n.id === notification.id ? { ...n, read: true } : n,
+        );
+        this.unreadCount.update((c) => Math.max(0, c - 1));
+      },
+    });
   }
 }

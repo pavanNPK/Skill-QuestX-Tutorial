@@ -50,6 +50,40 @@ export class BatchService {
     return this.batchModel.countDocuments({ courseId: { $in: courseIds } }).exec();
   }
 
+  /** Unique student IDs enrolled in the given batches. */
+  async getStudentIdsByBatchIds(batchIds: string[]): Promise<string[]> {
+    if (!batchIds?.length) return [];
+    const ids = batchIds.map((id) => new Types.ObjectId(id));
+    const batches = await this.batchModel
+      .find({ _id: { $in: ids } })
+      .select('studentIds')
+      .lean()
+      .exec();
+    const set = new Set<string>();
+    for (const b of batches as any[]) {
+      for (const sid of b.studentIds || []) {
+        set.add(sid.toString());
+      }
+    }
+    return Array.from(set);
+  }
+
+  /** Unique student IDs in any batch of the given course. */
+  async getStudentIdsByCourseId(courseId: string): Promise<string[]> {
+    const batches = await this.batchModel
+      .find({ courseId: new Types.ObjectId(courseId) })
+      .select('studentIds')
+      .lean()
+      .exec();
+    const set = new Set<string>();
+    for (const b of batches as any[]) {
+      for (const sid of b.studentIds || []) {
+        set.add(sid.toString());
+      }
+    }
+    return Array.from(set);
+  }
+
   /** Unique student IDs enrolled in any batch of courses taught by this instructor. */
   async getStudentIdsForInstructor(instructorId: string): Promise<Types.ObjectId[]> {
     const courses = await this.courseService.findByInstructorId(instructorId);

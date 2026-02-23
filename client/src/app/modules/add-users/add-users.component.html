@@ -147,12 +147,13 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 28%">Name</th>
-          <th style="width: 32%">Email</th>
-          <th style="width: 15%">Role</th>
+          <th style="width: 24%">Name</th>
+          <th style="width: 28%">Email</th>
+          <th style="width: 12%">Role</th>
+          <th style="width: 12%">Head</th>
           @if (showActions) {
             <th style="width: 12%">Status</th>
-            <th style="width: 13%">Actions</th>
+            <th style="width: 12%">Actions</th>
           }
         </tr>
       </ng-template>
@@ -166,6 +167,20 @@
           </td>
           <td>{{ user.email }}</td>
           <td><p-tag [value]="roleLabel(user.role)" [severity]="getRoleSeverity(user.role)" /></td>
+          <td>
+            @if (user.role === 'admin') {
+              <label class="head-toggle" [pTooltip]="user.canManageUsers ? 'Revoke head permission' : 'Grant head permission: this Admin can add users and activate/deactivate'">
+                <input
+                  type="checkbox"
+                  [checked]="user.canManageUsers"
+                  (change)="onHeadToggle(user.id, $event)"
+                />
+                <span class="head-toggle-slider"></span>
+              </label>
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
           @if (showActions) {
             <td>
               <p-tag [value]="isActive(user) ? 'Active' : 'Inactive'" [severity]="isActive(user) ? 'success' : 'danger'" />
@@ -182,7 +197,7 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td [attr.colspan]="showActions ? 5 : 3" class="empty-message">
+          <td [attr.colspan]="showActions ? 6 : 4" class="empty-message">
             <i class="pi pi-users"></i>
             <span>No admins yet. Add one using the form above.</span>
           </td>

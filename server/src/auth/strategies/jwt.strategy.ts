@@ -30,6 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       lastName: user.lastName,
       role: user.role ?? 'student',
       profileImageUrl: user.profileImageUrl ?? null,
+      canManageUsers: user.role === 'admin' ? (user as any).canManageUsers === true : undefined,
     };
   }
 }

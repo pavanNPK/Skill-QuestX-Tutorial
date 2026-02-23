@@ -10,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { MailService } from '../mail/mail.service';
+import { NotificationService } from '../notification/notification.service';
 import { CREATABLE_BY_SA_ROLES } from '../user/constants/roles';
 import { ROLES } from '../user/constants/roles';
 
@@ -28,6 +29,8 @@ export interface AuthResult {
     name: string;
     role: string;
     profileImageUrl?: string | null;
+    /** Present for role=admin when SA has granted head permission. */
+    canManageUsers?: boolean;
   };
 }
 
@@ -91,6 +94,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
     private configService: ConfigService,
+    private notificationService: NotificationService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<UserDocument | null> {
@@ -113,16 +117,16 @@ export class AuthService {
     return this.issueToken(user);
   }
 
-  /** Create Admin or Instructor. SA can add Admin or Instructor; Admin can only add Instructor. No password = send set-password email. */
+  /** Create Admin or Instructor. SA always; Admin only if SA has granted head (canManageUsers). No password = send set-password email. */
   async createUser(
     dto: CreateUserDto,
-    currentUser: { role: string },
+    currentUser: { role: string; canManageUsers?: boolean },
   ): Promise<AuthResult | { message: string; user: AuthResult['user'] }> {
-    const allowed = ['super_admin', 'admin'];
-    if (!allowed.includes(currentUser.role)) {
-      throw new ForbiddenException('Only Super Admin or Admin can add users.');
+    const canCreate = currentUser.role === ROLES.SUPER_ADMIN || (currentUser.role === ROLES.ADMIN && currentUser.canManageUsers === true);
+    if (!canCreate) {
+      throw new ForbiddenException('Only Super Admin or an Admin with head permission can add users.');
     }
-    if (currentUser.role === 'admin' && dto.role === 'admin') {
+    if (currentUser.role === ROLES.ADMIN && dto.role === 'admin') {
       throw new ForbiddenException('Admins can only add Instructors, not other Admins.');
     }
     const hasPassword = dto.password != null && dto.password.length >= 8;
@@ -138,6 +142,12 @@ export class AuthService {
       });
       if (dto.role === 'instructor' && dto.courseIds?.length) {
         await this.courseService.addInstructorToCourses(user._id.toString(), dto.courseIds);
+        await this.notifyInstructorAssignedToCourses(
+          user._id.toString(),
+          user.email,
+          `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim(),
+          dto.courseIds,
+        );
       }
       return this.issueToken(user);
     }
@@ -160,6 +170,12 @@ export class AuthService {
     await this.mailService.sendSetPasswordEmail(user.email, setPasswordLink, user.role ?? dto.role);
     if (dto.role === 'instructor' && dto.courseIds?.length) {
       await this.courseService.addInstructorToCourses(user._id.toString(), dto.courseIds);
+      await this.notifyInstructorAssignedToCourses(
+        user._id.toString(),
+        user.email,
+        `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim(),
+        dto.courseIds,
+      );
     }
     return {
       message: 'Invitation sent. They will receive an email to set their password and can then log in.',
@@ -206,22 +222,15 @@ export class AuthService {
     };
   }
 
-  /** List users by role: SA sees all + batchesByCourse; Admin sees instructors + students; Instructor sees only their students. */
+  /** List users by role: SA sees all + batchesByCourse; Admin sees instructors + students (view-only). */
   async listUsers(
     currentUser: { id: string; role: string },
   ): Promise<
     | ({ view: 'sa' } & ListUsersResponseSA)
     | ({ view: 'admin' } & ListUsersResponseAdmin)
-    | ({ view: 'instructor' } & ListUsersResponseInstructor)
   > {
-    if (![ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.INSTRUCTOR].includes(currentUser.role as any)) {
+    if (![ROLES.SUPER_ADMIN, ROLES.ADMIN].includes(currentUser.role as any)) {
       throw new ForbiddenException('You do not have permission to view users.');
-    }
-
-    if (currentUser.role === ROLES.INSTRUCTOR) {
-      const studentIds = await this.batchService.getStudentIdsForInstructor(currentUser.id);
-      const students = await this.userService.listByIdsSafe(studentIds);
-      return { view: 'instructor', students };
     }
 
     if (currentUser.role === ROLES.ADMIN) {
@@ -301,20 +310,25 @@ export class AuthService {
     }));
   }
 
-  /** SA only: create a course by name. */
-  async createCourse(name: string): Promise<{ id: string; name: string }> {
+  /** SA or Admin with head: create a course by name. */
+  async createCourse(name: string, currentUser: { role: string; canManageUsers?: boolean }): Promise<{ id: string; name: string }> {
+    const canCreate = currentUser.role === ROLES.SUPER_ADMIN || (currentUser.role === ROLES.ADMIN && currentUser.canManageUsers === true);
+    if (!canCreate) {
+      throw new ForbiddenException('Only Super Admin or an Admin with head permission can create courses.');
+    }
     const course = await this.courseService.create(name);
     return { id: course._id.toString(), name: course.name };
   }
 
-  /** SA: can activate/deactivate any user. Admin: only instructor and student. */
+  /** SA: any user. Admin: only if SA granted head (canManageUsers); can only activate/deactivate instructor and student. */
   async setUserStatus(
     userId: string,
     active: boolean,
-    currentUser: { id: string; role: string },
+    currentUser: { id: string; role: string; canManageUsers?: boolean },
   ): Promise<{ user: SafeUser }> {
-    if (currentUser.role !== ROLES.SUPER_ADMIN && currentUser.role !== ROLES.ADMIN) {
-      throw new ForbiddenException('Only Super Admin or Admin can activate or deactivate users.');
+    const canSet = currentUser.role === ROLES.SUPER_ADMIN || (currentUser.role === ROLES.ADMIN && currentUser.canManageUsers === true);
+    if (!canSet) {
+      throw new ForbiddenException('Only Super Admin or an Admin with head permission can activate or deactivate users.');
     }
     const target = await this.userService.findById(userId);
     if (!target) {
@@ -414,6 +428,65 @@ export class AuthService {
     };
   }
 
+  /** SA only: grant or revoke head permission (canManageUsers) for an Admin. That Admin can then add users and set user status. */
+  async setHeadPermission(
+    userId: string,
+    head: boolean,
+    currentUser: { role: string },
+  ): Promise<{ user: { id: string; email: string; firstName: string; lastName: string; name: string; role: string; isActive: boolean; canManageUsers: boolean } }> {
+    if (currentUser.role !== ROLES.SUPER_ADMIN) {
+      throw new ForbiddenException('Only Super Admin can grant or revoke head permission.');
+    }
+    const updated = await this.userService.setCanManageUsers(userId, head);
+    if (!updated) {
+      throw new BadRequestException('User not found or is not an Admin.');
+    }
+    const name = `${updated.firstName ?? ''} ${updated.lastName ?? ''}`.trim();
+    return {
+      user: {
+        id: updated._id.toString(),
+        email: updated.email ?? '',
+        firstName: updated.firstName ?? '',
+        lastName: updated.lastName ?? '',
+        name,
+        role: updated.role ?? 'admin',
+        isActive: (updated as any).isActive !== false,
+        canManageUsers: (updated as any).canManageUsers === true,
+      },
+    };
+  }
+
+  /** Send email + in-app notification when an instructor is assigned to course(s). */
+  private async notifyInstructorAssignedToCourses(
+    instructorId: string,
+    instructorEmail: string,
+    instructorName: string,
+    courseIds: string[],
+  ): Promise<void> {
+    const courses = await this.courseService.findNamesByIds(courseIds);
+    const courseNames = courses.map((c) => c.name);
+    try {
+      await this.mailService.sendInstructorAssignedToCourse(
+        instructorEmail,
+        instructorName || 'Instructor',
+        courseNames,
+      );
+    } catch (e) {
+      console.warn('Failed to send instructor-assigned email', e);
+    }
+    const title = courseNames.length
+      ? `You've been assigned to: ${courseNames.join(', ')}`
+      : "You've been assigned to course(s)";
+    await this.notificationService.create({
+      userId: instructorId,
+      title,
+      message: 'An administrator assigned you to these courses. You can now manage tasks and batches.',
+      type: 'instructor_assigned_to_course',
+      link: '/courses',
+      metadata: { courseIds, courseNames },
+    });
+  }
+
   /** Remove expired OTPs from in-memory map to avoid unbounded growth. */
   private purgeExpiredPendingOtps(): void {
     const now = new Date();
@@ -498,17 +571,19 @@ export class AuthService {
   private issueToken(user: UserDocument): AuthResult {
     const payload: JwtPayload = { sub: user._id.toString(), email: user.email };
     const access_token = this.jwtService.sign(payload);
-    return {
-      access_token,
-      user: {
-        id: user._id.toString(),
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        name: `${user.firstName} ${user.lastName}`.trim(),
-        role: user.role ?? 'student',
-        profileImageUrl: user.profileImageUrl ?? null,
-      },
+    const role = user.role ?? 'student';
+    const userPayload: AuthResult['user'] = {
+      id: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      name: `${user.firstName} ${user.lastName}`.trim(),
+      role,
+      profileImageUrl: user.profileImageUrl ?? null,
     };
+    if (role === ROLES.ADMIN && (user as any).canManageUsers === true) {
+      (userPayload as any).canManageUsers = true;
+    }
+    return { access_token, user: userPayload };
   }
 }

@@ -8,6 +8,8 @@ import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 import { UploadModule } from './upload/upload.module';
 import { CourseModule } from './course/course.module';
+import { NotificationModule } from './notification/notification.module';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { CourseModule } from './course/course.module';
     CourseModule,
     MailModule,
     UploadModule,
+    NotificationModule,
+    TaskModule,
   ],
   providers: [
     {

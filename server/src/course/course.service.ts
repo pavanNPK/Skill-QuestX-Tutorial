@@ -37,6 +37,14 @@ export class CourseService {
     return list as unknown as CourseLean[];
   }
 
+  /** Get course names by IDs (for notifications). */
+  async findNamesByIds(courseIds: string[]): Promise<{ id: string; name: string }[]> {
+    if (!courseIds?.length) return [];
+    const ids = courseIds.map((id) => new Types.ObjectId(id));
+    const list = await this.courseModel.find({ _id: { $in: ids } }).select('name').lean().exec();
+    return (list as any[]).map((c) => ({ id: c._id.toString(), name: c.name ?? 'Course' }));
+  }
+
   /** Courses where the given user is an instructor. */
   async findByInstructorId(instructorId: string): Promise<CourseLean[]> {
     const id = new Types.ObjectId(instructorId);

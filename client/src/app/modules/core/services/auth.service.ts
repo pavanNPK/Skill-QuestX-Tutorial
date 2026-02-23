@@ -78,6 +78,8 @@ export interface AuthUser {
   isActive?: boolean;
   /** When set, show this image as avatar; otherwise show initials. */
   profileImageUrl?: string | null;
+  /** For role=admin: true when SA has granted head permission (can add users and set status). */
+  canManageUsers?: boolean;
 }
 
 /** Instructor with course/batch counts (Admin & SA views). */
@@ -147,16 +149,28 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  /** True for Super Admin and Admin (can add/invite users). */
+  /** True for Super Admin and Admin (can add/invite users when SA grants head option). */
   canAccessAddUsers(): boolean {
     const role = this.currentUser()?.role;
     return role === 'super_admin' || role === 'admin';
   }
 
-  /** True for SA, Admin, or Instructor (can view Users page). */
+  /** True for SA and Admin only (can view Users page). Instructor sees all other screens but not Users. */
   canAccessUsersPage(): boolean {
     const role = this.currentUser()?.role;
-    return role === 'super_admin' || role === 'admin' || role === 'instructor';
+    return role === 'super_admin' || role === 'admin';
+  }
+
+  /** True for SA, or for Admin when SA has granted head (canManageUsers). Enables Add User form and Activate/Deactivate. */
+  canDoUserCUD(): boolean {
+    const u = this.currentUser();
+    return u?.role === 'super_admin' || (u?.role === 'admin' && u?.canManageUsers === true);
+  }
+
+  /** SA & Admin see only Dashboard, Courses, Batches, Users. Instructor & Student see Materials, Classes, Tasks, Exams, Projects too. */
+  showNavBeyondSaAdmin(): boolean {
+    const role = this.currentUser()?.role;
+    return role === 'instructor' || role === 'student';
   }
 
   /** Human-readable role for UI. */
@@ -230,6 +244,11 @@ export class AuthService {
   /** SA or Admin: set user active status (SA: any user; Admin: instructor/student only). */
   setUserStatus(userId: string, active: boolean): Observable<{ user: AuthUser }> {
     return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/users/${userId}/status`, { active });
+  }
+
+  /** SA only: grant or revoke head permission for an Admin. That Admin can then add users and set user status. */
+  setHeadPermission(userId: string, head: boolean): Observable<{ user: AuthUser }> {
+    return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/users/${userId}/head`, { head });
   }
 
   /** SA and Admin: list courses (for assigning instructors on Add User). Returns at least id, name. */

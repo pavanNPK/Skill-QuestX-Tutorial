@@ -91,14 +91,14 @@ export class AddUsersComponent implements OnInit {
       this.selectedRole = this.roleOptions[this.roleOptions.length - 1];
     }
     this.loadUsers();
-    if (this.auth.canAccessAddUsers()) {
+    if (this.auth.canDoUserCUD()) {
       this.loadCourses();
     }
   }
 
   /** Load courses from API (for Assign to courses). Call on init and when opening the dropdown. */
   loadCourses(): void {
-    if (!this.auth.canAccessAddUsers()) return;
+    if (!this.auth.canDoUserCUD()) return;
     this.coursesLoading.set(true);
     this.auth.listCourses().subscribe({
       next: (list) => {
@@ -155,14 +155,14 @@ export class AddUsersComponent implements OnInit {
     });
   }
 
-  /** True if current role can add users (SA or Admin). */
+  /** True if current role can add users (SA only; Admin is view-only until SA grants head option). */
   get showAddUserForm(): boolean {
-    return this.auth.canAccessAddUsers();
+    return this.auth.canDoUserCUD();
   }
 
-  /** True if current role can activate/deactivate users (SA or Admin). Instructors have no actions. */
+  /** True if current role can activate/deactivate users (SA only). Admin has no C,U,D until SA grants option. */
   get showActions(): boolean {
-    return this.auth.canAccessAddUsers();
+    return this.auth.canDoUserCUD();
   }
 
   setUserStatus(userId: string, active: boolean): void {
@@ -182,6 +182,36 @@ export class AddUsersComponent implements OnInit {
           detail: getFriendlyErrorMessage(err, {
             default: 'Could not update user status. Please try again.',
             notFound: 'User not found or the request could not be completed. Please refresh the page and try again.',
+            network: 'Unable to connect. Please check your connection and try again.',
+          }),
+        });
+      },
+    });
+  }
+
+  /** SA only: toggle head permission from checkbox change event. */
+  onHeadToggle(userId: string, event: Event): void {
+    const head = (event.target as HTMLInputElement).checked;
+    this.setHeadPermission(userId, head);
+  }
+
+  /** SA only: grant or revoke head permission for an Admin. That Admin can then add users and set user status. */
+  setHeadPermission(userId: string, head: boolean): void {
+    this.auth.setHeadPermission(userId, head).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: head ? 'Head granted' : 'Head revoked',
+          detail: head ? 'This Admin can now add users and activate/deactivate users.' : 'This Admin can no longer add users or change status.',
+        });
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: getFriendlyErrorMessage(err, {
+            default: 'Could not update head permission. Please try again.',
             network: 'Unable to connect. Please check your connection and try again.',
           }),
         });

@@ -8,6 +8,7 @@ import { UserModule } from '../user/user.module';
 import { MailModule } from '../mail/mail.module';
 import { CourseModule } from '../course/course.module';
 import { BatchModule } from '../batch/batch.module';
+import { NotificationModule } from '../notification/notification.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
@@ -18,6 +19,7 @@ import { RolesGuard } from './guards/roles.guard';
     MailModule,
     CourseModule,
     BatchModule,
+    NotificationModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -20,13 +20,16 @@
       <span>Courses</span>
     </a>
 
-    <!-- Materials -->
+    <!-- Materials (Instructor, Student only) -->
+    @if (auth.showNavBeyondSaAdmin()) {
     <a routerLink="/materials" routerLinkActive="active" class="nav-item">
       <i class="pi pi-file"></i>
       <span>Materials</span>
     </a>
+    }
 
-    <!-- Classes Dropdown -->
+    <!-- Classes Dropdown (Instructor, Student only) -->
+    @if (auth.showNavBeyondSaAdmin()) {
     <div class="nav-item dropdown" [class.open]="classesDropdownOpen()">
       <div class="nav-item-header" (click)="toggleClassesDropdown()" [class.active]="isActive('/classes')">
         <div class="nav-item-content">
@@ -46,12 +49,15 @@
         </a>
       </div>
     </div>
+    }
 
-    <!-- Tasks -->
+    <!-- Tasks (Instructor, Student only) -->
+    @if (auth.showNavBeyondSaAdmin()) {
     <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
       <i class="pi pi-check-square"></i>
       <span>Tasks</span>
     </a>
+    }
 
     <!-- Batches -->
     <a routerLink="/batches" routerLinkActive="active" class="nav-item">
@@ -59,7 +65,7 @@
       <span>Batches</span>
     </a>
 
-    <!-- Users (SA, Admin, Instructor - view varies by role) -->
+    <!-- Users (SA, Admin only) -->
     @if (auth.canAccessUsersPage()) {
     <a routerLink="/add-users" routerLinkActive="active" class="nav-item">
       <i class="pi pi-user-plus"></i>
@@ -67,7 +73,8 @@
     </a>
     }
 
-    <!-- Exams Dropdown -->
+    <!-- Exams Dropdown (Instructor, Student only) -->
+    @if (auth.showNavBeyondSaAdmin()) {
     <div class="nav-item dropdown" [class.open]="examsDropdownOpen()">
       <div class="nav-item-header" (click)="toggleExamsDropdown()" [class.active]="isActive('/exams')">
         <div class="nav-item-content">
@@ -87,12 +94,15 @@
         </a>
       </div>
     </div>
+    }
 
-    <!-- Projects -->
+    <!-- Projects (Instructor, Student only) -->
+    @if (auth.showNavBeyondSaAdmin()) {
     <a routerLink="/projects" routerLinkActive="active" class="nav-item">
       <i class="pi pi-briefcase"></i>
       <span>Projects</span>
     </a>
+    }
   </nav>
 
   <!-- User Profile Section: show profile image when set, else initials -->

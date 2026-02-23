@@ -96,14 +96,14 @@ export class UserService {
 
   /** Safe fields only - never exposes passwordHash, setPasswordToken, otpCode, etc. */
   private readonly SAFE_USER_FIELDS =
-    'firstName lastName email role isActive';
+    'firstName lastName email role isActive canManageUsers';
 
   async listByRoles(roles: string[]): Promise<UserDocument[]> {
     return this.userModel.find({ role: { $in: roles } }).sort({ createdAt: -1 }).exec();
   }
 
   /** List users by IDs (string or ObjectId); returns only safe, non-sensitive fields. */
-  async listByIdsSafe(ids: (string | Types.ObjectId)[]): Promise<Array<{ id: string; email: string; firstName: string; lastName: string; name: string; role: string; isActive: boolean }>> {
+  async listByIdsSafe(ids: (string | Types.ObjectId)[]): Promise<Array<{ id: string; email: string; firstName: string; lastName: string; name: string; role: string; isActive: boolean; canManageUsers?: boolean }>> {
     if (!ids?.length) return [];
     const objectIds = ids
       .filter(Boolean)
@@ -121,11 +121,12 @@ export class UserService {
       name: `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim(),
       role: u.role ?? 'student',
       isActive: u.isActive !== false,
+      canManageUsers: u.role === 'admin' ? (u.canManageUsers === true) : undefined,
     }));
   }
 
   /** List users by role with only safe fields (no secrets). */
-  async listByRolesSafe(roles: string[]): Promise<Array<{ id: string; email: string; firstName: string; lastName: string; name: string; role: string; isActive: boolean }>> {
+  async listByRolesSafe(roles: string[]): Promise<Array<{ id: string; email: string; firstName: string; lastName: string; name: string; role: string; isActive: boolean; canManageUsers?: boolean }>> {
     const users = await this.userModel
       .find({ role: { $in: roles } })
       .select(this.SAFE_USER_FIELDS)
@@ -140,6 +141,7 @@ export class UserService {
       name: `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim(),
       role: u.role ?? 'student',
       isActive: u.isActive !== false,
+      canManageUsers: u.role === 'admin' ? (u.canManageUsers === true) : undefined,
     }));
   }
 
@@ -210,6 +212,16 @@ export class UserService {
         { $set: { passwordHash, otpCode: null, otpExpiresAt: null } },
       )
       .exec();
+  }
+
+  /** SA only: set canManageUsers (head permission) for an admin user. */
+  async setCanManageUsers(userId: string, canManageUsers: boolean): Promise<UserDocument | null> {
+    const user = await this.userModel.findById(userId).exec();
+    if (!user || user.role !== 'admin') return null;
+    const result = await this.userModel
+      .findByIdAndUpdate(userId, { $set: { canManageUsers } }, { new: true })
+      .exec();
+    return result ?? null;
   }
 
   /** Update current user profile: firstName and lastName only (role and email/username are read-only). */

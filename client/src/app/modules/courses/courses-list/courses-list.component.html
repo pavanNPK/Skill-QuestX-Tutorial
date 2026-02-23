@@ -11,7 +11,16 @@
             </div>
         </div>
         <div class="header-actions">
-            <button pButton label="Add New Course" icon="pi pi-plus" (click)="navigateToAddCourse()"></button>
+            @if (showAddCourseButton()) {
+            <button
+              pButton
+              label="Add New Course"
+              icon="pi pi-plus"
+              [disabled]="!canAddCourse()"
+              (click)="navigateToAddCourse()"
+              [pTooltip]="canAddCourse() ? '' : 'Head permission required to add courses'"
+            ></button>
+            }
         </div>
     </div>
 

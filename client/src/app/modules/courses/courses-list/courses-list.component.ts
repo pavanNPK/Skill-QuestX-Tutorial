@@ -184,7 +184,18 @@ export class CoursesListComponent implements OnInit {
         });
     }
 
+    /** Show Add New Course button only for SA and Admin (hidden for Instructor and Student). */
+    showAddCourseButton(): boolean {
+        return this.auth.isSuperAdmin() || this.auth.isAdmin();
+    }
+
+    /** SA or Admin with head can add course; Admin without head cannot. */
+    canAddCourse(): boolean {
+        return this.auth.canDoUserCUD();
+    }
+
     navigateToAddCourse() {
+        if (!this.canAddCourse()) return;
         this.router.navigate(['/courses/add']);
     }
 

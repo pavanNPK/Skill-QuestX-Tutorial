@@ -43,8 +43,8 @@
         <div class="header-right">
             <button class="notification-btn" (click)="openNotifications()">
                 <i class="pi pi-bell"></i>
-                @if (unreadCount > 0) {
-                <span class="badge">{{ unreadCount }}</span>
+                @if (unreadCount() > 0) {
+                <span class="badge">{{ unreadCount() }}</span>
                 }
             </button>
         </div>
@@ -52,7 +52,7 @@
 </header>
 
 <!-- Notification Drawer -->
-<p-drawer [(visible)]="showDrawer" position="right" [showCloseIcon]="true" (onHide)="closeDrawer()">
+<p-drawer [visible]="showDrawer()" (visibleChange)="showDrawer.set($event)" position="right" [showCloseIcon]="true" (onHide)="closeDrawer()">
     <ng-template pTemplate="header">
         <div class="drawer-header">
             <h3>Notifications</h3>
@@ -84,7 +84,7 @@
     </ng-template>
 
     <ng-template pTemplate="footer">
-        @if (unreadCount > 0) {
+        @if (unreadCount() > 0) {
         <div class="drawer-footer">
             <button class="mark-all-btn" (click)="markAllAsRead()">
                 <i class="pi pi-check-circle"></i>

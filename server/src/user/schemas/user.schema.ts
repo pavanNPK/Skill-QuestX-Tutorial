@@ -58,6 +58,10 @@ export class User {
   /** When false, user cannot login or use forgot password until reactivated by SA/Admin. */
   @Prop({ type: Boolean, default: true })
   isActive: boolean;
+
+  /** For role=admin only: when true, SA has granted this Admin "head" permission to create users and set user status. */
+  @Prop({ type: Boolean, default: false })
+  canManageUsers: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
