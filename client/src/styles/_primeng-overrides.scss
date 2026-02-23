@@ -12,6 +12,16 @@
 .p-button-danger {
   box-shadow: none !important;
   outline: none !important;
+  text-decoration: none !important;
+}
+
+.p-button:hover,
+.p-button:focus,
+.p-button:active,
+.p-button.p-button-outlined:hover,
+.p-button.p-button-outlined:focus,
+.p-button.p-button-outlined:active {
+  text-decoration: none !important;
 }
 
 .p-button.p-button-primary,

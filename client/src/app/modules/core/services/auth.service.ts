@@ -272,6 +272,25 @@ export class AuthService {
     });
   }
 
+  /** Authenticated user: change password (current + new). Server returns message; client should logout or re-login. */
+  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.patch<{ message: string }>(`${this.apiUrl}/auth/change-password`, {
+      currentPassword,
+      newPassword,
+    });
+  }
+
+  /** Authenticated user: update own profile (firstName, lastName only). Role and email/username are read-only. Refreshes stored user. */
+  updateProfile(payload: { firstName: string; lastName: string }): Observable<AuthUser> {
+    return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/profile`, payload).pipe(
+      tap((res) => {
+        this.currentUser.set(res.user);
+        localStorage.setItem(this.userKey, JSON.stringify(res.user));
+      }),
+      map((res) => res.user)
+    );
+  }
+
   /** Validate JWT and refresh current user from server. Call on app init when token exists. */
   getMe(): Observable<AuthUser> {
     return this.http.get<{ user: AuthUser }>(`${this.apiUrl}/auth/me`).pipe(

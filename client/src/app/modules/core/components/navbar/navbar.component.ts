@@ -44,18 +44,15 @@ export class NavbarComponent {
   }
 
   goToProfile() {
-    console.log('Navigate to profile settings');
-    // TODO: Navigate to profile page
+    this.router.navigate(['/profile-settings']);
   }
 
   changePassword() {
-    console.log('Navigate to change password');
-    // TODO: Navigate to change password page
+    this.router.navigate(['/change-password']);
   }
 
   userPreferences() {
-    console.log('Navigate to user preferences');
-    // TODO: Navigate to preferences page
+    this.router.navigate(['/profile-settings']);
   }
 
   logout() {

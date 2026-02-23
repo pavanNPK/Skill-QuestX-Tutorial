@@ -1,0 +1,53 @@
+<div class="profile-settings-page">
+  <p-toast />
+  <div class="profile-card card">
+    <h2 class="card-heading">Account</h2>
+    <div class="profile-row">
+      <div class="profile-avatar">
+        @if (auth.currentUser()?.profileImageUrl) {
+          <img [src]="auth.currentUser()?.profileImageUrl | safeUrl" alt="Profile" />
+        } @else {
+          <span class="avatar-initials">{{ userInitials() }}</span>
+        }
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" class="profile-details profile-form">
+        <div class="form-field">
+          <p-floatlabel variant="on" class="w-full">
+            <input pInputText formControlName="firstName" id="firstName" class="w-full" />
+            <label for="firstName">First name</label>
+          </p-floatlabel>
+          @if (form.get('firstName')?.touched && form.get('firstName')?.invalid) {
+            <small class="p-error">First name is required.</small>
+          }
+        </div>
+        <div class="form-field">
+          <p-floatlabel variant="on" class="w-full">
+            <input pInputText formControlName="lastName" id="lastName" class="w-full" />
+            <label for="lastName">Last name</label>
+          </p-floatlabel>
+          @if (form.get('lastName')?.touched && form.get('lastName')?.invalid) {
+            <small class="p-error">Last name is required.</small>
+          }
+        </div>
+        <div class="detail-row read-only">
+          <span class="label">Email (username)</span>
+          <span class="value">{{ auth.currentUser()?.email ?? '—' }}</span>
+        </div>
+        <div class="detail-row read-only">
+          <span class="label">Role</span>
+          <span class="value">{{ auth.roleLabel() }}</span>
+        </div>
+        <div class="profile-actions">
+          <button pButton type="submit" label="Save changes" class="p-button-primary"
+            [loading]="submitting()" [disabled]="submitting() || form.invalid || form.pristine"></button>
+          <a pButton routerLink="/change-password" label="Change password" class="p-button-outlined" icon="pi pi-lock"></a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="preferences-card card">
+    <h2 class="card-heading">User Preferences</h2>
+    <p class="coming-soon">We'll add user preferences here in a future update.</p>
+  </div>
+</div>

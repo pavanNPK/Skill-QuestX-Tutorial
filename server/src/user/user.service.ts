@@ -211,4 +211,19 @@ export class UserService {
       )
       .exec();
   }
+
+  /** Update current user profile: firstName and lastName only (role and email/username are read-only). */
+  async updateProfile(
+    userId: string,
+    dto: { firstName?: string; lastName?: string },
+  ): Promise<UserDocument | null> {
+    const updates: Record<string, string> = {};
+    if (dto.firstName != null && dto.firstName.trim()) updates.firstName = dto.firstName.trim();
+    if (dto.lastName != null && dto.lastName.trim()) updates.lastName = dto.lastName.trim();
+    if (Object.keys(updates).length === 0) return this.findById(userId);
+    const result = await this.userModel
+      .findByIdAndUpdate(userId, { $set: updates }, { new: true })
+      .exec();
+    return result ?? null;
+  }
 }

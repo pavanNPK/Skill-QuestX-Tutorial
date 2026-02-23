@@ -6,6 +6,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SetPasswordDto } from './dto/set-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Public } from './decorators/public.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
@@ -66,6 +68,30 @@ export class AuthController {
     @Request() req: { user: { id: string; email: string; firstName: string; lastName: string; role: string } },
   ): Promise<AuthResult | { message: string; user: AuthResult['user'] }> {
     return this.authService.createUser(dto, req.user);
+  }
+
+  /** Authenticated user: change own password. */
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(
+    @Body() dto: ChangePasswordDto,
+    @Request() req: { user: { id: string } },
+  ): Promise<{ message: string }> {
+    return this.authService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
+  }
+
+  /** Authenticated user: update own profile (first name, last name only; role and email/username are read-only). */
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  async updateProfile(
+    @Body() dto: UpdateProfileDto,
+    @Request() req: { user: { id: string } },
+  ) {
+    const user = await this.authService.updateProfile(req.user.id, {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+    });
+    return { user };
   }
 
   @Get('me')

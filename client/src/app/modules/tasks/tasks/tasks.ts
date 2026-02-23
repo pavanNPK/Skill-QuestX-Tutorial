@@ -103,12 +103,13 @@ export class Tasks implements OnInit {
       );
       this.selectedMonthValue = currentMonthOption ?? this.monthOptionsListCache[0];
       const currentWeekNum = this.getWeekOfMonth(now);
-      this.selectedWeekValue = this.weekOptions.find((w) => w.value === currentWeekNum) ?? this.weekOptions[0];
+      this.selectedWeekValue =
+        this.weekOptionsForSelectedMonth.find((w) => w.value === currentWeekNum) ?? this.weekOptionsForSelectedMonth[0];
       this.selectFirstTaskForFilter();
     }
   }
 
-  /** All 12 months for current year and previous year (most recent first). */
+  /** All 12 months for current year and previous year (most recent first). Future: add year dropdown for real-time year + month selection. */
   private buildMonthOptions(): void {
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -271,16 +272,40 @@ export class Tasks implements OnInit {
     return this.monthOptionsListCache.length ? this.monthOptionsListCache[0] : null;
   }
 
+  /** Effective week for filter; validates against selected month (real-time weeks). */
   get effectiveWeek(): { label: string; value: number | 'all' } {
-    return this.selectedWeekValue ?? this.weekOptions[1];
+    const options = this.weekOptionsForSelectedMonth;
+    if (!this.selectedWeekValue) return options[0];
+    const found = options.find((o) => o.value === this.selectedWeekValue!.value);
+    return found ?? options[0];
   }
 
-  /** Week number in month (1–5). */
+  /** Week number in month (1–5). Day 1–7 = week 1, 8–14 = week 2, etc. */
   getWeekOfMonth(d: Date): number {
     const date = new Date(d);
-    const first = new Date(date.getFullYear(), date.getMonth(), 1);
     const dayOfMonth = date.getDate();
     return Math.ceil(dayOfMonth / 7) || 1;
+  }
+
+  /** Number of weeks in the given month (real-time: 4 or 5 based on last day). */
+  getWeeksInMonth(year: number, monthIndex: number): number {
+    const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+    return this.getWeekOfMonth(new Date(year, monthIndex, lastDay));
+  }
+
+  /** Week options for the selected month (real-time: only weeks that exist in that month). */
+  get weekOptionsForSelectedMonth(): { label: string; value: number | 'all' }[] {
+    const month = this.effectiveMonth;
+    const base: { label: string; value: number | 'all' }[] = [{ label: 'All Weeks', value: 'all' }];
+    if (!month) return [...base, ...this.weekOptions.slice(1)];
+    const year = month.value.getFullYear();
+    const monthIndex = month.value.getMonth();
+    const numWeeks = this.getWeeksInMonth(year, monthIndex);
+    const labels: Record<number, string> = { 1: '1st Week', 2: '2nd Week', 3: '3rd Week', 4: '4th Week', 5: '5th Week' };
+    for (let w = 1; w <= numWeeks; w++) {
+      base.push({ label: labels[w] ?? `${w}th Week`, value: w });
+    }
+    return base;
   }
 
   /** Tasks filtered by selected month/week for student list. */
@@ -324,6 +349,14 @@ export class Tasks implements OnInit {
 
   formatTaskDate(d: Date): string {
     return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '/');
+  }
+
+  /** When month changes, normalize week to a valid option for that month, then select first task. */
+  onMonthChange(): void {
+    const options = this.weekOptionsForSelectedMonth;
+    const valid = options.some((o) => o.value === this.selectedWeekValue?.value);
+    if (!valid) this.selectedWeekValue = options[0];
+    this.selectFirstTaskForFilter();
   }
 
   /** Student view: select first task for current filter (month/week). Call on filter change and init. */

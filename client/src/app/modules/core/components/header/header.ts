@@ -100,9 +100,16 @@ export class HeaderComponent implements OnInit {
     // Default Home
     const home: BreadcrumbItem = { label: 'Home', icon: 'pi pi-home', url: '/dashboard' };
 
+    // When adding new app routes: add a case here with title and breadcrumbs so the header shows the component name and breadcrumbs.
     if (url.includes('/dashboard')) {
       title = 'Dashboard';
       breadcrumbs = [];
+    } else if (url.includes('/profile-settings')) {
+      title = 'Profile Settings';
+      breadcrumbs = [{ label: 'Profile Settings', url: '/profile-settings' }];
+    } else if (url.includes('/change-password')) {
+      title = 'Change Password';
+      breadcrumbs = [{ label: 'Change Password', url: '/change-password' }];
     } else if (url.includes('/courses')) {
       title = 'My Course Syllabus';
       breadcrumbs = [{ label: 'My Course Syllabus', url: '/courses' }];

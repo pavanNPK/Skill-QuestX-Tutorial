@@ -374,6 +374,46 @@ export class AuthService {
     return this.issueToken(user);
   }
 
+  /** Authenticated user: change password (current + new). */
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+    const valid = await this.userService.validatePassword(user, currentPassword);
+    if (!valid) {
+      throw new UnauthorizedException('Current password is incorrect.');
+    }
+    await this.userService.updatePassword(userId, newPassword);
+    return { message: 'Password updated successfully. Please sign in again with your new password.' };
+  }
+
+  /** Authenticated user: update own profile (firstName, lastName only; role and email are read-only). */
+  async updateProfile(
+    userId: string,
+    dto: { firstName?: string; lastName?: string },
+  ): Promise<AuthResult['user']> {
+    const user = await this.userService.updateProfile(userId, dto);
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+    const firstName = user.firstName ?? '';
+    const lastName = user.lastName ?? '';
+    return {
+      id: user._id.toString(),
+      email: user.email ?? '',
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`.trim(),
+      role: user.role ?? 'student',
+      profileImageUrl: user.profileImageUrl ?? null,
+    };
+  }
+
   /** Remove expired OTPs from in-memory map to avoid unbounded growth. */
   private purgeExpiredPendingOtps(): void {
     const now = new Date();

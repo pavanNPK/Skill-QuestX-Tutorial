@@ -10,7 +10,7 @@
                         <label class="filter-label">Month</label>
                         <p-select [options]="monthOptionsList" [(ngModel)]="selectedMonthValue" optionLabel="label"
                             placeholder="Month" [showClear]="false" class="student-filter-select"
-                            (onChange)="selectFirstTaskForFilter()">
+                            (onChange)="onMonthChange()">
                             <ng-template pTemplate="selectedItem" let-item>
                                 @if (item) {
                                 <span>{{ item.label }}</span>
@@ -25,7 +25,7 @@
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Week</label>
-                        <p-select [options]="weekOptions" [(ngModel)]="selectedWeekValue" optionLabel="label"
+                        <p-select [options]="weekOptionsForSelectedMonth" [(ngModel)]="selectedWeekValue" optionLabel="label"
                             placeholder="Week" [showClear]="false" class="student-filter-select"
                             (onChange)="selectFirstTaskForFilter()">
                             <ng-template pTemplate="selectedItem" let-item>

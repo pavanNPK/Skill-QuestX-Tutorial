@@ -12,6 +12,8 @@ import { UtilitiesDemoComponent } from './shared/components/utilities-demo/utili
 import { ForgotComponent } from './modules/core/components/forgot/forgot.component';
 import { SetPasswordComponent } from './modules/core/components/set-password/set-password.component';
 import { HomeComponent } from './modules/home/home.component';
+import { ChangePasswordComponent } from './modules/core/components/change-password/change-password.component';
+import { ProfileSettingsComponent } from './modules/core/components/profile-settings/profile-settings.component';
 
 export const routes: Routes = [
   // Auth routes (public)
@@ -68,7 +70,9 @@ export const routes: Routes = [
       {
         path: 'projects',
         loadChildren: () => import('./modules/projects/projects.routes').then((m) => m.projectsRoutes)
-      }
+      },
+      { path: 'change-password', component: ChangePasswordComponent, canActivate: [authGuard] },
+      { path: 'profile-settings', component: ProfileSettingsComponent, canActivate: [authGuard] }
     ]
   },
 
