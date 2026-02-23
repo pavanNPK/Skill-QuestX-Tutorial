@@ -8,6 +8,7 @@ import { lastValueFrom } from 'rxjs';
 import { routes } from './app.routes';
 import { authInterceptor } from './modules/core/interceptors/auth.interceptor';
 import { loaderInterceptor } from './modules/core/interceptors/loader.interceptor';
+import { dedupeInterceptor } from './modules/core/interceptors/dedupe.interceptor';
 import { AuthService } from './modules/core/services/auth.service';
 
 function initAuth(auth: AuthService): () => Promise<void> {
@@ -22,7 +23,7 @@ function initAuth(auth: AuthService): () => Promise<void> {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, loaderInterceptor])),
+    provideHttpClient(withInterceptors([dedupeInterceptor, authInterceptor, loaderInterceptor])),
     {
       provide: APP_INITIALIZER,
       useFactory: initAuth,

@@ -53,7 +53,7 @@
         </div>
 
         <button pButton type="submit" label="Send OTP" class="login-button w-full"
-          [disabled]="emailForm.invalid"></button>
+          [loading]="submitting()" [disabled]="emailForm.invalid || submitting()"></button>
       </form>
     </div>
     }
@@ -85,7 +85,8 @@
         </div>
 
         <div class="flex flex-column sm:flex-row gap-2">
-          <button pButton type="submit" label="Verify OTP" class="login-button w-full"></button>
+          <button pButton type="submit" label="Verify OTP" class="login-button w-full"
+            [loading]="submitting()" [disabled]="submitting()"></button>
           <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full"
             (click)="resendOtp()"></button>
         </div>
@@ -135,7 +136,8 @@
           </small>
         </div>
 
-        <button pButton type="submit" label="Update Password" class="login-button w-full"></button>
+        <button pButton type="submit" label="Update Password" class="login-button w-full"
+        [loading]="submitting()" [disabled]="submitting()"></button>
       </form>
     </div>
     }

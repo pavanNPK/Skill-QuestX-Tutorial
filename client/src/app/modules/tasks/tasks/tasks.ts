@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -14,6 +14,7 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { AuthService } from '../../core/services/auth.service';
 
 interface Student {
   id: number;
@@ -39,6 +40,25 @@ interface Task {
   duration: string;
   assignedCount: number;
   submittedCount: number;
+  /** For student view: task PDF filename. */
+  attachmentFilename?: string;
+  /** For student view: task created date. */
+  createdAt?: Date;
+}
+
+/** Week group for student task list. */
+interface WeekGroup {
+  weekLabel: string;
+  weekNumber: number;
+  tasks: Task[];
+}
+
+/** Single feedback entry for student view. */
+interface TaskFeedback {
+  authorName: string;
+  authorAvatar?: string;
+  time: string;
+  text: string;
 }
 
 @Component({
@@ -64,15 +84,73 @@ interface Task {
   templateUrl: './tasks.html',
   styleUrl: './tasks.scss',
 })
-export class Tasks {
+export class Tasks implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  readonly auth = inject(AuthService);
+
+  /** Student sees week-wise list + month/week filters; instructor sees board/list + create. */
+  get isStudentView(): boolean {
+    return this.auth.currentUser()?.role === 'student';
+  }
+
+  ngOnInit(): void {
+    this.buildMonthOptions();
+    if (this.isStudentView && this.monthOptionsListCache.length > 0 && !this.selectedMonthValue) {
+      const now = new Date();
+      const currentMonthOption = this.monthOptionsListCache.find(
+        (m) => m.value.getMonth() === now.getMonth() && m.value.getFullYear() === now.getFullYear()
+      );
+      this.selectedMonthValue = currentMonthOption ?? this.monthOptionsListCache[0];
+      const currentWeekNum = this.getWeekOfMonth(now);
+      this.selectedWeekValue = this.weekOptions.find((w) => w.value === currentWeekNum) ?? this.weekOptions[0];
+      this.selectFirstTaskForFilter();
+    }
+  }
+
+  /** All 12 months for current year and previous year (most recent first). */
+  private buildMonthOptions(): void {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const list: { label: string; value: Date }[] = [];
+    for (const year of [currentYear, currentYear - 1]) {
+      for (let month = 11; month >= 0; month--) {
+        const d = new Date(year, month, 1);
+        list.push({
+          label: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          value: new Date(d),
+        });
+      }
+    }
+    this.monthOptionsListCache = list;
+  }
 
   // State
   currentView = signal<'list' | 'board'>('board');
   isCreateDrawerOpen = signal(false);
   isEditing = signal(false);
   currentTaskId = signal<number | null>(null);
+
+  // Student view: month & week filters
+  selectedMonthValue: { label: string; value: Date } | null = null;
+  selectedWeekValue: { label: string; value: number | 'all' } | null = null;
+  monthOptions: { label: string; value: Date }[] = [];
+  weekOptions: { label: string; value: number | 'all' }[] = [
+    { label: 'All Weeks', value: 'all' },
+    { label: '1st Week', value: 1 },
+    { label: '2nd Week', value: 2 },
+    { label: '3rd Week', value: 3 },
+    { label: '4th Week', value: 4 },
+    { label: '5th Week', value: 5 },
+  ];
+
+  /** Cached so select selection stays stable (built from tasks in ngOnInit). */
+  monthOptionsListCache: { label: string; value: Date }[] = [];
+
+  /** Student view: timer shows only after Download Task or Start Task. Task id when timer is active. */
+  timerStartedForTaskId = signal<number | null>(null);
+  /** Display value for timer (e.g. 01:00:58). */
+  timerDisplay = signal<string>('01:00:58');
 
   // Data
   batches: Batch[] = [
@@ -101,16 +179,18 @@ export class Tasks {
   tasks: Task[] = [
     {
       id: 1,
-      title: 'Python Basics: Variables & Types',
-      description: 'Complete the exercises on variable declaration and data types.',
+      title: 'Introduction to Python, Course. introduction and Learnings.',
+      description: 'Download the Daily Task as PDF. Right after downloading, the timer starts with allotted time by mentor. Finish the task in allotted time, Submit it as PDF.',
       batchId: 101,
       batchName: 'Python Masterclass - Batch A',
-      status: 'Pending',
+      status: 'In Progress',
       priority: 'High',
-      dueDate: new Date('2024-03-25T23:59:00'),
+      dueDate: new Date('2026-02-01T23:59:00'),
       duration: '2 hours',
       assignedCount: 5,
-      submittedCount: 2
+      submittedCount: 2,
+      attachmentFilename: 'Assignment01.pdf',
+      createdAt: new Date('2026-02-03'),
     },
     {
       id: 2,
@@ -120,10 +200,12 @@ export class Tasks {
       batchName: 'Python Masterclass - Batch A',
       status: 'In Progress',
       priority: 'Medium',
-      dueDate: new Date('2024-03-28T23:59:00'),
+      dueDate: new Date('2026-02-02T23:59:00'),
       duration: '1 day',
       assignedCount: 5,
-      submittedCount: 1
+      submittedCount: 1,
+      attachmentFilename: 'Assignment02.pdf',
+      createdAt: new Date('2026-02-01'),
     },
     {
       id: 3,
@@ -133,11 +215,43 @@ export class Tasks {
       batchName: 'Web Development - Batch B',
       status: 'Completed',
       priority: 'Low',
-      dueDate: new Date('2024-03-20T23:59:00'),
+      dueDate: new Date('2026-02-03T23:59:00'),
       duration: '3 hours',
       assignedCount: 3,
-      submittedCount: 3
-    }
+      submittedCount: 3,
+      attachmentFilename: 'Assignment03.pdf',
+      createdAt: new Date('2026-02-02'),
+    },
+    {
+      id: 4,
+      title: 'Python Basics: Variables & Types',
+      description: 'Complete the exercises on variable declaration and data types.',
+      batchId: 101,
+      batchName: 'Python Masterclass - Batch A',
+      status: 'Pending',
+      priority: 'High',
+      dueDate: new Date('2026-02-08T23:59:00'),
+      duration: '2 hours',
+      assignedCount: 5,
+      submittedCount: 0,
+      attachmentFilename: 'Assignment04.pdf',
+      createdAt: new Date('2026-02-05'),
+    },
+    {
+      id: 5,
+      title: 'Functions and Modules',
+      description: 'Write reusable functions and organize code into modules.',
+      batchId: 101,
+      batchName: 'Python Masterclass - Batch A',
+      status: 'Pending',
+      priority: 'Medium',
+      dueDate: new Date('2026-02-15T23:59:00'),
+      duration: '1 day',
+      assignedCount: 5,
+      submittedCount: 0,
+      attachmentFilename: 'Assignment05.pdf',
+      createdAt: new Date('2026-02-10'),
+    },
   ];
 
   // Filters
@@ -147,6 +261,82 @@ export class Tasks {
   searchText: string = '';
 
   filterStatusOptions = ['Pending', 'In Progress', 'Completed'];
+
+  get monthOptionsList(): { label: string; value: Date }[] {
+    return this.monthOptionsListCache;
+  }
+
+  get effectiveMonth(): { label: string; value: Date } | null {
+    if (this.selectedMonthValue) return this.selectedMonthValue;
+    return this.monthOptionsListCache.length ? this.monthOptionsListCache[0] : null;
+  }
+
+  get effectiveWeek(): { label: string; value: number | 'all' } {
+    return this.selectedWeekValue ?? this.weekOptions[1];
+  }
+
+  /** Week number in month (1–5). */
+  getWeekOfMonth(d: Date): number {
+    const date = new Date(d);
+    const first = new Date(date.getFullYear(), date.getMonth(), 1);
+    const dayOfMonth = date.getDate();
+    return Math.ceil(dayOfMonth / 7) || 1;
+  }
+
+  /** Tasks filtered by selected month/week for student list. */
+  get tasksForStudent(): Task[] {
+    const month = this.effectiveMonth;
+    const week = this.effectiveWeek;
+    if (!month) return [];
+    return this.tasks
+      .filter((t) => {
+        const due = new Date(t.dueDate);
+        if (due.getMonth() !== month.value.getMonth() || due.getFullYear() !== month.value.getFullYear()) {
+          return false;
+        }
+        if (week.value === 'all') return true;
+        return this.getWeekOfMonth(due) === week.value;
+      })
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+  }
+
+  /** Grouped by week for left list (student view). */
+  get tasksGroupedByWeek(): WeekGroup[] {
+    const weekMap = new Map<number, Task[]>();
+    this.tasksForStudent.forEach((t) => {
+      const w = this.getWeekOfMonth(new Date(t.dueDate));
+      if (!weekMap.has(w)) weekMap.set(w, []);
+      weekMap.get(w)!.push(t);
+    });
+    const labels: Record<number, string> = { 1: '1st Week', 2: '2nd Week', 3: '3rd Week', 4: '4th Week', 5: '5th Week' };
+    return Array.from(weekMap.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([weekNumber, tasks]) => ({ weekLabel: labels[weekNumber] ?? `${weekNumber}th Week`, weekNumber, tasks }));
+  }
+
+  /** Mock feedbacks for selected task (student view). */
+  getFeedbacksForTask(task: Task | null): TaskFeedback[] {
+    if (!task) return [];
+    return [
+      { authorName: 'Charil Polamraju', time: '9:45 PM', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Good progress on the first section.' },
+    ];
+  }
+
+  formatTaskDate(d: Date): string {
+    return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '/');
+  }
+
+  /** Student view: select first task for current filter (month/week). Call on filter change and init. */
+  selectFirstTaskForFilter(): void {
+    const list = this.tasksForStudent;
+    this.selectedTask.set(list.length > 0 ? list[0] : null);
+  }
+
+  /** Student view: show timer after Download Task or Start Task. */
+  startTimerForTask(taskId: number): void {
+    this.timerStartedForTaskId.set(taskId);
+    this.timerDisplay.set('01:00:58');
+  }
 
   // Form Data
   newTask = {

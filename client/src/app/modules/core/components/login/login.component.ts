@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -53,6 +53,9 @@ export class LoginComponent implements OnDestroy {
 
   activeIndex = 0;
 
+  /** True while login request is in progress (prevents double submit). */
+  readonly submitting = signal(false);
+
   loginForm!: FormGroup;
 
   constructor(
@@ -79,14 +82,16 @@ export class LoginComponent implements OnDestroy {
   }
 
   submitLogin() {
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.submitting()) {
       this.loginForm.markAllAsTouched();
       return;
     }
+    this.submitting.set(true);
     const { email, password } = this.loginForm.value;
     this.auth.login({ email, password }).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: (err) => {
+        this.submitting.set(false);
         const msg = getFriendlyErrorMessage(err, { default: 'Invalid email or password. Please try again.' });
         this.messageService.add({
           severity: 'error',
@@ -94,7 +99,8 @@ export class LoginComponent implements OnDestroy {
           detail: msg,
           life: 5000
         });
-      }
+      },
+      complete: () => this.submitting.set(false),
     });
   }
 

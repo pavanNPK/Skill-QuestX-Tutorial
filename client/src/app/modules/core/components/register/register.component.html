@@ -204,7 +204,7 @@
         </div>
 
         <button pButton type="submit" label="Continue to Verify Email" class="login-button w-full"
-          [disabled]="registerForm.invalid"></button>
+          [loading]="submitting()" [disabled]="registerForm.invalid || submitting()"></button>
 
         <div class="text-sm text-center">
           Already have an account? <a routerLink="/login" class="brand-link">Login</a>
@@ -246,7 +246,7 @@
 
           <div class="flex flex-column sm:flex-row gap-2">
             <button pButton type="submit" label="Verify OTP" class="login-button w-full"
-              [disabled]="otpCode.length !== 6"></button>
+              [loading]="submitting()" [disabled]="otpCode.length !== 6 || submitting()"></button>
             <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full" [disabled]="!canResendOTP"
               (click)="resendOTP()"></button>
           </div>
@@ -309,7 +309,7 @@
         </div>
 
         <button pButton type="submit" label="Complete Registration" class="login-button w-full"
-          [disabled]="passwordForm.invalid"></button>
+          [loading]="submitting()" [disabled]="passwordForm.invalid || submitting()"></button>
 
         <div class="text-sm text-center">
           Already have an account? <a routerLink="/login" class="brand-link">Login</a>

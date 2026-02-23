@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -64,6 +64,9 @@ export class ForgotComponent implements OnDestroy {
 
   activeIndex = 0;
 
+  /** True while any submit request is in progress. */
+  readonly submitting = signal(false);
+
   emailForm: FormGroup;
   otpForm: FormGroup;
   resetForm: FormGroup;
@@ -108,10 +111,11 @@ export class ForgotComponent implements OnDestroy {
   }
 
   submitEmail() {
-    if (this.emailForm.invalid) {
+    if (this.emailForm.invalid || this.submitting()) {
       this.emailForm.markAllAsTouched();
       return;
     }
+    this.submitting.set(true);
     const email = this.emailForm.get('email')?.value;
     this.auth.forgotPasswordSendOtp(email).subscribe({
       next: (res) => {
@@ -132,9 +136,11 @@ export class ForgotComponent implements OnDestroy {
             life: 5000
           });
         }
+        this.submitting.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
+        this.submitting.set(false);
         const msg = getFriendlyErrorMessage(err, { default: 'Something went wrong. Please try again.' });
         this.messageService.add({
           severity: 'error',
@@ -148,10 +154,11 @@ export class ForgotComponent implements OnDestroy {
   }
 
   submitOtp() {
-    if (this.otpForm.invalid || this.otpExpired) {
+    if (this.otpForm.invalid || this.otpExpired || this.submitting()) {
       this.otpForm.markAllAsTouched();
       return;
     }
+    this.submitting.set(true);
     const email = this.emailForm.get('email')?.value;
     const otp = this.otpForm.get('otp')?.value;
     this.auth.verifyOtp(email, otp).subscribe({
@@ -173,9 +180,11 @@ export class ForgotComponent implements OnDestroy {
             life: 5000
           });
         }
+        this.submitting.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
+        this.submitting.set(false);
         const msg = getFriendlyErrorMessage(err, { default: 'Could not verify OTP. Please try again.' });
         this.messageService.add({
           severity: 'error',
@@ -189,10 +198,11 @@ export class ForgotComponent implements OnDestroy {
   }
 
   submitReset() {
-    if (this.resetForm.invalid || !this.passwordsMatch()) {
+    if (this.resetForm.invalid || !this.passwordsMatch() || this.submitting()) {
       this.resetForm.markAllAsTouched();
       return;
     }
+    this.submitting.set(true);
     const email = this.emailForm.get('email')?.value;
     const otp = this.otpForm.get('otp')?.value;
     const newPassword = this.resetForm.get('password')?.value;
@@ -204,10 +214,12 @@ export class ForgotComponent implements OnDestroy {
           detail: res.message || 'You can now log in with your new password.',
           life: 5000
         });
+        this.submitting.set(false);
         this.cdr.markForCheck();
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
+        this.submitting.set(false);
         const msg = getFriendlyErrorMessage(err, { default: 'Could not reset password. Please try again.' });
         this.messageService.add({
           severity: 'error',

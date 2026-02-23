@@ -72,6 +72,7 @@
       </div>
     </div>
 
-    <button pButton type="submit" label="Login" class="login-button w-full" [disabled]="loginForm.invalid"></button>
+    <button pButton type="submit" label="Login" class="login-button w-full"
+      [loading]="submitting()" [disabled]="loginForm.invalid || submitting()"></button>
   </form>
 </section>

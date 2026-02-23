@@ -1,4 +1,124 @@
 <div class="page-container">
+    <!-- ========== STUDENT VIEW: Week-wise list + Month/Week filters ========== -->
+    @if (isStudentView) {
+    <div class="student-tasks-layout">
+        <div class="student-tasks-body">
+            <!-- Left: White card with filters at top + task list -->
+            <div class="student-task-list-panel">
+                <div class="student-filters-in-card">
+                    <div class="filter-group">
+                        <label class="filter-label">Month</label>
+                        <p-select [options]="monthOptionsList" [(ngModel)]="selectedMonthValue" optionLabel="label"
+                            placeholder="Month" [showClear]="false" class="student-filter-select"
+                            (onChange)="selectFirstTaskForFilter()">
+                            <ng-template pTemplate="selectedItem" let-item>
+                                @if (item) {
+                                <span>{{ item.label }}</span>
+                                } @else {
+                                <span class="placeholder">Month</span>
+                                }
+                            </ng-template>
+                            <ng-template pTemplate="item" let-item>
+                                <span>{{ item.label }}</span>
+                            </ng-template>
+                        </p-select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Week</label>
+                        <p-select [options]="weekOptions" [(ngModel)]="selectedWeekValue" optionLabel="label"
+                            placeholder="Week" [showClear]="false" class="student-filter-select"
+                            (onChange)="selectFirstTaskForFilter()">
+                            <ng-template pTemplate="selectedItem" let-item>
+                                @if (item) {
+                                <span>{{ item.label }}</span>
+                                } @else {
+                                <span class="placeholder">2nd Week</span>
+                                }
+                            </ng-template>
+                            <ng-template pTemplate="item" let-item>
+                                <span>{{ item.label }}</span>
+                            </ng-template>
+                        </p-select>
+                    </div>
+                </div>
+                @for (group of tasksGroupedByWeek; track group.weekNumber) {
+                <div class="week-group">
+                    @for (task of group.tasks; track task.id) {
+                    <div class="student-task-card" [class.selected]="selectedTask()?.id === task.id"
+                        (click)="selectedTask.set(task)">
+                        <div class="student-task-card-title">{{ task.title }}</div>
+                        <div class="student-task-card-date">{{ formatTaskDate(task.dueDate) }}</div>
+                    </div>
+                    }
+                </div>
+                }
+                @if (tasksGroupedByWeek.length === 0) {
+                <div class="student-task-list-empty">No tasks for this month and week.</div>
+                }
+            </div>
+
+            <!-- Right: Three cards - row1: task data + clock/timer, row2: feedbacks -->
+            <div class="student-task-detail-panel">
+                @if (selectedTask(); as task) {
+                <div class="student-detail-cards">
+                    <!-- Row 1 - Card 1: Task data with Download Task -->
+                    <div class="student-detail-card student-detail-card-task">
+                        <h2 class="student-detail-title">{{ task.title }}</h2>
+                        <p class="student-detail-description">{{ task.description }}</p>
+                        <div class="student-detail-download-wrap">
+                            <button pButton [label]="task.attachmentFilename || 'Download Task'" icon="pi pi-download"
+                                class="p-button-outlined" (click)="startTimerForTask(task.id)"></button>
+                        </div>
+                        @if (task.createdAt) {
+                        <p class="student-detail-created">Task Created on {{ formatTaskDate(task.createdAt) }}</p>
+                        }
+                    </div>
+                    <!-- Row 1 - Card 2: Clock - Start Task button by default, timer + Upload after click -->
+                    <div class="student-detail-card student-detail-card-clock">
+                        @if (timerStartedForTaskId() === task.id) {
+                        <div class="student-timer-section">
+                            <div class="student-timer-circle">
+                                <span class="student-timer-value">{{ timerDisplay() }}</span>
+                            </div>
+                        </div>
+                        <div class="student-upload-section">
+                            <button pButton label="Upload Task" icon="pi pi-upload" class="student-upload-btn"></button>
+                        </div>
+                        } @else {
+                        <div class="student-start-task-wrap">
+                            <button pButton label="Start Task" icon="pi pi-play" class="student-start-task-btn"
+                                (click)="startTimerForTask(task.id)"></button>
+                        </div>
+                        }
+                    </div>
+                    <!-- Row 2 - Card 3: Feedbacks -->
+                    <div class="student-detail-card student-detail-card-feedbacks">
+                        <h3 class="student-feedbacks-title">Feedbacks</h3>
+                        @for (fb of getFeedbacksForTask(task); track fb.authorName + fb.time) {
+                        <div class="student-feedback-item">
+                            <p-avatar [label]="fb.authorName.charAt(0)" shape="circle" size="normal"
+                                styleClass="student-feedback-avatar"></p-avatar>
+                            <div class="student-feedback-body">
+                                <span class="student-feedback-author">{{ fb.authorName }}</span>
+                                <span class="student-feedback-time">{{ fb.time }}</span>
+                                <p class="student-feedback-text">{{ fb.text }}</p>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="student-detail-empty">
+                    <p>Select a task from the list to view details.</p>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- ========== INSTRUCTOR/ADMIN VIEW ========== -->
+    @if (!isStudentView) {
     <!-- Header -->
     <div class="tasks-header-actions">
         <div class="view-toggles">
@@ -160,6 +280,7 @@
             </div>
         </div>
     </div>
+    }
     }
 </div>
 

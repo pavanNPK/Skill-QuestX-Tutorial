@@ -1,5 +1,325 @@
-// Header Actions
-// Header Actions
+// ========== Student Tasks View: Week-wise list + Month/Week filters ==========
+.student-tasks-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: calc(100vh - 120px);
+}
+
+/* Filters inside the white card (above task list) */
+.student-filters-in-card {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.student-filters-in-card .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.student-filters-in-card .filter-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.student-filters-in-card .student-filter-select {
+  min-width: 130px;
+}
+
+/* Left col 4, right col 8 */
+.student-tasks-body {
+  display: grid;
+  grid-template-columns: 4fr 8fr;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.student-task-list-panel {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.student-task-list-panel .week-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-task-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: #f3f4f6;
+    border-color: var(--sqx-color-primary, #5B4BC4);
+  }
+
+  &.selected {
+    background: rgba(91, 75, 196, 0.08);
+    border-color: var(--sqx-color-primary, #5B4BC4);
+  }
+}
+
+.student-task-card-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #374151;
+  line-height: 1.35;
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.student-task-card-date {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.student-task-list-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.9375rem;
+}
+
+.student-task-detail-panel {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Three cards: row1 = task + clock (same height), row2 = feedbacks */
+.student-detail-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1.25rem;
+  align-items: stretch;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.student-detail-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-height: 0;
+}
+
+/* Row 1 cards: same height (stretch to match) */
+.student-detail-card-task {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.student-detail-card-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 200px;
+}
+
+.student-detail-card-feedbacks {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.student-detail-download-wrap {
+  .p-button-outlined {
+    border-color: #d1d5db;
+    color: #374151;
+
+    &:hover {
+      border-color: var(--sqx-color-primary, #5B4BC4);
+      color: var(--sqx-color-primary, #5B4BC4);
+    }
+  }
+}
+
+.student-start-task-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 180px;
+}
+
+.student-start-task-btn {
+  background: var(--sqx-color-primary, #5B4BC4) !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #fff !important;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+}
+
+.student-detail-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.35;
+}
+
+.student-detail-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+
+.student-detail-created {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.student-timer-section {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.student-timer-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 4px solid #e5e7eb;
+  border-top-color: var(--sqx-color-primary, #5B4BC4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.student-timer-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  font-variant-numeric: tabular-nums;
+}
+
+.student-upload-section {
+  .student-upload-btn {
+    background: var(--sqx-color-primary, #5B4BC4) !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #fff !important;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
+  }
+}
+
+.student-feedbacks-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.student-feedback-item {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.student-feedback-avatar {
+  flex-shrink: 0;
+  background: var(--sqx-color-primary, #5B4BC4) !important;
+  color: #fff !important;
+}
+
+.student-feedback-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.student-feedback-author {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: #1f2937;
+}
+
+.student-feedback-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.student-feedback-text {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.student-detail-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #9ca3af;
+  font-size: 0.9375rem;
+}
+
+// Header Actions (Instructor view)
 .tasks-header-actions {
     display: flex;
     justify-content: space-between;

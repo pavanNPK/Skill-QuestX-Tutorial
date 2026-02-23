@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -59,6 +59,9 @@ export class RegisterComponent implements OnDestroy {
 
   activeIndex = 0;
   currentStep = 1; // 1: Form, 2: OTP, 3: Password
+
+  /** True while any submit request is in progress. */
+  readonly submitting = signal(false);
 
   // Forms
   registerForm: FormGroup;
@@ -305,7 +308,7 @@ export class RegisterComponent implements OnDestroy {
 
   // Step 1: Submit Profile Form
   submitStep1() {
-    if (this.registerForm.invalid) {
+    if (this.registerForm.invalid || this.submitting()) {
       this.registerForm.markAllAsTouched();
       return;
     }
@@ -354,6 +357,7 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
+    this.submitting.set(true);
     const email = this.registerForm.get('email')?.value;
     this.auth.sendOtp(email).subscribe({
       next: () => {
@@ -366,12 +370,14 @@ export class RegisterComponent implements OnDestroy {
           detail: 'Check your email for the OTP',
           life: 3000
         });
+        this.submitting.set(false);
         this.cdr.markForCheck();
       },
       error: () => {
         this.otpSent = true;
         this.currentStep = 2;
         this.startResendTimer();
+        this.submitting.set(false);
         this.cdr.markForCheck();
       }
     });
@@ -417,21 +423,23 @@ export class RegisterComponent implements OnDestroy {
 
   // Step 2: Submit OTP
   submitOTP() {
-    if (this.otpCode.length !== 6) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Invalid OTP',
-        detail: 'Please enter a valid 6-digit OTP',
-        life: 3000
-      });
+    if (this.otpCode.length !== 6 || this.submitting()) {
+      if (this.otpCode.length !== 6) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Invalid OTP',
+          detail: 'Please enter a valid 6-digit OTP',
+          life: 3000
+        });
+      }
       return;
     }
+    this.submitting.set(true);
     const email = this.registerForm.get('email')?.value;
     this.auth.verifyOtp(email, this.otpCode).subscribe({
       next: (res) => {
         if (res.valid) {
           this.currentStep = 3;
-          this.cdr.markForCheck();
         } else {
           this.messageService.add({
             severity: 'error',
@@ -440,24 +448,29 @@ export class RegisterComponent implements OnDestroy {
             life: 3000
           });
         }
+        this.submitting.set(false);
+        this.cdr.markForCheck();
       },
       error: () => {
+        this.submitting.set(false);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Could not verify OTP',
           life: 3000
         });
+        this.cdr.markForCheck();
       }
     });
   }
 
   // Step 3: Submit Password
   submitPassword() {
-    if (this.passwordForm.invalid) {
+    if (this.passwordForm.invalid || this.submitting()) {
       this.passwordForm.markAllAsTouched();
       return;
     }
+    this.submitting.set(true);
     const password = this.passwordForm.get('password')?.value;
     const { firstName, lastName, email, phoneCountry, phoneNumber, underGraduate } = this.registerForm.value;
     this.auth.register({
@@ -479,9 +492,11 @@ export class RegisterComponent implements OnDestroy {
           detail: 'Welcome! Redirecting to dashboard.',
           life: 3000
         });
+        this.submitting.set(false);
         setTimeout(() => this.router.navigate(['/dashboard']), 1500);
       },
       error: (err) => {
+        this.submitting.set(false);
         const msg = getFriendlyErrorMessage(err, {
           default: 'This email may already be registered. Try logging in.'
         });
