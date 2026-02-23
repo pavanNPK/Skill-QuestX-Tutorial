@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,9 +8,11 @@ import { CarouselModule } from 'primeng/carousel';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { AuthService, CourseForDisplay } from '../../core/services/auth.service';
 
+/** Popular course (from API or static fallback). */
 interface Course {
-    id: number;
+    id: number | string;
     title: string;
     description: string;
     thumbnail: string;
@@ -18,6 +20,9 @@ interface Course {
     discount: number;
     unavailable?: boolean;
     accentColor?: string;
+    author?: string;
+    ratingAverage?: number;
+    ratingCount?: number;
 }
 
 interface MyCourse {
@@ -38,11 +43,13 @@ interface MyCourse {
     templateUrl: './courses-list.component.html',
     styleUrls: ['./courses-list.component.scss']
 })
-export class CoursesListComponent {
+export class CoursesListComponent implements OnInit {
+    private auth = inject(AuthService);
 
     searchQuery = '';
 
-    courses: Course[] = [
+    /** Static fallback when API fails or user not logged in. */
+    private staticCourses: Course[] = [
         {
             id: 1,
             title: 'Program Overview',
@@ -126,6 +133,9 @@ export class CoursesListComponent {
         }
     ];
 
+    /** Populated from API (GET /courses) or static fallback. */
+    courses: Course[] = [];
+
     myCourses: MyCourse[] = [
         {
             name: 'UI/UX Design',
@@ -150,6 +160,29 @@ export class CoursesListComponent {
     ];
 
     constructor(private router: Router) { }
+
+    ngOnInit(): void {
+        this.courses = this.staticCourses.slice();
+        this.auth.listCoursesForDisplay().subscribe({
+            next: (list) => {
+                this.courses = list.map((c: CourseForDisplay) => ({
+                    id: c.id,
+                    title: c.title ?? c.name,
+                    description: c.description ?? '',
+                    thumbnail: c.thumbnail ?? '',
+                    price: c.price ?? 0,
+                    discount: c.discount ?? 0,
+                    accentColor: c.accentColor ?? '#5B4BC4',
+                    author: c.author,
+                    ratingAverage: c.ratingAverage ?? 0,
+                    ratingCount: c.ratingCount ?? 0,
+                }));
+            },
+            error: () => {
+                this.courses = this.staticCourses.slice();
+            },
+        });
+    }
 
     navigateToAddCourse() {
         this.router.navigate(['/courses/add']);

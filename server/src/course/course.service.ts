@@ -3,10 +3,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Course, CourseDocument } from './schemas/course.schema';
 
-/** Lean (plain) course for list responses - no Document methods. */
+/** Lean (plain) course for list responses - no Document methods. New fields optional for existing DB docs. */
 export interface CourseLean {
   _id: Types.ObjectId;
   name: string;
+  description?: string;
+  author?: string;
+  createdBy?: Types.ObjectId | null;
+  price?: number;
+  discount?: number;
+  ratingAverage?: number;
+  ratingCount?: number;
+  thumbnail?: string;
+  accentColor?: string;
   instructorIds: Types.ObjectId[];
 }
 
@@ -16,7 +25,7 @@ export class CourseService {
     @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
   ) {}
 
-  /** Create a course (name only; instructorIds empty). */
+  /** Create a course (name only; instructorIds empty). Other fields use schema defaults. */
   async create(name: string): Promise<{ _id: Types.ObjectId; name: string }> {
     const created = await this.courseModel.create({ name, instructorIds: [] });
     return { _id: created._id, name: created.name };

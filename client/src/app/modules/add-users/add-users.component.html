@@ -93,23 +93,22 @@
 
       @if (selectedRole?.value === 'instructor') {
       <div class="form-row form-field">
-        <div class="form-field w-full">
+        <div class="form-field w-full assign-courses-field">
           <label class="block mb-2 font-medium text-color">Assign to courses</label>
-          <p-select
-            [options]="coursesForDropdown"
-            [(ngModel)]="courseToAdd"
+          <p-multiSelect
+            [options]="courses()"
+            [(ngModel)]="selectedCourses"
             [ngModelOptions]="{standalone: true}"
             optionLabel="name"
-            placeholder="Select course to add"
-            class="w-full"
-            (ngModelChange)="onCourseSelected($event)"
+            placeholder="Select courses to assign"
+            display="chip"
+            [showClear]="true"
+            [loading]="coursesLoading()"
+            (onFocus)="loadCourses()"
+            class="w-full assign-course-select"
           />
-          @if (selectedCourses.length > 0) {
-            <div class="course-chips mt-2 flex flex-wrap gap-2">
-              @for (course of selectedCourses; track course.id) {
-                <p-chip [label]="course.name" [removable]="true" (onRemove)="removeCourse(course)" styleClass="course-chip" />
-              }
-            </div>
+          @if (courses().length === 0) {
+            <small class="assign-courses-empty-hint">No courses in the system yet. Run the seed script from the server folder: <code>node scripts/seed-courses.cjs</code></small>
           }
         </div>
       </div>

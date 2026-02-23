@@ -305,6 +305,12 @@
                 line-height: 1.3;
             }
 
+            .course-author {
+                font-size: 12px;
+                color: var(--sqx-color-text-light);
+                margin: 0 0 6px 0;
+            }
+
             .course-description {
                 font-size: 13px;
                 color: #6B7280;
@@ -336,6 +342,12 @@
             gap: 5px;
             font-size: 14px;
             font-weight: 600;
+
+            .rating-count {
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--sqx-color-text-light);
+            }
 
             i {
                 color: #F59E0B;

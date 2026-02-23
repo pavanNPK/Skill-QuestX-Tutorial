@@ -37,6 +37,23 @@ export interface CourseOption {
   name: string;
 }
 
+/** Full course for Popular Courses list (from GET /courses). */
+export interface CourseForDisplay {
+  id: string;
+  name: string;
+  title?: string;
+  description: string;
+  author: string;
+  createdBy?: string | null;
+  price: number;
+  discount: number;
+  ratingAverage: number;
+  ratingCount: number;
+  thumbnail: string;
+  accentColor: string;
+  unavailable?: boolean;
+}
+
 /** SA/A only: add Admin or Instructor. Omit password to send set-password email. */
 export interface CreateUserRequest {
   firstName: string;
@@ -215,9 +232,14 @@ export class AuthService {
     return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/users/${userId}/status`, { active });
   }
 
-  /** SA and Admin: list courses (for assigning instructors on Add User). */
+  /** SA and Admin: list courses (for assigning instructors on Add User). Returns at least id, name. */
   listCourses(): Observable<CourseOption[]> {
     return this.http.get<CourseOption[]>(`${this.apiUrl}/auth/courses`);
+  }
+
+  /** All authenticated users: list courses with full data (Popular Courses). */
+  listCoursesForDisplay(): Observable<CourseForDisplay[]> {
+    return this.http.get<CourseForDisplay[]>(`${this.apiUrl}/courses`);
   }
 
   /** Set password using token from invite email (no auth). */

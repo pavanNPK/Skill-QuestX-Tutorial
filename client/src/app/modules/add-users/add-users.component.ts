@@ -8,6 +8,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -43,6 +44,7 @@ interface RoleOption {
     FloatLabelModule,
     TableModule,
     SelectModule,
+    MultiSelectModule,
     ToastModule,
     TagModule,
     TooltipModule,
@@ -70,8 +72,8 @@ export class AddUsersComponent implements OnInit {
   selectedRole: RoleOption | null = null;
 
   readonly courses = signal<CourseOption[]>([]);
+  readonly coursesLoading = signal(false);
   selectedCourses: CourseOption[] = [];
-  courseToAdd: CourseOption | null = null;
 
   form: FormGroup;
 
@@ -90,32 +92,33 @@ export class AddUsersComponent implements OnInit {
     }
     this.loadUsers();
     if (this.auth.canAccessAddUsers()) {
-      this.auth.listCourses().subscribe({
-        next: (list) => this.courses.set(list),
-        error: () => this.courses.set([]),
-      });
+      this.loadCourses();
     }
   }
 
-  /** Courses not yet selected (for dropdown when adding instructor). */
-  get coursesForDropdown(): CourseOption[] {
-    const selectedIds = new Set(this.selectedCourses.map((c) => c.id));
-    return this.courses().filter((c) => !selectedIds.has(c.id));
-  }
-
-  addCourse(course: CourseOption | null): void {
-    if (course && !this.selectedCourses.some((c) => c.id === course.id)) {
-      this.selectedCourses = [...this.selectedCourses, course];
-    }
-  }
-
-  onCourseSelected(course: CourseOption | null): void {
-    this.addCourse(course);
-    this.courseToAdd = null;
-  }
-
-  removeCourse(course: CourseOption): void {
-    this.selectedCourses = this.selectedCourses.filter((c) => c.id !== course.id);
+  /** Load courses from API (for Assign to courses). Call on init and when opening the dropdown. */
+  loadCourses(): void {
+    if (!this.auth.canAccessAddUsers()) return;
+    this.coursesLoading.set(true);
+    this.auth.listCourses().subscribe({
+      next: (list) => {
+        this.courses.set(list);
+        this.coursesLoading.set(false);
+      },
+      error: (err) => {
+        this.courses.set([]);
+        this.coursesLoading.set(false);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Could not load courses',
+          detail: getFriendlyErrorMessage(err, {
+            default: 'Unable to load courses. Check your connection and try again.',
+            notFound: 'Courses could not be loaded. Please refresh and try again.',
+            network: 'Unable to connect. Please check your connection.',
+          }),
+        });
+      },
+    });
   }
 
   loadUsers(): void {
@@ -176,7 +179,11 @@ export class AddUsersComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: getFriendlyErrorMessage(err),
+          detail: getFriendlyErrorMessage(err, {
+            default: 'Could not update user status. Please try again.',
+            notFound: 'User not found or the request could not be completed. Please refresh the page and try again.',
+            network: 'Unable to connect. Please check your connection and try again.',
+          }),
         });
       },
     });

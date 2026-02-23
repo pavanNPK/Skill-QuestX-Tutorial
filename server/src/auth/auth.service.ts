@@ -292,10 +292,13 @@ export class AuthService {
     };
   }
 
-  /** List courses (id, name) for SA/Admin to assign instructors. */
+  /** List courses for SA/Admin (assign instructors). Returns only id and name. */
   async listCourses(): Promise<Array<{ id: string; name: string }>> {
     const courses = await this.courseService.findAll();
-    return courses.map((c) => ({ id: c._id.toString(), name: c.name }));
+    return courses.map((c) => ({
+      id: c._id.toString(),
+      name: c.name,
+    }));
   }
 
   /** SA only: create a course by name. */
@@ -328,10 +331,15 @@ export class AuthService {
       throw new BadRequestException('User not found.');
     }
     const name = `${updated.firstName} ${updated.lastName}`.trim();
-    if (active) {
-      await this.mailService.sendAccountActivated(updated.email, name);
-    } else {
-      await this.mailService.sendAccountDeactivated(updated.email, name);
+    try {
+      if (active) {
+        await this.mailService.sendAccountActivated(updated.email, name);
+      } else {
+        await this.mailService.sendAccountDeactivated(updated.email, name);
+      }
+    } catch (e) {
+      // Do not fail status update if notification email fails
+      console.warn('Failed to send activation/deactivation email', e);
     }
     return {
       user: {

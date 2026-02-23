@@ -31,7 +31,7 @@ export function getFriendlyErrorMessage(
   } = {}
 ): string {
   const defaultMsg = fallbacks.default ?? 'Something went wrong. Please try again.';
-  const notFoundMsg = fallbacks.notFound ?? 'Service is temporarily unavailable. Please try again later.';
+  const notFoundMsg = fallbacks.notFound ?? 'The request could not be completed. Please refresh the page and try again.';
   const networkMsg = fallbacks.network ?? 'Unable to connect. Please check your connection and try again.';
   const serverMsg = fallbacks.server ?? 'Something went wrong. Please try again later.';
 

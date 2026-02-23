@@ -117,6 +117,38 @@
   padding-left: 44px;
 }
 
+/* Assign to courses: no left icon, so no extra left padding; ensure dropdown chevron visible */
+:host ::ng-deep .assign-courses-field .p-select .p-select-label {
+  padding-left: 1rem;
+}
+
+.assign-courses-empty-hint {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--sqx-color-text-light, #6b7280);
+  font-size: 0.8125rem;
+  code {
+    background: rgba(91, 75, 196, 0.08);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+}
+:host ::ng-deep .assign-courses-field .p-select .p-select-trigger,
+:host ::ng-deep .assign-course-select .p-select-trigger {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+:host ::ng-deep .assign-courses-field .p-select .p-select-trigger-icon,
+:host ::ng-deep .assign-course-select .p-select-trigger-icon,
+:host ::ng-deep .assign-courses-field .p-select .p-icon,
+:host ::ng-deep .assign-course-select .p-select .p-icon {
+  opacity: 1;
+  visibility: visible;
+  color: var(--sqx-color-text-light);
+}
+
 :host ::ng-deep .form-field .p-select:not(.p-disabled):hover,
 :host ::ng-deep .form-field .p-select:not(.p-disabled).p-focus {
   border-color: var(--sqx-color-primary);

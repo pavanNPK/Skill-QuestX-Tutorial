@@ -1,0 +1,79 @@
+// Force primary color (#5B4BC4) on all form focus/active — no green.
+// Dropdowns, datepicker, and inputs: focus/hover use primary everywhere.
+
+$focus-ring: 0 0 0 3px rgba(91, 75, 196, 0.2);
+$focus-border: var(--sqx-color-primary);
+
+// Inputs: focus border and ring primary (override any PrimeNG green)
+.p-inputtext:enabled:focus,
+.p-inputtext:enabled:active,
+.p-password input:focus,
+.p-password input:active {
+  border-color: $focus-border !important;
+  box-shadow: $focus-ring !important;
+  outline: none !important;
+}
+
+.p-iconfield .p-inputtext:focus,
+.p-iconfield .p-password input:focus {
+  border-color: $focus-border !important;
+  box-shadow: $focus-ring !important;
+}
+
+// Select / Dropdown: focus and open state primary; ensure dropdown chevron is visible
+.p-select .p-select-trigger,
+.p-select .p-select-trigger-icon,
+.p-select .p-icon.p-select-dropdown-icon {
+  display: flex !important;
+  align-items: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.p-select:not(.p-disabled):hover,
+.p-select.p-focus,
+.p-select .p-select-label.p-focus,
+.p-dropdown:not(.p-disabled):hover,
+.p-dropdown.p-focus,
+.p-dropdown .p-dropdown-label:focus {
+  border-color: $focus-border !important;
+  box-shadow: $focus-ring !important;
+  outline: none !important;
+}
+
+.p-select.p-inputwrapper-focus,
+.p-dropdown.p-inputwrapper-focus {
+  border-color: $focus-border !important;
+  box-shadow: $focus-ring !important;
+}
+
+// DatePicker / Calendar: focus and selected primary
+.p-datepicker .p-inputtext:focus,
+.p-datepicker .p-datepicker-input:focus,
+.p-datepicker-trigger:focus,
+.p-datepicker-panel .p-datepicker-header,
+.p-datepicker table td span.p-highlight,
+.p-datepicker table td span:not(.p-disabled):focus {
+  border-color: $focus-border !important;
+  box-shadow: none !important;
+}
+
+.p-datepicker table td > span.p-highlight {
+  background: var(--sqx-color-primary) !important;
+  color: #fff !important;
+}
+
+.p-datepicker .p-datepicker-header .p-datepicker-title select:focus,
+.p-datepicker-trigger.p-focus {
+  border-color: $focus-border !important;
+  box-shadow: $focus-ring !important;
+}
+
+// Override PrimeNG theme primary (green) with our primary
+:root {
+  --p-primary-color: #5B4BC4;
+  --p-primary-contrast-color: #ffffff;
+  --p-primary-hover-color: #4a3da3;
+  --p-primary-active-color: #4a3da3;
+  --p-focus-ring-color: rgba(91, 75, 196, 0.2);
+}
