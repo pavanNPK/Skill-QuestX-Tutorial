@@ -1,5 +1,5 @@
 <div class="materials-container">
-    @if (!selectedCourse) {
+    @if (!selectedCourse && visibleCourses.length !== 1) {
     <div class="view-section fade-in">
         @if (loading) {
         <div class="empty-state">Loading materials...</div>

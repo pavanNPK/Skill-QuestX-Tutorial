@@ -64,6 +64,10 @@ export class Materials implements OnInit, OnDestroy {
     return this.selectedModule?.lessons?.length ?? 0;
   }
 
+  private breadcrumbLabel(title: string): string {
+    return title.replace(/^\d+\.\s*/, '');
+  }
+
   constructor(
     private headerService: HeaderService,
     private contentService: CourseContentService,
@@ -135,28 +139,31 @@ export class Materials implements OnInit, OnDestroy {
   }
 
   updateGlobalHeader() {
-    const base: any[] = [
-      { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
-      { label: 'Materials', command: () => this.goBack() }
-    ];
-
     if (!this.selectedCourse) {
       this.headerService.updateTitle('Materials');
-      this.headerService.updateBreadcrumbs([{ label: 'Materials' }]); // Just base materials? Or simply empty if root?
-      // Actually, header.ts logic handles "Materials" root breadcrumb.
-      // If we want to override:
       this.headerService.updateBreadcrumbs([
         { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
         { label: 'Materials' }
       ]);
-    } else {
-      this.headerService.updateTitle(this.selectedCourse.title);
+      return;
+    }
+
+    if (this.selectedModule) {
+      this.headerService.updateTitle('');
       this.headerService.updateBreadcrumbs([
         { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
-        { label: 'Materials', command: () => this.goBack() },
-        { label: this.selectedCourse.title }
+        { label: 'Materials', command: () => this.backToIndex() },
+        { label: this.breadcrumbLabel(this.selectedModule.title) }
       ]);
+      return;
     }
+
+    this.headerService.updateTitle('');
+    this.headerService.updateBreadcrumbs([
+      { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
+      { label: 'Materials', command: () => this.goBack() },
+      { label: this.selectedCourse.title }
+    ]);
   }
 
   selectCourse(course: AvailableCourseContent) {

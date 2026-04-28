@@ -1469,8 +1469,1022 @@
     {
       "id": "index-3-blood-and-circulatory-system",
       "title": "3. Blood and Circulatory System",
-      "summary": "Content will be added from the next PPT/doc batch.",
-      "lessons": []
+      "summary": "Overview of the circulatory system, blood vessels, heart anatomy, blood components, glossary terms, and common circulatory conditions.",
+      "lessons": [
+        {
+          "id": "blood-circulatory-slide-1",
+          "title": "Circulatory System",
+          "durationMinutes": 10,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "Circulatory System",
+              "items": [
+                {
+                  "text": "It consists of",
+                  "children": [
+                    {
+                      "text": "Heart - acts as a pump"
+                    },
+                    {
+                      "text": "Blood vessels"
+                    }
+                  ]
+                },
+                {
+                  "text": "Main functions",
+                  "children": [
+                    {
+                      "text": "Carry oxygen, nutrients, and chemicals in the blood to the body's cells."
+                    },
+                    {
+                      "text": "Remove waste products from the cells and carry them for elimination."
+                    },
+                    {
+                      "text": "Includes the lymphatic system."
+                    }
+                  ]
+                },
+                {
+                  "text": "Types of circulation",
+                  "children": [
+                    {
+                      "text": "Pulmonary circulation: right ventricle -> lungs -> left atrium; oxygen absorbed; carbon dioxide excreted."
+                    },
+                    {
+                      "text": "Systemic circulation: left ventricle -> aorta -> body tissues; returns via venae cavae -> right atrium; supplies oxygen and nutrients to the body."
+                    },
+                    {
+                      "text": "Portal circulation: digestive organs and spleen -> liver; blood passes through the liver before returning to the heart."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-2",
+          "title": "Blood Vessels",
+          "durationMinutes": 10,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "Arteries",
+              "items": [
+                {
+                  "text": "Carry blood away from heart."
+                },
+                {
+                  "text": "Usually carry oxygenated blood."
+                },
+                {
+                  "text": "Exception: pulmonary artery."
+                },
+                {
+                  "text": "Thick, elastic walls."
+                },
+                {
+                  "text": "Smallest branches: arterioles."
+                }
+              ]
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "Veins",
+              "items": [
+                {
+                  "text": "Carry blood toward heart."
+                },
+                {
+                  "text": "Usually carry deoxygenated blood."
+                },
+                {
+                  "text": "Exception: pulmonary veins."
+                },
+                {
+                  "text": "Thinner walls."
+                },
+                {
+                  "text": "Contain valves to prevent backflow."
+                },
+                {
+                  "text": "Smallest veins: venules."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-3",
+          "title": "Great Vessels of the Heart",
+          "durationMinutes": 8,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "Great Vessels of the Heart",
+              "items": [
+                {
+                  "text": "Aorta",
+                  "children": [
+                    {
+                      "text": "Main artery from left ventricle."
+                    },
+                    {
+                      "text": "Carries oxygenated blood to the body."
+                    }
+                  ]
+                },
+                {
+                  "text": "Venae cavae",
+                  "children": [
+                    {
+                      "text": "Superior and inferior."
+                    },
+                    {
+                      "text": "Return deoxygenated blood to the right atrium."
+                    }
+                  ]
+                },
+                {
+                  "text": "Pulmonary artery",
+                  "children": [
+                    {
+                      "text": "Right ventricle -> lungs."
+                    },
+                    {
+                      "text": "Carries deoxygenated blood."
+                    }
+                  ]
+                },
+                {
+                  "text": "Pulmonary veins",
+                  "children": [
+                    {
+                      "text": "Lungs -> left atrium."
+                    },
+                    {
+                      "text": "Carry oxygenated blood."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-4",
+          "title": "Heart",
+          "durationMinutes": 10,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "Heart",
+              "items": [
+                {
+                  "text": "The heart is a muscular organ that pumps blood throughout the body."
+                },
+                {
+                  "text": "Normal heart rate: 60-80 beats per minute."
+                },
+                {
+                  "text": "The heartbeat is controlled by the sinoatrial (SA) node - the natural pacemaker."
+                }
+              ]
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "Chambers of the Heart",
+              "items": [
+                {
+                  "text": "Atria (upper chambers)",
+                  "children": [
+                    {
+                      "text": "Right and left atrium."
+                    },
+                    {
+                      "text": "Receive blood entering the heart."
+                    }
+                  ]
+                },
+                {
+                  "text": "Ventricles (lower chambers)",
+                  "children": [
+                    {
+                      "text": "Right and left ventricles."
+                    },
+                    {
+                      "text": "Pump blood out of the heart."
+                    }
+                  ]
+                },
+                {
+                  "text": "Septum",
+                  "children": [
+                    {
+                      "text": "Muscular wall separating right and left sides."
+                    },
+                    {
+                      "text": "Prevents mixing of oxygenated and deoxygenated blood."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-5",
+          "title": "Heart Valves and Layers of the Heart Wall",
+          "durationMinutes": 10,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "Heart Valves",
+              "items": [
+                {
+                  "text": "Aortic valve",
+                  "children": [
+                    {
+                      "text": "Located between left ventricle and aorta."
+                    },
+                    {
+                      "text": "Prevents backflow into the left ventricle."
+                    }
+                  ]
+                },
+                {
+                  "text": "Mitral valve (bicuspid valve)",
+                  "children": [
+                    {
+                      "text": "Between left atrium and left ventricle."
+                    },
+                    {
+                      "text": "Has two cusps."
+                    },
+                    {
+                      "text": "Prevents backflow during systole."
+                    }
+                  ]
+                },
+                {
+                  "text": "Tricuspid valve",
+                  "children": [
+                    {
+                      "text": "Between right atrium and right ventricle."
+                    },
+                    {
+                      "text": "Has three cusps."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "Layers of the Heart Wall",
+              "items": [
+                {
+                  "text": "Pericardium",
+                  "children": [
+                    {
+                      "text": "Outermost protective layer."
+                    },
+                    {
+                      "text": "Double membranous sac surrounding the heart."
+                    }
+                  ]
+                },
+                {
+                  "text": "Myocardium",
+                  "children": [
+                    {
+                      "text": "Middle layer."
+                    },
+                    {
+                      "text": "Made of cardiac muscle."
+                    },
+                    {
+                      "text": "Responsible for pumping action."
+                    }
+                  ]
+                },
+                {
+                  "text": "Endocardium",
+                  "children": [
+                    {
+                      "text": "Innermost lining."
+                    },
+                    {
+                      "text": "Continuous with blood vessel lining."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-6",
+          "title": "Coronary Circulation",
+          "durationMinutes": 6,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "Coronary Circulation",
+              "items": [
+                {
+                  "text": "Heart muscle receives oxygenated blood from",
+                  "children": [
+                    {
+                      "text": "Left coronary artery."
+                    },
+                    {
+                      "text": "Right coronary artery."
+                    }
+                  ]
+                },
+                {
+                  "text": "These arteries supply the myocardium."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-7",
+          "title": "Blood and Blood Cells",
+          "durationMinutes": 8,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "General Description",
+              "items": [
+                {
+                  "text": "Blood is a connective tissue that circulates in blood vessels."
+                },
+                {
+                  "text": "Composed of",
+                  "children": [
+                    {
+                      "text": "Plasma - liquid portion, mostly water plus dissolved substances."
+                    },
+                    {
+                      "text": "Red blood cells (RBCs)."
+                    },
+                    {
+                      "text": "White blood cells (WBCs)."
+                    },
+                    {
+                      "text": "Platelets."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "White Blood Cells (Leucocytes)",
+              "items": [
+                {
+                  "text": "Function: defend the body against infection."
+                },
+                {
+                  "text": "Types",
+                  "children": [
+                    {
+                      "text": "Granular leucocytes: neutrophils, eosinophils, basophils."
+                    },
+                    {
+                      "text": "Non-granular leucocytes: lymphocytes, monocytes."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-8",
+          "title": "Red Blood Cells and Platelets",
+          "durationMinutes": 8,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "title": "Red Blood Cells (Erythrocytes)",
+              "items": [
+                {
+                  "text": "Function",
+                  "children": [
+                    {
+                      "text": "Carry oxygen from lungs to body tissues."
+                    },
+                    {
+                      "text": "Carry carbon dioxide from tissues back to lungs."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "Platelets (Thrombocytes)",
+              "items": [
+                {
+                  "text": "Function",
+                  "children": [
+                    {
+                      "text": "Initiate blood clotting."
+                    },
+                    {
+                      "text": "Prevent excessive bleeding during injury."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-9",
+          "title": "Glossary of Terms - Circulatory System I",
+          "durationMinutes": 12,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "Term",
+                "Meaning"
+              ],
+              "rows": [
+                [
+                  "Aorta",
+                  "Largest artery in the body; arises out of the left ventricle of the heart and courses down the body trunk."
+                ],
+                [
+                  "Aortic arch",
+                  "Curved portion of the aorta which courses upward then turns downward behind the heart to form an arch."
+                ],
+                [
+                  "Aortic bifurcation",
+                  "Distal end of the abdominal aorta at which point the artery divides into the two common iliac arteries."
+                ],
+                [
+                  "Aortic valve",
+                  "Fibrous tissue flaps or leaflets which open and close between the left ventricle and ascending aorta. Valve closure prevents backflow of blood into the heart."
+                ],
+                [
+                  "Arteries",
+                  "Elastic, extensible vessels which carry blood in the direction away from the heart."
+                ],
+                [
+                  "Arteriole",
+                  "Small artery."
+                ],
+                [
+                  "Atrium",
+                  "One of the two upper chambers of the heart (right and left)."
+                ],
+                [
+                  "Bicuspid valve",
+                  "Also called the mitral valve."
+                ],
+                [
+                  "Blood capillary",
+                  "A microscopic vessel through which blood travels from arteriole to venule. Oxygen and carbon dioxide exchange occurs across capillary walls."
+                ],
+                [
+                  "Carotid arteries",
+                  "Vessels (common, external and internal) which provide the major blood supply to the head and neck."
+                ],
+                [
+                  "Circulatory",
+                  "Pertaining to movement around a circular route."
+                ],
+                [
+                  "Diastole",
+                  "The resting stage of the cardiac cycle."
+                ],
+                [
+                  "Heart",
+                  "Hollow, muscular organ which pumps blood to all parts of the body."
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-10",
+          "title": "Glossary of Terms - Circulatory System II",
+          "durationMinutes": 12,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "Term",
+                "Meaning"
+              ],
+              "rows": [
+                [
+                  "Iliac artery",
+                  "Common vessel which carries major blood supply to each leg."
+                ],
+                [
+                  "Innominate artery",
+                  "Also known as the subclavian artery."
+                ],
+                [
+                  "Mitral valve",
+                  "The two-leaflet heart valve between the left atrium and ventricle of the heart. Closure prevents reflux of blood into the left atrium. The mitral valve is also called the bicuspid valve."
+                ],
+                [
+                  "Oxygenated",
+                  "Saturated with oxygen."
+                ],
+                [
+                  "Plasma",
+                  "Fluid portion of blood in which cells are suspended."
+                ],
+                [
+                  "Portal circulation",
+                  "Instead of returning directly to the heart, venous blood passes from the capillary bed of the abdominal part of the digestive system and the spleen via the capillary bed of the liver."
+                ],
+                [
+                  "Pulmonary artery",
+                  "Vessel which carries venous blood from right ventricle of the heart to lung for oxygenation."
+                ],
+                [
+                  "Pulmonary circulation",
+                  "The circulation of blood from the right ventricle of the heart to the lungs and back to the left atrium."
+                ],
+                [
+                  "Pulmonary vein",
+                  "Vessel which returns oxygenated blood from the lung to the left atrium of the heart."
+                ],
+                [
+                  "Red blood cells",
+                  "Erythrocytes carry oxygen and carbon dioxide between the lungs and all body cells."
+                ],
+                [
+                  "Subclavian artery",
+                  "Large vessel which branches off the aortic arch on the left and the brachiocephalic trunk on the right to supply blood to areas of the trunk, head and upper extremities. Also known as the innominate artery."
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-11",
+          "title": "Glossary of Terms - Circulatory System III",
+          "durationMinutes": 12,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "Term",
+                "Meaning"
+              ],
+              "rows": [
+                [
+                  "Systemic circulation",
+                  "The circulation of blood from the left ventricle of the heart via the aorta to all parts of the body and back to the right atrium via the venae cavae."
+                ],
+                [
+                  "Systole",
+                  "The contracting stage of the cardiac cycle."
+                ],
+                [
+                  "Thoracic",
+                  "Pertaining to the chest."
+                ],
+                [
+                  "Tricuspid valve",
+                  "Valve with three fibrous tissue leaflets which open and close between the right atrium and ventricle of the heart. Closure prevents reflux of blood into the right atrium."
+                ],
+                [
+                  "Vascular",
+                  "Pertaining to vessels."
+                ],
+                [
+                  "Vein",
+                  "Vessel which carries blood in the direction toward the heart."
+                ],
+                [
+                  "Venae cavae",
+                  "Two large veins, inferior and superior, which return venous blood to the right atrium of the heart."
+                ],
+                [
+                  "Venous",
+                  "Pertaining to veins."
+                ],
+                [
+                  "Ventricle",
+                  "One of the two lower chambers of the heart (right and left)."
+                ],
+                [
+                  "Venule",
+                  "Small vein."
+                ],
+                [
+                  "White blood cells",
+                  "Two main varieties of white blood cells are granular leucocytes (neutrophils, eosinophils and basophils) and non-granular leucocytes (lymphocytes and monocytes). Their main function is to fight infection."
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-12",
+          "title": "Conditions of the Circulatory System I",
+          "durationMinutes": 15,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "S.No",
+                "Diagnosis",
+                "Definition",
+                "Investigations (Labs/Imaging)",
+                "Treatment"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "Acrocyanosis",
+                  "Persistent bluish discoloration of extremities due to vasospasm",
+                  "Clinical exam, pulse oximetry",
+                  "Reassurance, avoid cold"
+                ],
+                [
+                  "2",
+                  "Aneurysm",
+                  "Localized dilation of a blood vessel wall",
+                  "Ultrasound, CT angiography, MRI",
+                  "BP control, surgical/endovascular repair"
+                ],
+                [
+                  "3",
+                  "Aortic incompetence",
+                  "Aortic valve regurgitation into left ventricle",
+                  "Echocardiography, ECG",
+                  "Vasodilators, valve replacement"
+                ],
+                [
+                  "4",
+                  "Aortic stenosis",
+                  "Narrowing of aortic valve opening",
+                  "Echocardiography, ECG",
+                  "Valve replacement"
+                ],
+                [
+                  "5",
+                  "Arrhythmia",
+                  "Abnormal heart rhythm",
+                  "ECG, Holter monitor",
+                  "Antiarrhythmics, cardioversion, pacemaker"
+                ],
+                [
+                  "6",
+                  "Arteriosclerosis",
+                  "Hardening and thickening of arteries",
+                  "Lipid profile, Doppler, angiography",
+                  "Lifestyle changes, statins"
+                ],
+                [
+                  "7",
+                  "Atrial flutter",
+                  "Rapid regular atrial rhythm",
+                  "ECG",
+                  "Rate control, cardioversion"
+                ],
+                [
+                  "8",
+                  "Atrial septal defect",
+                  "Congenital opening in atrial septum",
+                  "Echocardiography",
+                  "Surgical/device closure"
+                ],
+                [
+                  "9",
+                  "Bacterial endocarditis",
+                  "Infection of heart valves",
+                  "Blood cultures, echocardiography",
+                  "IV antibiotics"
+                ],
+                [
+                  "10",
+                  "Bradycardia",
+                  "Heart rate <60 bpm",
+                  "ECG",
+                  "Atropine, pacemaker"
+                ],
+                [
+                  "11",
+                  "Cardiac ischaemia",
+                  "Reduced blood flow to myocardium",
+                  "ECG, troponin, angiography",
+                  "Nitrates, antiplatelets"
+                ],
+                [
+                  "12",
+                  "Cardiomyopathy",
+                  "Disease of heart muscle",
+                  "Echocardiography, MRI",
+                  "ACE inhibitors, beta-blockers"
+                ],
+                [
+                  "13",
+                  "Cerebrovascular accident",
+                  "Sudden brain dysfunction due to stroke",
+                  "CT brain, MRI",
+                  "Thrombolysis, BP control"
+                ],
+                [
+                  "14",
+                  "Claudication",
+                  "Limb pain due to arterial insufficiency",
+                  "Doppler, ankle-brachial index",
+                  "Exercise therapy, antiplatelets"
+                ],
+                [
+                  "15",
+                  "Coronary atherosclerosis",
+                  "Plaque buildup in coronary arteries",
+                  "Coronary angiography",
+                  "Statins, CABG/angioplasty"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-13",
+          "title": "Conditions of the Circulatory System II",
+          "durationMinutes": 15,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "S.No",
+                "Diagnosis",
+                "Definition",
+                "Investigations (Labs/Imaging)",
+                "Treatment"
+              ],
+              "rows": [
+                [
+                  "16",
+                  "Cor pulmonale",
+                  "Right heart failure from lung disease",
+                  "ECG, echo",
+                  "Oxygen therapy, diuretics"
+                ],
+                [
+                  "17",
+                  "Embolism",
+                  "Vessel blockage by clot",
+                  "D-dimer, CT angiography",
+                  "Anticoagulants"
+                ],
+                [
+                  "18",
+                  "Essential hypertension",
+                  "Chronic high BP without known cause",
+                  "BP monitoring, ECG",
+                  "Lifestyle modification, antihypertensives"
+                ],
+                [
+                  "19",
+                  "Fallot's tetralogy",
+                  "Congenital defect with four cardiac abnormalities",
+                  "Echocardiography",
+                  "Surgical correction"
+                ],
+                [
+                  "20",
+                  "Heart murmur",
+                  "Abnormal heart sound due to turbulent flow",
+                  "Auscultation, echocardiography",
+                  "Treat underlying cause"
+                ],
+                [
+                  "21",
+                  "Hypertension",
+                  "Persistent elevation of blood pressure",
+                  "BP measurement, renal function test",
+                  "Antihypertensives"
+                ],
+                [
+                  "22",
+                  "Hypotension",
+                  "Abnormally low blood pressure",
+                  "BP measurement, ECG",
+                  "IV fluids, treat cause"
+                ],
+                [
+                  "23",
+                  "Ischaemic heart disease",
+                  "Reduced coronary blood supply",
+                  "ECG, troponin, angiography",
+                  "Nitrates, revascularization"
+                ],
+                [
+                  "24",
+                  "Malignant hypertension",
+                  "Severe BP elevation with organ damage",
+                  "BP measurement, fundoscopy",
+                  "IV antihypertensives"
+                ],
+                [
+                  "25",
+                  "Mitral stenosis",
+                  "Narrowing of mitral valve",
+                  "Echocardiography",
+                  "Valve repair/replacement"
+                ],
+                [
+                  "26",
+                  "Myocardial infarct",
+                  "Death of heart muscle due to ischaemia",
+                  "ECG, troponin",
+                  "Thrombolysis, PCI"
+                ],
+                [
+                  "27",
+                  "Palpitation",
+                  "Awareness of abnormal heartbeat",
+                  "ECG, Holter",
+                  "Treat cause, beta-blockers"
+                ],
+                [
+                  "28",
+                  "Paroxysmal tachycardia",
+                  "Sudden rapid heart rate episodes",
+                  "ECG",
+                  "Vagal maneuvers, adenosine"
+                ],
+                [
+                  "29",
+                  "Pericarditis",
+                  "Inflammation of pericardium",
+                  "ECG, echocardiography",
+                  "NSAIDs, colchicine"
+                ],
+                [
+                  "30",
+                  "Phlebitis",
+                  "Inflammation of vein",
+                  "Doppler ultrasound",
+                  "NSAIDs, compression"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-14",
+          "title": "Conditions of the Circulatory System III",
+          "durationMinutes": 15,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "S.No",
+                "Diagnosis",
+                "Definition",
+                "Investigations (Labs/Imaging)",
+                "Treatment"
+              ],
+              "rows": [
+                [
+                  "31",
+                  "Portal hypertension",
+                  "Increased portal venous pressure",
+                  "Ultrasound abdomen, endoscopy",
+                  "Beta-blockers, TIPS"
+                ],
+                [
+                  "32",
+                  "Raynaud's disease",
+                  "Vasospasm of digital arteries causing color change",
+                  "Clinical exam, ANA",
+                  "Avoid cold, CCBs"
+                ],
+                [
+                  "33",
+                  "Sclerosis",
+                  "Hardening of tissue due to fibrosis",
+                  "Imaging, biopsy",
+                  "Treat cause"
+                ],
+                [
+                  "34",
+                  "Subacute bacterial endocarditis",
+                  "Slowly progressive valve infection",
+                  "Blood cultures, echo",
+                  "IV antibiotics"
+                ],
+                [
+                  "35",
+                  "Tachycardia",
+                  "Heart rate >100 bpm",
+                  "ECG",
+                  "Beta-blockers"
+                ],
+                [
+                  "36",
+                  "Thrombophlebitis",
+                  "Vein inflammation with clot",
+                  "Doppler",
+                  "Anticoagulants"
+                ],
+                [
+                  "37",
+                  "Thrombosis",
+                  "Formation of clot in vessel",
+                  "Doppler, D-dimer",
+                  "Anticoagulants"
+                ],
+                [
+                  "38",
+                  "Varicose veins",
+                  "Dilated superficial veins",
+                  "Doppler",
+                  "Compression, surgery"
+                ],
+                [
+                  "39",
+                  "Ventricular tachycardia",
+                  "Rapid ventricular rhythm",
+                  "ECG",
+                  "Cardioversion, antiarrhythmics"
+                ],
+                [
+                  "40",
+                  "Ventricular fibrillation",
+                  "Chaotic ventricular rhythm causing arrest",
+                  "ECG",
+                  "Immediate defibrillation"
+                ],
+                [
+                  "41",
+                  "Agranulocytosis",
+                  "Severe reduction in granulocytes increasing infection risk",
+                  "CBC with differential, bone marrow biopsy",
+                  "Stop causative drug, antibiotics, G-CSF"
+                ],
+                [
+                  "42",
+                  "Aplastic anaemia",
+                  "Bone marrow failure causing pancytopenia",
+                  "CBC, bone marrow biopsy",
+                  "Transfusion, immunosuppressants, BMT"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blood-circulatory-slide-15",
+          "title": "Conditions of the Circulatory System IV",
+          "durationMinutes": 10,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "S.No",
+                "Diagnosis",
+                "Definition",
+                "Investigations (Labs/Imaging)",
+                "Treatment"
+              ],
+              "rows": [
+                [
+                  "43",
+                  "Thrombocytopenia",
+                  "Low platelet count",
+                  "CBC, peripheral smear",
+                  "Platelet transfusion"
+                ],
+                [
+                  "44",
+                  "Anemia",
+                  "Decrease in hemoglobin concentration or RBC count leading to reduced oxygen-carrying capacity of blood",
+                  "CBC (low Hb), peripheral smear, iron studies, vitamin B12 levels",
+                  "Iron therapy, vitamin B12/folate supplementation, blood transfusion (severe cases), treat underlying cause"
+                ],
+                [
+                  "45",
+                  "Pancytopenia",
+                  "Reduction in all three blood cell lines (RBCs, WBCs, and platelets)",
+                  "CBC (low Hb, low WBC, low platelets), peripheral smear, bone marrow biopsy",
+                  "Treat underlying cause, blood transfusion, immunosuppressive therapy, bone marrow transplant (severe cases)"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "index-4-lymphatic-system",
