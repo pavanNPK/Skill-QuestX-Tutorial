@@ -3,8 +3,8 @@
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": false,
     "allowSyntheticDefaultImports": true,
     "target": "ES2021",
     "sourceMap": true,
@@ -19,6 +19,6 @@
     "noFallthroughCasesInSwitch": true,
     "paths": { "@/*": ["src/*"] }
   },
-  "include": ["src/**/*"],
+  "include": ["src/express/**/*"],
   "exclude": ["node_modules", "dist"]
 }
