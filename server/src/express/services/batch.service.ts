@@ -45,4 +45,24 @@ export class BatchService {
     }
     return Array.from(set);
   }
+
+  async isStudentInCourse(studentId: string, courseId: string): Promise<boolean> {
+    const count = await BatchModel.countDocuments({
+      courseId: new Types.ObjectId(courseId),
+      studentIds: new Types.ObjectId(studentId),
+    }).exec();
+    return count > 0;
+  }
+
+  async getCourseIdsForStudent(studentId: string): Promise<string[]> {
+    const batches = await BatchModel.find({ studentIds: new Types.ObjectId(studentId) })
+      .select('courseId')
+      .lean()
+      .exec();
+    const ids = new Set<string>();
+    for (const batch of batches as any[]) {
+      if (batch.courseId) ids.add(batch.courseId.toString());
+    }
+    return Array.from(ids);
+  }
 }

@@ -27,6 +27,11 @@ export class CourseService {
     return list as unknown as CourseLean[];
   }
 
+  async findById(courseId: string): Promise<CourseLean | null> {
+    const course = await CourseModel.findById(courseId).lean().exec();
+    return course as unknown as CourseLean | null;
+  }
+
   async findNamesByIds(courseIds: string[]): Promise<{ id: string; name: string }[]> {
     if (!courseIds?.length) return [];
     const ids = courseIds.map((id) => new Types.ObjectId(id));

@@ -1,14 +1,28 @@
 <div class="syllabus-container">
     <!-- Simple Course Info -->
     <div class="course-info">
-        <h2 class="course-title">{{ courseTitle }}</h2>
-        <p class="course-description">{{ courseDescription }}</p>
+        <select class="course-selector" [value]="selectedCourseId" (change)="onCourseChange($event)">
+            @for (course of courses; track course.id) {
+            <option [value]="course.id">{{ course.title }}</option>
+            }
+        </select>
+        <h2 class="course-title">{{ content?.title || 'Syllabus' }}</h2>
+        <p class="course-description">{{ content?.description || error }}</p>
     </div>
 
+    @if (loading) {
+    <div class="empty-state">Loading syllabus...</div>
+    } @else if (error && !content) {
+    <div class="empty-state">{{ error }}</div>
+    } @else if (content && content.modules.length === 0) {
+    <div class="empty-state">No syllabus modules have been added yet.</div>
+    }
+
     <!-- Syllabus Modules -->
+    @if (content && content.modules.length) {
     <div class="modules-section">
         <p-accordion [value]="'0'">
-            @for (module of modules; track module.title; let i = $index) {
+            @for (module of content.modules; track module.id; let i = $index) {
             <p-accordion-panel [value]="i.toString()">
                 <p-accordion-header>
                     <ng-template #toggleicon let-active="active">
@@ -20,15 +34,20 @@
                     </ng-template>
                     <span class="module-header-content">
                         <span class="module-title-text">{{ module.title }}</span>
-                        <span class="topic-count-badge">{{ module.topics.length }}</span>
+                        <span class="topic-count-badge">{{ module.lessons.length }}</span>
                     </span>
                 </p-accordion-header>
                 <p-accordion-content class="syllabus-contnet-parent">
                     <div class="topics-list">
-                        @for (topic of module.topics; track topic.number) {
+                        @for (lesson of module.lessons; track lesson.id; let lessonIndex = $index) {
                         <div class="topic-item">
-                            <div class="topic-number">{{ topic.number }}</div>
-                            <div class="topic-title">{{ topic.title }}</div>
+                            <div class="topic-number">{{ lessonIndex + 1 }}</div>
+                            <div class="topic-title">
+                                {{ lesson.title }}
+                                @if (lesson.summary) {
+                                <small>{{ lesson.summary }}</small>
+                                }
+                            </div>
                         </div>
                         }
                     </div>
@@ -37,4 +56,5 @@
             }
         </p-accordion>
     </div>
+    }
 </div>

@@ -5,6 +5,11 @@
     <!-- Level 1: Enrolled Courses List -->
     @if (currentView === 'courses') {
     <div class="view-section fade-in">
+        @if (loading) {
+        <div class="empty-state">Loading recorded classes...</div>
+        } @else if (error) {
+        <div class="empty-state">{{ error }}</div>
+        }
         <!-- Removed "My Recorded Classes" title as per user feedback about redundancy -->
         <div class="courses-grid">
             @for (course of courses; track course.id) {
@@ -16,16 +21,16 @@
                 <div class="card-content">
                     <h3 class="course-title">{{ course.title }}</h3>
                     <div class="course-meta">
-                        <span><i class="pi pi-folder"></i> {{ course.totalChapters }} Chapters</span>
-                        <span><i class="pi pi-clock"></i> {{ course.totalHours }}h Content</span>
+                        <span><i class="pi pi-folder"></i> {{ course.moduleCount }} Modules</span>
+                        <span><i class="pi pi-clock"></i> {{ course.lessonCount }} Lessons</span>
                     </div>
                     <div class="progress-section">
                         <div class="progress-bar">
-                            <div class="fill" [style.width.%]="course.progress"
-                                [style.background-color]="getProgressColor(course.progress)">
+                            <div class="fill" [style.width.%]="course.moduleCount ? 20 : 0"
+                                [style.background-color]="getProgressColor(course.moduleCount ? 20 : 0)">
                             </div>
                         </div>
-                        <span class="progress-text">{{ course.progress }}% Complete</span>
+                        <span class="progress-text">{{ course.status | titlecase }}</span>
                     </div>
                 </div>
                 <button class="action-btn">
@@ -40,16 +45,19 @@
     <!-- Level 2: Chapters (Folder Structure) -->
     @if (currentView === 'chapters' && selectedCourse) {
     <div class="view-section fade-in">
+        @if (!selectedContent || selectedContent.modules.length === 0) {
+        <div class="empty-state">No modules uploaded yet.</div>
+        }
         <div class="folders-grid">
-            @for (chapter of selectedCourse.chapters; track chapter.id) {
+            @for (chapter of selectedContent?.modules || []; track chapter.id; let moduleIndex = $index) {
             <div class="folder-card" (click)="selectChapter(chapter)">
-                <div class="folder-top" [style.border-bottom-color]="chapter.color">
-                    <i class="pi pi-folder folder-icon" [style.color]="chapter.color || '#FCD34D'"></i>
-                    <span class="chapter-num-badge">0{{ chapter.number }}</span>
+                <div class="folder-top" [style.border-bottom-color]="moduleColor(moduleIndex)">
+                    <i class="pi pi-folder folder-icon" [style.color]="moduleColor(moduleIndex)"></i>
+                    <span class="chapter-num-badge">0{{ moduleIndex + 1 }}</span>
                 </div>
                 <div class="folder-body">
                     <h4 class="folder-title">{{ chapter.title }}</h4>
-                    <p class="folder-subtitle">{{ chapter.concepts.length }} Concepts</p>
+                    <p class="folder-subtitle">{{ chapter.lessons.length }} Lessons</p>
                 </div>
             </div>
             }
@@ -61,29 +69,24 @@
     @if (currentView === 'concepts' && selectedChapter) {
     <div class="view-section fade-in">
         <div class="concepts-grid">
-            @for (concept of selectedChapter.concepts; track concept.id) {
+            @for (concept of selectedChapter.lessons; track concept.id) {
             <div class="concept-item" (click)="openConcept(concept)">
-                <div class="concept-icon" [class.completed]="concept.completed">
-                    <i [class]="concept.type === 'video' ? 'pi pi-play-circle' : 'pi pi-file'"></i>
+                <div class="concept-icon">
+                    <i [class]="lessonType(concept) === 'video' ? 'pi pi-play-circle' : 'pi pi-file'"></i>
                 </div>
                 <div class="concept-info">
                     <h4 class="concept-title">{{ concept.title }}</h4>
-                    <span class="concept-meta">{{ concept.type | titlecase }} • {{ concept.duration || 'Reading'
-                        }}</span>
+                    <span class="concept-meta">{{ lessonType(concept) | titlecase }} • {{ lessonDuration(concept) }}</span>
                 </div>
                 <div class="concept-action">
-                    @if(concept.completed) {
-                    <i class="pi pi-check-circle completed-icon"></i>
-                    } @else {
                     <button pButton icon="pi pi-play" class="p-button-rounded p-button-text"></button>
-                    }
                 </div>
             </div>
             }
-            @if (selectedChapter.concepts.length === 0) {
+            @if (selectedChapter.lessons.length === 0) {
             <div class="empty-state">
                 <i class="pi pi-folder-open"></i>
-                <p>No concepts uploaded yet.</p>
+                <p>No lessons uploaded yet.</p>
             </div>
             }
         </div>

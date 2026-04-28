@@ -8,7 +8,16 @@
         <p class="course-description">{{ courseDescription }}</p>
     </div>
 
+    @if (loading) {
+    <div class="empty-state">Loading class content...</div>
+    } @else if (error) {
+    <div class="empty-state">{{ error }}</div>
+    } @else if (modules.length === 0) {
+    <div class="empty-state">No lessons uploaded yet.</div>
+    }
+
     <!-- Modules Accordion -->
+    @if (modules.length) {
     <div class="modules-section">
         <p-accordion [value]="'0'">
             @for (module of modules; track module.id; let i = $index) {
@@ -25,35 +34,35 @@
                 </p-accordion-header>
                 <p-accordion-content>
                     <div class="videos-list">
-                        @for (video of module.videos; track video.id) {
-                        <div class="video-item" [class.locked]="video.locked" (click)="playVideo(video)">
+                        @for (lesson of module.lessons; track lesson.id; let lessonIndex = $index) {
+                        <div class="video-item" (click)="openLesson(lesson)">
                             <div class="video-thumbnail">
-                                @if (video.thumbnail) {
-                                <img [src]="video.thumbnail" [alt]="video.title">
-                                } @else {
                                 <div class="placeholder-thumbnail">
                                     <i class="pi pi-play"></i>
                                 </div>
-                                }
-                                @if (video.duration) {
-                                <span class="duration-badge">{{ video.duration }}</span>
+                                @if (lesson.durationMinutes) {
+                                <span class="duration-badge">{{ lesson.durationMinutes }} min</span>
                                 }
                             </div>
                             <div class="video-info">
                                 <h4 class="video-title">
-                                    Day {{ video.day }}: {{ video.title }}
+                                    Lesson {{ lessonIndex + 1 }}: {{ lesson.title }}
                                 </h4>
-                                @if (video.videoCount) {
+                                @if (lesson.summary) {
                                 <div class="video-meta">
-                                    <i class="pi pi-users"></i>
-                                    <span>+{{ video.videoCount }} Videos</span>
+                                    <i class="pi pi-align-left"></i>
+                                    <span>{{ lesson.summary }}</span>
+                                </div>
+                                }
+                                @if (primaryBlock(lesson)) {
+                                <div class="video-meta">
+                                    <i class="pi pi-file"></i>
+                                    <span>{{ blockText(primaryBlock(lesson)!) }}</span>
                                 </div>
                                 }
                             </div>
                             <div class="video-action">
-                                @if (video.locked) {
-                                <i class="pi pi-lock lock-icon"></i>
-                                }
+                                <i class="pi pi-external-link"></i>
                             </div>
                         </div>
                         }
@@ -63,4 +72,76 @@
             }
         </p-accordion>
     </div>
+    }
+
+    @if (selectedLesson) {
+    <div class="modules-section">
+        <h2 class="course-title">{{ selectedLesson.title }}</h2>
+        @if (selectedLesson.summary) {
+        <p class="course-description">{{ selectedLesson.summary }}</p>
+        }
+        <div class="videos-list">
+            @for (block of selectedLesson.blocks; track block.id) {
+            <div class="video-item">
+                <div class="video-info">
+                    @if (block.type === 'heading') {
+                    <h3 class="video-title">{{ block.text || block.title }}</h3>
+                    } @else if (block.type === 'paragraph' || block.type === 'assignment_note') {
+                    <p>{{ block.text }}</p>
+                    } @else if (block.type === 'bullet_list' || block.type === 'nested_bullet_list') {
+                    <ul>
+                        @for (item of block.items || []; track item.text) {
+                        <li>
+                            {{ item.text }}
+                            @if (item.children?.length) {
+                            <ul>
+                                @for (child of item.children || []; track child.text) {
+                                <li>
+                                    {{ child.text }}
+                                    @if (child.children?.length) {
+                                    <ul>
+                                        @for (grandChild of child.children || []; track grandChild.text) {
+                                        <li>{{ grandChild.text }}</li>
+                                        }
+                                    </ul>
+                                    }
+                                </li>
+                                }
+                            </ul>
+                            }
+                        </li>
+                        }
+                    </ul>
+                    } @else if (block.type === 'table') {
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                @for (column of block.columns || []; track column) {
+                                <th style="border: 1px solid #d1d5db; padding: 0.5rem; text-align: left;">{{ column }}</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (row of block.rows || []; track row) {
+                            <tr>
+                                @for (cell of row; track cell) {
+                                <td style="border: 1px solid #d1d5db; padding: 0.5rem;">{{ cell }}</td>
+                                }
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                    } @else if (block.type === 'image' && block.url) {
+                    <img [src]="blockUrl(block)" [alt]="block.title || block.text" style="max-width: 100%; border-radius: 8px;">
+                    } @else if (block.url) {
+                    <a [href]="blockUrl(block)" target="_blank" rel="noopener">{{ block.title || block.text || block.type }}</a>
+                    } @else {
+                    <p>{{ block.title || block.text || block.type }}</p>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    }
 </div>

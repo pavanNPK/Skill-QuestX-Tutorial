@@ -9,6 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { AuthService, CourseForDisplay } from '../../core/services/auth.service';
+import { CourseContentService } from '../../core/services/course-content.service';
 
 /** Popular course (from API or static fallback). */
 interface Course {
@@ -45,6 +46,7 @@ interface MyCourse {
 })
 export class CoursesListComponent implements OnInit {
     private auth = inject(AuthService);
+    private courseContent = inject(CourseContentService);
 
     searchQuery = '';
 
@@ -163,6 +165,27 @@ export class CoursesListComponent implements OnInit {
 
     ngOnInit(): void {
         this.courses = this.staticCourses.slice();
+        this.courseContent.getAvailableCourses().subscribe({
+            next: (list) => {
+                if (!list.length) return;
+                this.courses = list.map((c) => ({
+                    id: c.id,
+                    title: c.title ?? c.name,
+                    description: c.description ?? '',
+                    thumbnail: c.thumbnail ?? '',
+                    price: 0,
+                    discount: 0,
+                    accentColor: c.accentColor ?? '#5B4BC4',
+                    author: c.author,
+                    ratingAverage: 0,
+                    ratingCount: 0,
+                }));
+            },
+            error: () => this.loadDisplayCoursesFallback(),
+        });
+    }
+
+    private loadDisplayCoursesFallback(): void {
         this.auth.listCoursesForDisplay().subscribe({
             next: (list) => {
                 this.courses = list.map((c: CourseForDisplay) => ({
@@ -186,12 +209,12 @@ export class CoursesListComponent implements OnInit {
 
     /** Show Add New Course button only for SA and Admin (hidden for Instructor and Student). */
     showAddCourseButton(): boolean {
-        return this.auth.isSuperAdmin() || this.auth.isAdmin();
+        return this.auth.canManageCourseContent();
     }
 
-    /** SA or Admin with head can add course; Admin without head cannot. */
+    /** SA/Admin/Instructor can manage course content. */
     canAddCourse(): boolean {
-        return this.auth.canDoUserCUD();
+        return this.auth.canManageCourseContent();
     }
 
     navigateToAddCourse() {

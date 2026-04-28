@@ -1,0 +1,1530 @@
+{
+  "title": "Basic Anatomy & Physiology",
+  "description": "Basic Anatomy & Physiology content organized by the course index. The first index currently contains the imported slide content; remaining index sections are ready for future PPT/doc data.",
+  "modules": [
+    {
+      "id": "index-1-basic-to-anatomy-physiology",
+      "title": "1. Basic to Anatomy & Physiology",
+      "summary": "Foundational terminology and introductory anatomy/physiology slides.",
+      "lessons": [
+        {
+          "title": "Contents",
+          "durationMinutes": 5,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "items": [
+                {
+                  "text": "Medical terminology",
+                  "children": [
+                    {
+                      "text": "Prefix"
+                    },
+                    {
+                      "text": "Suffix"
+                    },
+                    {
+                      "text": "Root words"
+                    }
+                  ]
+                },
+                {
+                  "text": "Word Building"
+                },
+                {
+                  "text": "Basic Human Anatomy and Physiology"
+                }
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-1"
+        },
+        {
+          "title": "Medical terminology is the language of medicine",
+          "durationMinutes": 15,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "It may seem complex at first, but once the structure is understood, the terms become easy to interpret. Medical words are built from prefixes, suffixes, and root words."
+            },
+            {
+              "type": "nested_bullet_list",
+              "items": [
+                {
+                  "text": "Prefix - Beginning; modifies meaning."
+                },
+                {
+                  "text": "Suffix - Ending; indicates condition or procedure."
+                },
+                {
+                  "text": "Root Word - Main body part."
+                },
+                {
+                  "text": "Meaning of the full term = meaning of each part combined."
+                }
+              ]
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "Examples",
+              "items": [
+                {
+                  "text": "Nephritis",
+                  "children": [
+                    {
+                      "text": "Nephr = kidney"
+                    },
+                    {
+                      "text": "-itis = inflammation"
+                    },
+                    {
+                      "text": "Meaning: inflammation of the kidney."
+                    }
+                  ]
+                },
+                {
+                  "text": "Hydronephrosis",
+                  "children": [
+                    {
+                      "text": "Hydro = water/fluid"
+                    },
+                    {
+                      "text": "Nephr = kidney"
+                    },
+                    {
+                      "text": "-osis = abnormal condition"
+                    },
+                    {
+                      "text": "Meaning: abnormal condition of fluid accumulation in the kidney."
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-2"
+        },
+        {
+          "title": "Prefixes",
+          "durationMinutes": 25,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "A prefix modifies the meaning of a word. It usually consists of one or two syllables and is placed before the root word."
+            },
+            {
+              "type": "table",
+              "title": "Prefixes - Part 1",
+              "columns": [
+                "S.No",
+                "Prefix",
+                "Meaning",
+                "Example",
+                "Definition"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "a-",
+                  "without, not",
+                  "anaesthesia",
+                  "loss of sensation"
+                ],
+                [
+                  "2",
+                  "ab-",
+                  "away from",
+                  "abnormal",
+                  "not normal"
+                ],
+                [
+                  "3",
+                  "ad-",
+                  "to, toward",
+                  "adhesion",
+                  "joining of parts"
+                ],
+                [
+                  "4",
+                  "ante-",
+                  "before",
+                  "antenatal",
+                  "before birth"
+                ],
+                [
+                  "5",
+                  "anti-",
+                  "against",
+                  "antipyretic",
+                  "fever reducing"
+                ],
+                [
+                  "6",
+                  "bi-",
+                  "two, both",
+                  "bilateral",
+                  "both sides"
+                ],
+                [
+                  "7",
+                  "co-, con-",
+                  "together, with",
+                  "congenital",
+                  "born with"
+                ],
+                [
+                  "8",
+                  "contra-",
+                  "against, opposite",
+                  "contraction",
+                  "pulling together"
+                ],
+                [
+                  "9",
+                  "dys-",
+                  "bad, difficult",
+                  "dysphagia",
+                  "difficulty swallowing"
+                ],
+                [
+                  "10",
+                  "ec-",
+                  "out of",
+                  "ectropion",
+                  "turning outward"
+                ],
+                [
+                  "11",
+                  "ect-",
+                  "outside",
+                  "ectopic pregnancy",
+                  "outside uterus"
+                ],
+                [
+                  "12",
+                  "em-, en-",
+                  "in, within",
+                  "empyema",
+                  "pus in cavity"
+                ],
+                [
+                  "13",
+                  "end-",
+                  "within",
+                  "endoscope",
+                  "instrument to view inside"
+                ],
+                [
+                  "14",
+                  "epi-",
+                  "upon, on",
+                  "epidermis",
+                  "outer skin layer"
+                ],
+                [
+                  "15",
+                  "ex-",
+                  "out of",
+                  "exophthalmos",
+                  "eyeball protrusion"
+                ],
+                [
+                  "16",
+                  "hemi-",
+                  "half",
+                  "hemiplegia",
+                  "paralysis of one side"
+                ],
+                [
+                  "17",
+                  "hypo-",
+                  "below, beneath",
+                  "hypoglycaemia",
+                  "low blood sugar"
+                ]
+              ]
+            },
+            {
+              "type": "table",
+              "title": "Prefixes - Part 2",
+              "columns": [
+                "S.No",
+                "Prefix",
+                "Meaning",
+                "Example",
+                "Definition"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "par-, para-",
+                  "beside, near",
+                  "paramastoid",
+                  "near mastoid"
+                ],
+                [
+                  "2",
+                  "peri-",
+                  "around",
+                  "pericardium",
+                  "membrane around heart"
+                ],
+                [
+                  "3",
+                  "pre-, pro-",
+                  "before",
+                  "precancerous",
+                  "before cancer develops"
+                ],
+                [
+                  "4",
+                  "retro-",
+                  "backward",
+                  "retroflexion",
+                  "bending backward"
+                ],
+                [
+                  "5",
+                  "semi-",
+                  "half",
+                  "semicoma",
+                  "partial coma"
+                ],
+                [
+                  "6",
+                  "sub-",
+                  "under, below",
+                  "sub clavicular",
+                  "beneath clavicle"
+                ],
+                [
+                  "7",
+                  "super-, supra-",
+                  "above",
+                  "suprarenal",
+                  "above kidney"
+                ],
+                [
+                  "8",
+                  "sym-, syn-",
+                  "together",
+                  "syndactylism",
+                  "fused fingers/toes"
+                ],
+                [
+                  "9",
+                  "trans-",
+                  "across, through",
+                  "transection",
+                  "cutting across"
+                ],
+                [
+                  "10",
+                  "tri-",
+                  "three",
+                  "tricuspid",
+                  "three cusps"
+                ]
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-3"
+        },
+        {
+          "title": "Suffixes",
+          "durationMinutes": 30,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "The ending that follows a root word is a suffix. The suffix usually consists of one or more syllables."
+            },
+            {
+              "type": "table",
+              "title": "Suffixes - Part 1",
+              "columns": [
+                "S.No",
+                "Suffix",
+                "Meaning",
+                "Example",
+                "Definition"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "-aemia",
+                  "blood condition",
+                  "hyperglycaemia",
+                  "high blood sugar"
+                ],
+                [
+                  "2",
+                  "-algia",
+                  "pain",
+                  "nephralgia",
+                  "kidney pain"
+                ],
+                [
+                  "3",
+                  "-cele",
+                  "swelling, hernia",
+                  "cystocele",
+                  "bladder hernia"
+                ],
+                [
+                  "4",
+                  "-centesis",
+                  "surgical puncture",
+                  "paracentesis",
+                  "puncture of cavity"
+                ],
+                [
+                  "5",
+                  "-desis",
+                  "binding, fusion",
+                  "arthrodesis",
+                  "surgical joint fusion"
+                ],
+                [
+                  "6",
+                  "-ectasis",
+                  "dilation",
+                  "angioectasis",
+                  "vessel dilation"
+                ],
+                [
+                  "7",
+                  "-ectomy",
+                  "removal",
+                  "tonsillectomy",
+                  "removal of tonsils"
+                ],
+                [
+                  "8",
+                  "-genic",
+                  "producing, originating",
+                  "bronchogenic",
+                  "originating in bronchus"
+                ],
+                [
+                  "9",
+                  "-gram",
+                  "record, tracing",
+                  "electrocardiogram",
+                  "heart electrical tracing"
+                ],
+                [
+                  "10",
+                  "-iasis",
+                  "abnormal condition",
+                  "lithiasis",
+                  "stone formation"
+                ],
+                [
+                  "11",
+                  "-ic",
+                  "pertaining to",
+                  "gastric",
+                  "pertaining to stomach"
+                ],
+                [
+                  "12",
+                  "-itis",
+                  "inflammation",
+                  "iritis",
+                  "inflammation of iris"
+                ]
+              ]
+            },
+            {
+              "type": "table",
+              "title": "Suffixes - Part 2",
+              "columns": [
+                "S.No",
+                "Suffix",
+                "Meaning",
+                "Example",
+                "Definition"
+              ],
+              "rows": [
+                [
+                  "13",
+                  "-lysis",
+                  "destruction",
+                  "haemolysis",
+                  "RBC destruction"
+                ],
+                [
+                  "14",
+                  "-malacia",
+                  "softening",
+                  "osteomalacia",
+                  "bone softening"
+                ],
+                [
+                  "15",
+                  "-megaly",
+                  "enlargement",
+                  "hepatomegaly",
+                  "liver enlargement"
+                ],
+                [
+                  "16",
+                  "-oid",
+                  "resembling",
+                  "lipoid",
+                  "fat-like"
+                ],
+                [
+                  "17",
+                  "-ology",
+                  "study of",
+                  "morphology",
+                  "study of structure"
+                ],
+                [
+                  "18",
+                  "-oma",
+                  "tumour",
+                  "adenoma",
+                  "gland tumour"
+                ],
+                [
+                  "19",
+                  "-osis",
+                  "condition, disease",
+                  "dermatosis",
+                  "skin disease"
+                ],
+                [
+                  "20",
+                  "-pathy",
+                  "disease",
+                  "myopathy",
+                  "muscle disease"
+                ],
+                [
+                  "21",
+                  "-penia",
+                  "deficiency",
+                  "leucopenia",
+                  "low WBC count"
+                ],
+                [
+                  "22",
+                  "-pexy",
+                  "fixation",
+                  "mastopexy",
+                  "breast fixation"
+                ],
+                [
+                  "23",
+                  "-plasty",
+                  "surgical repair",
+                  "arthroplasty",
+                  "joint repair"
+                ],
+                [
+                  "24",
+                  "-ptosis",
+                  "drooping",
+                  "nephroptosis",
+                  "kidney displacement"
+                ],
+                [
+                  "25",
+                  "-rhaphy",
+                  "suturing",
+                  "perineorrhaphy",
+                  "perineum suture"
+                ],
+                [
+                  "26",
+                  "-scopy",
+                  "visual examination",
+                  "cystoscopy",
+                  "bladder examination"
+                ],
+                [
+                  "27",
+                  "-spasm",
+                  "involuntary contraction",
+                  "enterospasm",
+                  "intestinal spasm"
+                ],
+                [
+                  "28",
+                  "-stomy",
+                  "surgical opening",
+                  "cystostomy",
+                  "bladder opening"
+                ],
+                [
+                  "29",
+                  "-tomy",
+                  "incision",
+                  "thoracotomy",
+                  "chest incision"
+                ],
+                [
+                  "30",
+                  "-tripsy",
+                  "crushing",
+                  "lithotripsy",
+                  "stone crushing"
+                ]
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-4"
+        },
+        {
+          "title": "Root Words",
+          "durationMinutes": 35,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Root word = foundation of a medical term. It indicates the main body organ or anatomical part."
+            },
+            {
+              "type": "table",
+              "title": "Root Words - Part 1",
+              "columns": [
+                "S.No",
+                "Root word",
+                "Meaning"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "abdomin/o",
+                  "abdomen"
+                ],
+                [
+                  "2",
+                  "aden/o",
+                  "gland"
+                ],
+                [
+                  "3",
+                  "angi/o",
+                  "vessel"
+                ],
+                [
+                  "4",
+                  "arthr/o",
+                  "joint"
+                ],
+                [
+                  "5",
+                  "bol/o",
+                  "throw, cast"
+                ],
+                [
+                  "6",
+                  "cephal/o",
+                  "head"
+                ],
+                [
+                  "7",
+                  "cervic/o",
+                  "neck"
+                ],
+                [
+                  "8",
+                  "chir/o",
+                  "hand"
+                ],
+                [
+                  "9",
+                  "chondr/o",
+                  "cartilage"
+                ],
+                [
+                  "10",
+                  "coccyg/o",
+                  "coccyx"
+                ],
+                [
+                  "11",
+                  "crani/o",
+                  "skull"
+                ],
+                [
+                  "12",
+                  "cyt/o",
+                  "cell"
+                ],
+                [
+                  "13",
+                  "dist/o",
+                  "far, distant"
+                ],
+                [
+                  "14",
+                  "encephal/o",
+                  "brain"
+                ],
+                [
+                  "15",
+                  "erythr/o",
+                  "red"
+                ],
+                [
+                  "16",
+                  "glyc/o",
+                  "sugar"
+                ],
+                [
+                  "17",
+                  "gynec/o",
+                  "female"
+                ],
+                [
+                  "18",
+                  "hem/o",
+                  "blood"
+                ],
+                [
+                  "19",
+                  "hist/o",
+                  "tissue"
+                ],
+                [
+                  "21",
+                  "kary/o",
+                  "nucleus"
+                ],
+                [
+                  "22",
+                  "leuk/o",
+                  "white"
+                ],
+                [
+                  "23",
+                  "lumb/o",
+                  "lower back"
+                ],
+                [
+                  "24",
+                  "mening/o",
+                  "membrane"
+                ],
+                [
+                  "25",
+                  "myel/o",
+                  "marrow, spinal cord"
+                ],
+                [
+                  "26",
+                  "neur/o",
+                  "nerve"
+                ],
+                [
+                  "27",
+                  "onc/o",
+                  "tumor"
+                ],
+                [
+                  "28",
+                  "oste/o",
+                  "bone"
+                ],
+                [
+                  "29",
+                  "ped/o",
+                  "child"
+                ],
+                [
+                  "30",
+                  "pneum/o",
+                  "lung, air"
+                ],
+                [
+                  "31",
+                  "proct/o",
+                  "anus"
+                ],
+                [
+                  "32",
+                  "psych/o",
+                  "mind"
+                ],
+                [
+                  "33",
+                  "py/o",
+                  "pus"
+                ],
+                [
+                  "34",
+                  "radi/o",
+                  "ray, radiation"
+                ],
+                [
+                  "35",
+                  "rhin/o",
+                  "nose"
+                ],
+                [
+                  "36",
+                  "sarc/o",
+                  "flesh"
+                ],
+                [
+                  "37",
+                  "spin/o",
+                  "spine"
+                ],
+                [
+                  "38",
+                  "thel/o",
+                  "nipple"
+                ],
+                [
+                  "39",
+                  "thromb/o",
+                  "clot"
+                ],
+                [
+                  "41",
+                  "ur/o",
+                  "urine"
+                ],
+                [
+                  "42",
+                  "viscer/o",
+                  "organ"
+                ],
+                [
+                  "44",
+                  "adip/o",
+                  "fat"
+                ],
+                [
+                  "45",
+                  "aer/o",
+                  "air"
+                ],
+                [
+                  "46",
+                  "anter/o",
+                  "front"
+                ],
+                [
+                  "47",
+                  "blephar/o",
+                  "eyelid"
+                ],
+                [
+                  "48",
+                  "cardi/o",
+                  "heart"
+                ],
+                [
+                  "49",
+                  "cerebr/o",
+                  "brain"
+                ],
+                [
+                  "50",
+                  "cheil/o",
+                  "lip"
+                ],
+                [
+                  "51",
+                  "chol/o",
+                  "bile"
+                ],
+                [
+                  "52",
+                  "chrom/o",
+                  "color"
+                ],
+                [
+                  "53",
+                  "cost/o",
+                  "rib"
+                ],
+                [
+                  "54",
+                  "cyst/o",
+                  "bladder, sac"
+                ],
+                [
+                  "55",
+                  "derm/o",
+                  "skin"
+                ],
+                [
+                  "56",
+                  "dors/o",
+                  "back"
+                ],
+                [
+                  "57",
+                  "enter/o",
+                  "intestine"
+                ],
+                [
+                  "58",
+                  "gastr/o",
+                  "stomach"
+                ],
+                [
+                  "59",
+                  "gnos/o",
+                  "knowledge"
+                ],
+                [
+                  "60",
+                  "hemat/o",
+                  "blood"
+                ]
+              ]
+            },
+            {
+              "type": "table",
+              "title": "Root Words - Part 2",
+              "columns": [
+                "S.No",
+                "Root word",
+                "Meaning"
+              ],
+              "rows": [
+                [
+                  "61",
+                  "hepat/o",
+                  "liver"
+                ],
+                [
+                  "62",
+                  "iatr/o",
+                  "treatment"
+                ],
+                [
+                  "63",
+                  "inguin/o",
+                  "groin"
+                ],
+                [
+                  "64",
+                  "later/o",
+                  "side"
+                ],
+                [
+                  "65",
+                  "log/o",
+                  "study"
+                ],
+                [
+                  "66",
+                  "medi/o",
+                  "middle"
+                ],
+                [
+                  "67",
+                  "my/o",
+                  "muscle"
+                ],
+                [
+                  "68",
+                  "nephr/o",
+                  "kidney"
+                ],
+                [
+                  "69",
+                  "nucle/o",
+                  "nucleus"
+                ],
+                [
+                  "70",
+                  "ophthalm/o",
+                  "eye"
+                ],
+                [
+                  "71",
+                  "path/o",
+                  "disease"
+                ],
+                [
+                  "72",
+                  "pelv/i",
+                  "pelvis"
+                ],
+                [
+                  "73",
+                  "poster/o",
+                  "back of body"
+                ],
+                [
+                  "74",
+                  "proxim/o",
+                  "near"
+                ],
+                [
+                  "75",
+                  "pulmon/o",
+                  "lung"
+                ],
+                [
+                  "76",
+                  "pyel/o",
+                  "renal pelvis"
+                ],
+                [
+                  "77",
+                  "ren/o",
+                  "kidney"
+                ],
+                [
+                  "78",
+                  "sacr/o",
+                  "sacrum"
+                ],
+                [
+                  "79",
+                  "sect/o",
+                  "cut"
+                ],
+                [
+                  "80",
+                  "spondyl/o",
+                  "vertebra"
+                ],
+                [
+                  "81",
+                  "thorac/o",
+                  "chest"
+                ],
+                [
+                  "82",
+                  "trache/o",
+                  "trachea"
+                ],
+                [
+                  "83",
+                  "umbilic/o",
+                  "navel"
+                ],
+                [
+                  "84",
+                  "vertebr/o",
+                  "vertebra"
+                ],
+                [
+                  "85",
+                  "ventr/o",
+                  "front (belly side)"
+                ]
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-5"
+        },
+        {
+          "title": "Word Building",
+          "durationMinutes": 20,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Medical terms are built by combining a root word with a prefix and/or suffix to create the appropriate meaning. In the examples, the root word nephr, meaning the functional unit of the kidney, is used to construct several different terms."
+            },
+            {
+              "type": "paragraph",
+              "text": "When two consonants fall together, a combining vowel is introduced to make pronunciation easier."
+            },
+            {
+              "type": "table",
+              "columns": [
+                "Root Words",
+                "Suffix",
+                "Meaning",
+                "Term"
+              ],
+              "rows": [
+                [
+                  "Nephr/o (Kidney)",
+                  "-itis",
+                  "Inflammation of the kidney",
+                  "Nephritis"
+                ],
+                [
+                  "Pyel/o (Renal pelvis), Nephr/o (Kidney)",
+                  "-itis",
+                  "Inflammation of renal pelvis and kidney",
+                  "Pyelonephritis"
+                ],
+                [
+                  "Nephr/o (Kidney)",
+                  "-ectomy",
+                  "Surgical removal of a kidney",
+                  "Nephrectomy"
+                ],
+                [
+                  "Hydr/o (Water/Fluid), Nephr/o (Kidney)",
+                  "-osis",
+                  "Abnormal condition of fluid in the kidney",
+                  "Hydronephrosis"
+                ],
+                [
+                  "Poly- (Many), Nephr/o (Kidney)",
+                  "-itis",
+                  "Inflammation affecting many areas of the kidney",
+                  "Polynephritis"
+                ]
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-6"
+        },
+        {
+          "title": "Index – Basic Anatomy & Physiology",
+          "durationMinutes": 5,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "items": [
+                {
+                  "text": "Introduction to Anatomy & Physiology"
+                },
+                {
+                  "text": "Integumentary System"
+                },
+                {
+                  "text": "Blood and Circulatory System"
+                },
+                {
+                  "text": "Lymphatic System"
+                },
+                {
+                  "text": "Digestive System"
+                },
+                {
+                  "text": "Endocrine System"
+                },
+                {
+                  "text": "Musculoskeletal System"
+                },
+                {
+                  "text": "Nervous System"
+                },
+                {
+                  "text": "Reproductive System"
+                },
+                {
+                  "text": "Respiratory System"
+                },
+                {
+                  "text": "Sensory Organs"
+                },
+                {
+                  "text": "Urinary System"
+                }
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-7"
+        },
+        {
+          "title": "Introduction to Anatomy & Physiology",
+          "durationMinutes": 25,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Anatomy: study of the structure of the body."
+            },
+            {
+              "type": "paragraph",
+              "text": "Physiology: study of how the body functions."
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "Levels of Organization of the Human Body",
+              "items": [
+                {
+                  "text": "Chemical Level - atoms and molecules."
+                },
+                {
+                  "text": "Cellular Level - cells."
+                },
+                {
+                  "text": "Tissue Level - groups of similar cells."
+                },
+                {
+                  "text": "Organ Level - two or more tissues working together."
+                },
+                {
+                  "text": "System Level - group of organs working together."
+                },
+                {
+                  "text": "Organismic Level - the whole individual."
+                }
+              ]
+            },
+            {
+              "type": "nested_bullet_list",
+              "title": "Interrelationship of Body Systems",
+              "items": [
+                {
+                  "text": "No body system works in isolation."
+                },
+                {
+                  "text": "All systems are interconnected."
+                },
+                {
+                  "text": "Each system supports others."
+                },
+                {
+                  "text": "Goal: homeostasis - maintenance of stable internal environment."
+                },
+                {
+                  "text": "Respiratory system brings in oxygen and removes carbon dioxide."
+                },
+                {
+                  "text": "Circulatory system delivers oxygen to cells and carries carbon dioxide away."
+                },
+                {
+                  "text": "Both systems work together to maintain life."
+                }
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-8"
+        },
+        {
+          "title": "Body Views and Directional Terms",
+          "durationMinutes": 20,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "Term",
+                "Meaning"
+              ],
+              "rows": [
+                [
+                  "Anterior (Ventral)",
+                  "Front surface"
+                ],
+                [
+                  "Posterior (Dorsal)",
+                  "Back surface"
+                ],
+                [
+                  "Superior",
+                  "Above"
+                ],
+                [
+                  "Inferior",
+                  "Below"
+                ],
+                [
+                  "Medial",
+                  "Near midline"
+                ],
+                [
+                  "Lateral",
+                  "Toward the side"
+                ],
+                [
+                  "Proximal",
+                  "Nearer to reference point"
+                ],
+                [
+                  "Distal",
+                  "Farther from reference point"
+                ],
+                [
+                  "Superficial",
+                  "Closer to surface"
+                ],
+                [
+                  "Peripheral",
+                  "Away from center"
+                ]
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-9"
+        },
+        {
+          "title": "Body Movements",
+          "durationMinutes": 20,
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "Movement",
+                "Meaning"
+              ],
+              "rows": [
+                [
+                  "Abduction",
+                  "Movement away from midline"
+                ],
+                [
+                  "Adduction",
+                  "Movement toward midline"
+                ],
+                [
+                  "Flexion",
+                  "Bending movement"
+                ],
+                [
+                  "Extension",
+                  "Straightening movement"
+                ],
+                [
+                  "Rotation",
+                  "Turning around an axis"
+                ],
+                [
+                  "Circumduction",
+                  "Circular movement of limb"
+                ]
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-10"
+        },
+        {
+          "title": "Body Cavities",
+          "durationMinutes": 25,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Body cavities are spaces within the body that protect internal organs, support organs, and separate organs."
+            },
+            {
+              "type": "nested_bullet_list",
+              "items": [
+                {
+                  "text": "The body cavities are divided into two main groups",
+                  "children": [
+                    {
+                      "text": "Dorsal Body Cavity"
+                    },
+                    {
+                      "text": "Ventral Body Cavity"
+                    }
+                  ]
+                },
+                {
+                  "text": "Dorsal Body Cavity: located at the back of the body",
+                  "children": [
+                    {
+                      "text": "Cranial cavity: contains the brain."
+                    },
+                    {
+                      "text": "Spinal (vertebral) cavity: contains the spinal cord."
+                    }
+                  ]
+                },
+                {
+                  "text": "Ventral Body Cavity: located at the front of the body and divided by the diaphragm",
+                  "children": [
+                    {
+                      "text": "Thoracic cavity: located above the diaphragm; contains two pleural cavities, mediastinum, and pericardial cavity."
+                    },
+                    {
+                      "text": "Abdominopelvic cavity: located below the diaphragm."
+                    },
+                    {
+                      "text": "Abdominal cavity: contains stomach, liver, spleen, pancreas, and intestines."
+                    },
+                    {
+                      "text": "Pelvic cavity: contains urinary bladder, reproductive organs, and rectum."
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-11"
+        },
+        {
+          "title": "Abdominal Quadrants",
+          "durationMinutes": 20,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "The abdomen is divided into four quadrants by a vertical line and a horizontal line crossing at the umbilicus (navel)."
+            },
+            {
+              "type": "nested_bullet_list",
+              "items": [
+                {
+                  "text": "Right Upper Quadrant (RUQ)",
+                  "children": [
+                    {
+                      "text": "Liver (right lobe)"
+                    },
+                    {
+                      "text": "Gallbladder"
+                    },
+                    {
+                      "text": "Part of stomach"
+                    },
+                    {
+                      "text": "Pancreas (head)"
+                    },
+                    {
+                      "text": "Right kidney"
+                    }
+                  ]
+                },
+                {
+                  "text": "Left Upper Quadrant (LUQ)",
+                  "children": [
+                    {
+                      "text": "Stomach"
+                    },
+                    {
+                      "text": "Spleen"
+                    },
+                    {
+                      "text": "Left lobe of liver"
+                    },
+                    {
+                      "text": "Pancreas (body & tail)"
+                    },
+                    {
+                      "text": "Left kidney"
+                    }
+                  ]
+                },
+                {
+                  "text": "Right Lower Quadrant (RLQ)",
+                  "children": [
+                    {
+                      "text": "Appendix"
+                    },
+                    {
+                      "text": "Cecum"
+                    },
+                    {
+                      "text": "Small intestine"
+                    },
+                    {
+                      "text": "Right ovary (female)"
+                    }
+                  ]
+                },
+                {
+                  "text": "Left Lower Quadrant (LLQ)",
+                  "children": [
+                    {
+                      "text": "Sigmoid colon"
+                    },
+                    {
+                      "text": "Small intestine"
+                    },
+                    {
+                      "text": "Left ovary (female)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-12"
+        },
+        {
+          "title": "Human Body Positions",
+          "durationMinutes": 15,
+          "blocks": [
+            {
+              "type": "nested_bullet_list",
+              "items": [
+                {
+                  "text": "Prone: lying flat on the abdomen with the face downward."
+                },
+                {
+                  "text": "Supine: lying flat on the back with the face upward."
+                },
+                {
+                  "text": "Right Lateral Recumbent: lying on the right side of the body."
+                },
+                {
+                  "text": "Left Lateral Recumbent: lying on the left side of the body."
+                },
+                {
+                  "text": "Fowler's Position: semi-sitting position with the head and upper body elevated."
+                },
+                {
+                  "text": "Trendelenburg Position: supine position with the head lower than the feet."
+                }
+              ]
+            }
+          ],
+          "id": "basic-anatomy-slide-13"
+        }
+      ]
+    },
+    {
+      "id": "index-2-integumentary-system",
+      "title": "2. Integumentary System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-3-blood-and-circulatory-system",
+      "title": "3. Blood and Circulatory System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-4-lymphatic-system",
+      "title": "4. Lymphatic System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-5-digestive-system",
+      "title": "5. Digestive System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-6-endocrine-system",
+      "title": "6. Endocrine System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-7-musculoskeletal-system",
+      "title": "7. Musculoskeletal System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-8-nervous-system",
+      "title": "8. Nervous System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-9-reproductive-system",
+      "title": "9. Reproductive System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-10-respiratory-system",
+      "title": "10. Respiratory System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-11-sensory-organs",
+      "title": "11. Sensory Organs",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    },
+    {
+      "id": "index-12-urinary-system",
+      "title": "12. Urinary System",
+      "summary": "Content will be added from the next PPT/doc batch.",
+      "lessons": []
+    }
+  ]
+}

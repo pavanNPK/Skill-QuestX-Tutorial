@@ -1,16 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AccordionModule } from 'primeng/accordion';
-
-interface Topic {
-  number: number;
-  title: string;
-}
-
-interface Module {
-  title: string;
-  topics: Topic[];
-}
+import { CourseContent, CourseContentService, AvailableCourseContent } from '../../core/services/course-content.service';
 
 @Component({
   selector: 'sqx-syllabus',
@@ -19,45 +10,52 @@ interface Module {
   templateUrl: './syllabus.html',
   styleUrl: './syllabus.scss',
 })
-export class Syllabus {
-  courseTitle = 'Python for Data Science and Machine Learning Bootcamp';
-  courseDescription = 'Master Python, Data Science, and Machine Learning with comprehensive hands-on training covering fundamentals to advanced topics.';
+export class Syllabus implements OnInit {
+  private contentService = inject(CourseContentService);
 
-  modules: Module[] = [
-    {
-      title: 'Introduction: Python',
-      topics: [
-        { number: 1, title: 'Introduction to Python' },
-        { number: 2, title: 'Introduction to Data Sciences and machine learnings' },
-        { number: 3, title: 'Basics of Python' },
-        { number: 4, title: 'Basics of Data science' },
-        { number: 5, title: 'Master critical data science skills.' },
-        { number: 6, title: 'Replicate real-world situations and data reports.' },
-        { number: 7, title: 'Conduct feature engineering on real world case studies.' }
-      ]
-    },
-    {
-      title: 'Python in Data Sciences and Machine Learning',
-      topics: [
-        { number: 1, title: 'Python Programming Fundamentals' },
-        { number: 2, title: 'NumPy for Numerical Computing' },
-        { number: 3, title: 'Pandas for Data Analysis' },
-        { number: 4, title: 'Matplotlib and Seaborn for Data Visualization' },
-        { number: 5, title: 'Statistical Analysis with Python' },
-        { number: 6, title: 'Machine Learning Algorithms' },
-        { number: 7, title: 'Scikit-learn Library' }
-      ]
-    },
-    {
-      title: 'End Chapter: Learning bootcamp and Improvisations',
-      topics: [
-        { number: 1, title: 'Real-world Project Implementation' },
-        { number: 2, title: 'Building Complete ML Pipelines' },
-        { number: 3, title: 'Model Deployment Strategies' },
-        { number: 4, title: 'Best Practices and Code Optimization' },
-        { number: 5, title: 'Career Preparation and Interview Tips' },
-        { number: 6, title: 'Advanced Topics and Future Learning Paths' }
-      ]
-    }
-  ];
+  courses: AvailableCourseContent[] = [];
+  selectedCourseId = '';
+  content: CourseContent | null = null;
+  loading = true;
+  error = '';
+
+  ngOnInit() {
+    this.contentService.getAvailableCourses().subscribe({
+      next: (courses) => {
+        this.courses = courses;
+        this.selectedCourseId = courses[0]?.id ?? '';
+        if (this.selectedCourseId) this.loadContent();
+        else {
+          this.loading = false;
+          this.error = 'No course content is available yet.';
+        }
+      },
+      error: () => {
+        this.loading = false;
+        this.error = 'Could not load course syllabus.';
+      },
+    });
+  }
+
+  onCourseChange(event: Event) {
+    this.selectedCourseId = (event.target as HTMLSelectElement).value;
+    this.loadContent();
+  }
+
+  loadContent() {
+    if (!this.selectedCourseId) return;
+    this.loading = true;
+    this.error = '';
+    this.contentService.getContent(this.selectedCourseId).subscribe({
+      next: (content) => {
+        this.content = content;
+        this.loading = false;
+      },
+      error: () => {
+        this.content = null;
+        this.loading = false;
+        this.error = 'Content is not published or you are not enrolled in this course.';
+      },
+    });
+  }
 }

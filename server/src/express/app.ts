@@ -4,6 +4,7 @@ const cors = require('cors') as any;
 import { env } from './config/env';
 import { authRoutes } from './routes/auth.routes';
 import { courseRoutes } from './routes/course.routes';
+import { courseContentRoutes } from './routes/course-content.routes';
 import { notificationRoutes } from './routes/notification.routes';
 import { taskRoutes } from './routes/task.routes';
 import { uploadRoutes } from './routes/upload.routes';
@@ -19,6 +20,7 @@ export function createExpressApp(): express.Express {
 
   const api = express.Router();
   api.use('/auth', authRoutes());
+  api.use('/courses', courseContentRoutes());
   api.use('/courses', courseRoutes());
   api.use('/tasks', taskRoutes());
   api.use('/notifications', notificationRoutes());

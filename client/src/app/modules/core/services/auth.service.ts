@@ -167,6 +167,12 @@ export class AuthService {
     return u?.role === 'super_admin' || (u?.role === 'admin' && u?.canManageUsers === true);
   }
 
+  /** True for users allowed to manage course learning content. */
+  canManageCourseContent(): boolean {
+    const role = this.currentUser()?.role;
+    return role === 'super_admin' || role === 'admin' || role === 'instructor';
+  }
+
   /** SA & Admin see only Dashboard, Courses, Batches, Users. Instructor & Student see Materials, Classes, Tasks, Exams, Projects too. */
   showNavBeyondSaAdmin(): boolean {
     const role = this.currentUser()?.role;

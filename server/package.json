@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/express/server",
+    "start": "node dist/server",
     "start:dev": "npm run build && npm start",
-    "start:prod": "node dist/express/server"
+    "start:prod": "node dist/server",
+    "import:sample-content": "node scripts/import-course-content.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
