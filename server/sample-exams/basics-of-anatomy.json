@@ -1,0 +1,90 @@
+{
+  "title": "Basics of Anatomy",
+  "description": "Blank and single-select assessment for Basic Anatomy & Physiology.",
+  "durationMinutes": 30,
+  "status": "published",
+  "sections": [
+    {
+      "id": "basics-of-anatomy",
+      "title": "Basics of Anatomy",
+      "summary": "Medical terminology and basic anatomy assessment.",
+      "questions": [
+        { "id": "q1", "type": "blank", "prompt": "Hydro- in the term Hydronephrosis means _____________." },
+        { "id": "q2", "type": "blank", "prompt": "In medical terminology, a prefix is placed at the ___________ of a word." },
+        { "id": "q3", "type": "blank", "prompt": "A prefix mainly _______________ the meaning of a medical term." },
+        { "id": "q4", "type": "blank", "prompt": "Prefixes usually consist of ____________ or two syllables." },
+        { "id": "q5", "type": "blank", "prompt": "In the term Hydronephrosis, which part is the prefix? ______________." },
+        { "id": "q6", "type": "blank", "prompt": "The suffix -itis means _________________." },
+        { "id": "q7", "type": "blank", "prompt": "In medical terminology, a suffix is placed at the ______________ of a word." },
+        { "id": "q8", "type": "blank", "prompt": "The suffix -osis means ____________________ condition." },
+        { "id": "q9", "type": "blank", "prompt": "The suffix usually describes a ____________________ or procedure." },
+        { "id": "q10", "type": "blank", "prompt": "In the term Nephritis, which part is the suffix? _____________________." },
+        { "id": "q11", "type": "blank", "prompt": "The root word Nephr refers to which organ? __________________________." },
+        { "id": "q12", "type": "blank", "prompt": "A root word represents the _____________________ part of a medical term." },
+        { "id": "q13", "type": "blank", "prompt": "The root word forms the ________________________ of a medical term." },
+        { "id": "q14", "type": "blank", "prompt": "In the word Hydronephrosis, the root word is ____________________." },
+        { "id": "q15", "type": "blank", "prompt": "The root word indicates the ____________ part involved in the medical term." },
+        { "id": "q16", "type": "blank", "prompt": "Anatomy is the study of the ____________________________ of the body." },
+        { "id": "q17", "type": "blank", "prompt": "Physiology is the study of how the body ________________________." },
+        { "id": "q18", "type": "blank", "prompt": "The maintenance of a stable internal environment is called _____________." },
+        { "id": "q19", "type": "blank", "prompt": "The cranial cavity contains the ____________________." },
+        { "id": "q20", "type": "blank", "prompt": "The spinal cavity contains the ____________________________." },
+        {
+          "id": "q21",
+          "type": "single_select",
+          "prompt": "Which system brings oxygen into the body and removes carbon dioxide?",
+          "options": [
+            { "value": "a", "label": "Digestive system" },
+            { "value": "b", "label": "Respiratory system" },
+            { "value": "c", "label": "Nervous system" },
+            { "value": "d", "label": "Urinary system" }
+          ]
+        },
+        {
+          "id": "q22",
+          "type": "single_select",
+          "prompt": "Which level of organization consists of groups of similar cells?",
+          "options": [
+            { "value": "a", "label": "Chemical level" },
+            { "value": "b", "label": "Cellular level" },
+            { "value": "c", "label": "Tissue level" },
+            { "value": "d", "label": "Organ level" }
+          ]
+        },
+        {
+          "id": "q23",
+          "type": "single_select",
+          "prompt": "Which body cavity contains the lungs?",
+          "options": [
+            { "value": "a", "label": "Cranial cavity" },
+            { "value": "b", "label": "Thoracic cavity" },
+            { "value": "c", "label": "Pelvic cavity" },
+            { "value": "d", "label": "Spinal cavity" }
+          ]
+        },
+        {
+          "id": "q24",
+          "type": "single_select",
+          "prompt": "Which body position means lying flat on the back with the face upward?",
+          "options": [
+            { "value": "a", "label": "Prone" },
+            { "value": "b", "label": "Supine" },
+            { "value": "c", "label": "Fowler's" },
+            { "value": "d", "label": "Lateral" }
+          ]
+        },
+        {
+          "id": "q25",
+          "type": "single_select",
+          "prompt": "Which quadrant of the abdomen contains the appendix?",
+          "options": [
+            { "value": "a", "label": "Right upper quadrant" },
+            { "value": "b", "label": "Left upper quadrant" },
+            { "value": "c", "label": "Right lower quadrant" },
+            { "value": "d", "label": "Left lower quadrant" }
+          ]
+        }
+      ]
+    }
+  ]
+}

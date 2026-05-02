@@ -10,18 +10,6 @@ import type { AuthRequest } from '../types/request';
 const uploadsDir = join(process.cwd(), 'uploads', 'content');
 if (!existsSync(uploadsDir)) mkdirSync(uploadsDir, { recursive: true });
 
-const allowedMimes = new Set([
-  'application/pdf',
-  'application/vnd.ms-powerpoint',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'video/mp4',
-]);
-
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, _file, cb) => {
@@ -34,11 +22,7 @@ const upload = multer({
       cb(null, `content-${uniqueSuffix}${extname(file.originalname)}`);
     },
   }),
-  limits: { fileSize: 50 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    if (allowedMimes.has(file.mimetype)) cb(null, true);
-    else cb(new Error('Invalid file type. Allowed: PDF, PPT, PPTX, DOC, DOCX, PNG, JPG, WEBP, MP4.'));
-  },
+  limits: { fileSize: 100 * 1024 * 1024 },
 });
 
 export function courseContentRoutes(): Router {

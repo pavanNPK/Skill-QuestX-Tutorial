@@ -1,55 +1,122 @@
 <div class="assessment-page">
-    <div class="assessment-container">
-        <div class="question-card">
-            <div class="question-header">
-                <span class="question-number">Question {{ currentQuestionIndex() + 1 }} of {{ questions.length }}</span>
-                <span class="time-remaining"><i class="pi pi-clock"></i> 45:00</span>
-            </div>
+  @if (loading && availableExams.length === 0) {
+  <div class="empty-state">Loading online assessments...</div>
+  } @else if (error && mode() !== 'exam') {
+  <div class="empty-state">{{ error }}</div>
+  }
 
-            <div class="question-content">
-                <h3>{{ currentQuestion.text }}</h3>
+  @if (mode() === 'list' && availableExams.length > 0) {
+  <div class="exam-list">
+    @for (exam of availableExams; track exam.id) {
+    <button type="button" class="exam-row" (click)="openExam(exam)">
+      <span class="exam-icon"><i class="pi pi-file-edit"></i></span>
+      <span class="exam-info">
+        <strong>{{ exam.title }}</strong>
+        <small>{{ exam.questionCount }} questions • {{ exam.durationMinutes }} minutes</small>
+      </span>
+      <i class="pi pi-chevron-right"></i>
+    </button>
+    }
+  </div>
+  }
 
-                @if (!currentQuestion.type || currentQuestion.type === 'mcq') {
-                <div class="options-list">
-                    @for (option of currentQuestion.options; track option.value) {
-                    <label class="option">
-                        <input type="radio" [name]="'q' + currentQuestion.id" [value]="option.value"
-                            [(ngModel)]="currentQuestion.selectedOption" />
-                        <span>{{ option.label }}</span>
-                    </label>
-                    }
-                </div>
-                }
-
-                @if (currentQuestion.type === 'text') {
-                <div class="text-answer-section">
-                    @if (currentQuestion.pdfUrl) {
-                    <div class="pdf-link">
-                        <i class="pi pi-file-pdf"></i>
-                        <a [href]="currentQuestion.pdfUrl" target="_blank">View Reference Document</a>
-                    </div>
-                    }
-                    <div class="answer-area">
-                        <label>Your Answer</label>
-                        <textarea [(ngModel)]="currentQuestion.textAnswer" rows="6"
-                            placeholder="Type your answer here..." class="form-control"></textarea>
-                    </div>
-                </div>
-                }
-            </div>
-
-            <div class="question-actions">
-                <button class="btn btn-secondary" (click)="prevQuestion()" [disabled]="isFirstQuestion"
-                    [class.disabled]="isFirstQuestion">
-                    Previous
-                </button>
-
-                @if (isLastQuestion) {
-                <button class="btn btn-primary submit-btn" (click)="submitAssessment()">Submit</button>
-                } @else {
-                <button class="btn btn-primary" (click)="nextQuestion()">Next</button>
-                }
-            </div>
-        </div>
+  @if (mode() === 'section' && selectedExam) {
+  <div class="exam-index">
+    <div class="exam-index-header">
+      <button type="button" class="icon-btn" (click)="mode.set('list')"><i class="pi pi-chevron-left"></i></button>
+      <div>
+        <h2>{{ selectedExam.title }}</h2>
+        <p>{{ selectedExam.durationMinutes }} minutes • {{ selectedExam.questionCount }} questions</p>
+      </div>
     </div>
+    <div class="section-list">
+      @for (section of selectedExam.sections; track section.id; let i = $index) {
+      <button type="button" class="section-row" (click)="startSection(section)">
+        <span>{{ i + 1 }}</span>
+        <strong>{{ section.title }}</strong>
+        <small>{{ section.questions.length }} questions</small>
+        <em>Start</em>
+      </button>
+      }
+    </div>
+  </div>
+  }
+
+  @if (mode() === 'exam' && selectedExam && selectedSection && currentQuestion) {
+  <div class="exam-shell">
+    <div class="exam-toolbar">
+      <button type="button" class="icon-btn" (click)="backToSections()"><i class="pi pi-chevron-left"></i></button>
+      <div class="exam-title">
+        <h2>{{ selectedExam.title }}</h2>
+        <p>{{ selectedSection.title }}</p>
+      </div>
+      <div class="timer"><i class="pi pi-clock"></i>{{ formattedTime }}</div>
+    </div>
+
+    @if (error) {
+    <div class="inline-error">{{ error }}</div>
+    }
+
+    <div class="question-card">
+      <div class="question-header">
+        <span>Question {{ currentQuestionIndex() + 1 }} of {{ selectedSection.questions.length }}</span>
+        <span>{{ answeredCount }} answered</span>
+      </div>
+
+      <div class="question-content">
+        <h3>{{ currentQuestion.prompt }}</h3>
+
+        @if (currentQuestion.type === 'blank') {
+        <input class="blank-input" type="text" placeholder="Type your answer"
+          [(ngModel)]="answers[currentQuestion.id]" />
+        }
+
+        @if (currentQuestion.type === 'single_select') {
+        <div class="options-list">
+          @for (option of currentQuestion.options; track option.value) {
+          <label class="option">
+            <input type="radio" [name]="currentQuestion.id" [value]="option.value"
+              [(ngModel)]="answers[currentQuestion.id]" />
+            <span>{{ option.label }}</span>
+          </label>
+          }
+        </div>
+        }
+
+        @if (currentQuestion.type === 'multi_select') {
+        <div class="options-list">
+          @for (option of currentQuestion.options; track option.value) {
+          <label class="option">
+            <input type="checkbox" [checked]="isMultiChecked(currentQuestion, option.value)"
+              (change)="toggleMulti(currentQuestion, option.value, $any($event.target).checked)" />
+            <span>{{ option.label }}</span>
+          </label>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="question-actions">
+        <button class="btn btn-secondary" (click)="prevQuestion()" [disabled]="isFirstQuestion">Previous</button>
+        @if (isLastQuestion) {
+        <button class="btn btn-primary" (click)="submitAssessment()">Submit</button>
+        } @else {
+        <button class="btn btn-primary" (click)="nextQuestion()">Next</button>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
+  @if (mode() === 'submitted' && submissionResult) {
+  <div class="submitted-card">
+    <i class="pi pi-check-circle"></i>
+    <h2>Assessment submitted</h2>
+    <p>{{ submissionResult.answeredCount }} of {{ submissionResult.questionCount }} questions answered.</p>
+    @if (submissionResult.autoSubmitted) {
+    <span>Submitted automatically when the timer ended.</span>
+    }
+    <button class="btn btn-primary" (click)="mode.set('list'); selectedExam = null; selectedSection = null">Back to exams</button>
+  </div>
+  }
 </div>

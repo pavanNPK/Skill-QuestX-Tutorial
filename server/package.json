@@ -7,7 +7,8 @@
     "start": "node dist/server",
     "start:dev": "npm run build && npm start",
     "start:prod": "node dist/server",
-    "import:sample-content": "node scripts/import-course-content.cjs"
+    "import:sample-content": "node scripts/import-course-content.cjs",
+    "import:sample-exam": "node scripts/import-exam.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -1,5 +1,5 @@
 <div class="materials-container">
-    @if (!selectedCourse && visibleCourses.length !== 1) {
+    @if (!selectedCourse) {
     <div class="view-section fade-in">
         @if (loading) {
         <div class="empty-state">Loading materials...</div>
@@ -18,7 +18,7 @@
                     <i class="pi pi-book"></i>
                 </div>
                 <div class="course-info">
-                    <h3 class="course-name">{{ course.title }}</h3>
+                    <h3 class="course-name">{{ courseDisplayTitle(course) }}</h3>
                     <p class="instructor">By {{ course.author || 'SkillQuestX' }}</p>
                     <div class="progress-wrapper">
                         <div class="progress-bar">
@@ -39,7 +39,7 @@
     </div>
     }
 
-    @if (selectedCourse && !selectedModule) {
+    @if (selectedCourse && !selectedModule && !manageMode) {
     <div class="index-layout fade-in">
         @if (loading) {
         <div class="empty-state">Loading course material...</div>
@@ -48,19 +48,34 @@
         }
 
         @if (selectedContent) {
-        @if (visibleCourses.length > 1) {
-        <div class="index-actions">
+        <div class="index-cover">
+            <div class="index-cover-mark">
+                <span>{{ selectedContent.modules.length }}</span>
+                <small>Indexes</small>
+            </div>
+            <div class="index-cover-copy">
+                <span class="index-eyebrow">Course Material</span>
+                <h2>{{ courseDisplayTitle(selectedCourse) }}</h2>
+                <p>{{ totalCourseSlides || selectedCourse.lessonCount }} slides organized for quick review.</p>
+            </div>
+            @if (visibleCourses.length > 1) {
             <button pButton type="button" icon="pi pi-arrow-left" label="Courses" class="back-btn"
                 (click)="goBack()"></button>
+            }
+            @if (selectedContent.canManage) {
+            <button pButton type="button" icon="pi pi-pencil" label="Manage Slides" class="back-btn"
+                (click)="startManage()"></button>
+            }
         </div>
-        }
 
         <div class="index-table">
             @for (module of indexModules; track module.id; let i = $index) {
             <button type="button" class="index-row" [class.disabled]="module.lessons.length === 0"
                 (click)="module.lessons.length ? openIndex(module) : null">
-                <span class="index-number">{{ i + 1 }}</span>
-                <span class="index-title">{{ module.title.replace((i + 1) + '. ', '') }}</span>
+                <span class="index-step">
+                    <span class="index-number">{{ i + 1 }}</span>
+                </span>
+                <span class="index-title">{{ moduleTitle(module, i) }}</span>
                 <span class="index-meta">
                     @if (module.lessons.length) {
                     {{ module.lessons.length }} slides
@@ -73,6 +88,228 @@
             }
         </div>
         }
+    </div>
+    }
+
+    @if (selectedCourse && selectedContent && manageMode) {
+    <div class="material-manager fade-in">
+        <div class="manager-header">
+            <div>
+                <span class="index-eyebrow">Course Material</span>
+                <h2>{{ courseDisplayTitle(selectedCourse) }}</h2>
+                <p>Add, update, delete, upload, and publish slide content.</p>
+            </div>
+            <div class="manager-actions">
+                <button pButton type="button" icon="pi pi-eye" label="Preview Index" class="back-btn"
+                    (click)="stopManage()"></button>
+                <button pButton type="button" icon="pi pi-save" label="Save Draft" class="back-btn"
+                    [disabled]="saving" (click)="saveContentDraft()"></button>
+                <button pButton type="button" icon="pi pi-send" label="Publish" class="back-btn primary"
+                    [disabled]="saving" (click)="publishContent()"></button>
+            </div>
+        </div>
+
+        @if (managerMessage) {
+        <div class="manager-message">{{ managerMessage }}</div>
+        }
+
+        <div class="manager-grid">
+            <aside class="manager-panel module-panel">
+                <h3>Indexes</h3>
+                @for (module of indexModules; track module.id; let i = $index) {
+                <button type="button" class="manager-list-item" [class.active]="selectedManageModule?.id === module.id"
+                    (click)="selectManageModule(module)">
+                    <span>{{ i + 1 }}</span>
+                    <strong>{{ moduleTitle(module, i) }}</strong>
+                    <small>{{ module.lessons.length }} slides</small>
+                </button>
+                }
+            </aside>
+
+            <aside class="manager-panel slide-panel">
+                <div class="panel-title-row">
+                    <h3>Slides</h3>
+                    <button type="button" class="icon-btn small" (click)="addSlide()" aria-label="Add slide">
+                        <i class="pi pi-plus"></i>
+                    </button>
+                </div>
+                @if (selectedManageModule) {
+                @for (lesson of selectedManageModule.lessons; track lesson.id; let i = $index) {
+                <button type="button" class="slide-list-item" [class.active]="selectedManageLesson?.id === lesson.id"
+                    (click)="selectManageLesson(lesson)">
+                    <span>{{ i + 1 }}</span>
+                    <strong>{{ lesson.title }}</strong>
+                </button>
+                }
+                } @else {
+                <div class="empty-state compact">No indexes available.</div>
+                }
+            </aside>
+
+            <section class="manager-editor">
+                @if (selectedManageLesson) {
+                <div class="editor-card">
+                    <label class="field-label">Slide title</label>
+                    <input class="manager-input" type="text" [(ngModel)]="selectedManageLesson.title"
+                        (blur)="saveContentDraft('Slide updated.')" />
+
+                    <label class="field-label">Summary</label>
+                    <textarea class="manager-textarea" rows="3" [(ngModel)]="selectedManageLesson.summary"
+                        (blur)="saveContentDraft('Slide updated.')"></textarea>
+
+                    <div class="upload-strip">
+                        <label class="upload-btn">
+                            <i class="pi pi-upload"></i>
+                            <span>Upload files</span>
+                            <input type="file" multiple (change)="onSlideFilesSelected($event)" />
+                        </label>
+                        <button type="button" class="text-btn" (click)="addTextBlock()">
+                            <i class="pi pi-align-left"></i>
+                            Add text
+                        </button>
+                        <button type="button" class="text-btn" (click)="addTableBlock()">
+                            <i class="pi pi-table"></i>
+                            Add table
+                        </button>
+                        <div class="add-block-control">
+                            <select class="manager-select inline" [(ngModel)]="newBlockType">
+                                @for (option of editableBlockTypes; track option.value) {
+                                <option [value]="option.value">{{ option.label }}</option>
+                                }
+                            </select>
+                            <button type="button" class="text-btn" (click)="addSelectedBlock()">
+                                <i class="pi pi-plus"></i>
+                                Add block
+                            </button>
+                        </div>
+                        <button type="button" class="text-btn danger" (click)="deleteSlide(selectedManageLesson)">
+                            <i class="pi pi-trash"></i>
+                            Delete slide
+                        </button>
+                    </div>
+
+                    <div class="content-editor-list">
+                        @for (block of contentBlocks(selectedManageLesson); track block.id) {
+                        <section class="content-editor-block">
+                            <div class="block-editor-toolbar">
+                                <select class="manager-select" [ngModel]="block.type"
+                                    (ngModelChange)="updateBlockType(block, $any($event))">
+                                    @for (option of editableBlockTypes; track option.value) {
+                                    <option [value]="option.value">{{ option.label }}</option>
+                                    }
+                                </select>
+                                <button type="button" class="asset-delete inline"
+                                    (click)="deleteBlock(block)" aria-label="Delete content block">
+                                    <i class="pi pi-trash"></i>
+                                </button>
+                            </div>
+
+                            @if (block.type !== 'heading') {
+                            <label class="field-label">Block title</label>
+                            <input class="manager-input compact" type="text" [(ngModel)]="block.title"
+                                (blur)="saveContentDraft('Content updated.')" />
+                            }
+
+                            @if (block.type === 'heading') {
+                            <label class="field-label">Heading</label>
+                            <input class="manager-input compact" type="text" [(ngModel)]="block.text"
+                                (blur)="saveContentDraft('Content updated.')" />
+                            } @else if (block.type === 'paragraph' || block.type === 'assignment_note') {
+                            <label class="field-label">Rich text</label>
+                            <textarea class="manager-textarea rich" rows="6" [(ngModel)]="block.text"
+                                (blur)="saveContentDraft('Content updated.')"></textarea>
+                            } @else if (block.type === 'bullet_list' || block.type === 'nested_bullet_list') {
+                            <label class="field-label">List items, one per line</label>
+                            <textarea class="manager-textarea rich" rows="6" [ngModel]="blockItemsText(block)"
+                                (ngModelChange)="setBlockItemsText(block, $event)"
+                                (blur)="saveContentDraft('Content updated.')"></textarea>
+                            } @else if (block.type === 'table') {
+                            <div class="table-editor">
+                                <div class="table-editor-actions">
+                                    <button type="button" class="text-btn compact" (click)="addTableColumn(block)">
+                                        <i class="pi pi-plus"></i>
+                                        Column
+                                    </button>
+                                    <button type="button" class="text-btn compact" (click)="addTableRow(block)">
+                                        <i class="pi pi-plus"></i>
+                                        Row
+                                    </button>
+                                </div>
+                                <div class="table-input-wrap">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                @for (column of tableColumns(block); track $index; let columnIndex = $index) {
+                                                <th>
+                                                    <input type="text" [(ngModel)]="block.columns![columnIndex]"
+                                                        (blur)="saveContentDraft('Content updated.')" />
+                                                    <button type="button" class="table-delete"
+                                                        (click)="deleteTableColumn(block, columnIndex)"
+                                                        [disabled]="tableColumns(block).length <= 1">
+                                                        <i class="pi pi-times"></i>
+                                                    </button>
+                                                </th>
+                                                }
+                                                <th class="row-action-cell"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (row of tableRows(block); track $index; let rowIndex = $index) {
+                                            <tr>
+                                                @for (cell of row; track $index; let cellIndex = $index) {
+                                                <td>
+                                                    <input type="text" [(ngModel)]="block.rows![rowIndex][cellIndex]"
+                                                        (blur)="saveContentDraft('Content updated.')" />
+                                                </td>
+                                                }
+                                                <td class="row-action-cell">
+                                                    <button type="button" class="table-delete"
+                                                        (click)="deleteTableRow(block, rowIndex)"
+                                                        [disabled]="tableRows(block).length <= 1">
+                                                        <i class="pi pi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            }
+                        </section>
+                        } @empty {
+                        <div class="empty-state compact">No text, list, or table content on this slide.</div>
+                        }
+                    </div>
+
+                    <div class="asset-grid">
+                        @for (block of fileBlocks(selectedManageLesson); track block.id) {
+                        <div class="asset-tile" [class.openable]="block.type === 'image' || block.type === 'video'"
+                            (click)="openPreview(block)">
+                            @if (block.type === 'image') {
+                            <img [src]="blockAssetUrl(block)" [alt]="block.title || 'Slide image'" />
+                            } @else if (block.type === 'video') {
+                            <span class="asset-icon video"><i class="pi pi-play"></i></span>
+                            } @else {
+                            <span class="asset-icon"><i class="pi pi-file"></i></span>
+                            }
+                            <strong>{{ assetPreviewLabel(block) }}</strong>
+                            <small>{{ block.title || block.text || 'Slide item' }}</small>
+                            <button type="button" class="asset-delete" (click)="$event.stopPropagation(); deleteBlock(block)"
+                                aria-label="Delete file">
+                                <i class="pi pi-times"></i>
+                            </button>
+                        </div>
+                        } @empty {
+                        <div class="empty-state compact">No uploaded files on this slide.</div>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="empty-state">Select an index and add a slide to start uploading files.</div>
+                }
+            </section>
+        </div>
     </div>
     }
 
@@ -99,8 +336,11 @@
         @if (currentLesson) {
         <article class="slide-page">
             <div class="slide-page-header">
-                <p>Slide {{ currentSlideNumber }}</p>
-                <h2>{{ currentLesson.title }}</h2>
+                <div>
+                    <p>Slide {{ currentSlideNumber }} / {{ totalSlides }}</p>
+                    <h2>{{ currentLesson.title }}</h2>
+                </div>
+                <span class="slide-course-chip">{{ courseDisplayTitle(selectedCourse) }}</span>
             </div>
 
             <div class="slide-blocks">
@@ -160,12 +400,12 @@
                     </div>
                     }
                     @case ('image') {
-                    <div class="asset-block">
+                    <div class="asset-block previewable" (click)="openPreview(block)">
                         <i class="pi pi-image"></i>
                         <span>{{ block.title || block.text || 'Image' }}</span>
                         @if (hasOpenableAsset(block)) {
-                        <button pButton type="button" icon="pi pi-external-link" label="Open"
-                            (click)="openBlock(block)"></button>
+                        <button pButton type="button" icon="pi pi-search-plus" label="Preview"
+                            (click)="$event.stopPropagation(); openPreview(block)"></button>
                         }
                     </div>
                     }
@@ -180,12 +420,12 @@
                     </div>
                     }
                     @case ('video') {
-                    <div class="asset-block">
-                        <i class="pi pi-video"></i>
+                    <div class="asset-block previewable" (click)="openPreview(block)">
+                        <i class="pi pi-play-circle"></i>
                         <span>{{ block.title || block.text || 'Video' }}</span>
                         @if (hasOpenableAsset(block)) {
-                        <button pButton type="button" icon="pi pi-external-link" label="Open"
-                            (click)="openBlock(block)"></button>
+                        <button pButton type="button" icon="pi pi-play" label="Play"
+                            (click)="$event.stopPropagation(); openPreview(block)"></button>
                         }
                     </div>
                     }
@@ -207,6 +447,37 @@
         } @else {
         <div class="empty-state">Content for this index will be added soon.</div>
         }
+    </div>
+    }
+
+    @if (previewBlock) {
+    <div class="preview-modal" (click)="closePreview()">
+        <div class="preview-dialog" (click)="$event.stopPropagation()">
+            <div class="preview-toolbar">
+                <strong>{{ previewBlock.title || previewBlock.text || 'Preview' }}</strong>
+                <div>
+                    @if (previewBlock.type === 'image') {
+                    <button type="button" class="icon-btn small" (click)="zoomPreview(-0.25)">
+                        <i class="pi pi-search-minus"></i>
+                    </button>
+                    <button type="button" class="icon-btn small" (click)="zoomPreview(0.25)">
+                        <i class="pi pi-search-plus"></i>
+                    </button>
+                    }
+                    <button type="button" class="icon-btn small" (click)="closePreview()">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="preview-stage">
+                @if (previewBlock.type === 'image') {
+                <img [src]="blockAssetUrl(previewBlock)" [style.transform]="'scale(' + previewZoom + ')'"
+                    [alt]="previewBlock.title || 'Preview image'" />
+                } @else if (previewBlock.type === 'video') {
+                <video [src]="blockAssetUrl(previewBlock)" controls autoplay playsinline controlsList="nodownload"></video>
+                }
+            </div>
+        </div>
     </div>
     }
 </div>
