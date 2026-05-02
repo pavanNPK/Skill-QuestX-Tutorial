@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { HeaderService } from '../../core/services/header.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -29,6 +29,11 @@ interface FlattenedBullet {
 interface BlockTypeOption {
   label: string;
   value: ContentBlockType;
+}
+
+interface TextSegment {
+  text: string;
+  bold: boolean;
 }
 
 @Component({
@@ -124,6 +129,7 @@ export class Materials implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private messageService: MessageService,
   ) { }
 
   ngOnInit() {
@@ -221,7 +227,7 @@ export class Materials implements OnInit, OnDestroy {
     this.headerService.updateBreadcrumbs([
       { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
       { label: 'Materials', command: () => this.goBack() },
-      { label: this.courseDisplayTitle(this.selectedCourse) }
+      { label: this.courseDisplayTitle(this.selectedCourse), command: () => this.backToIndex() }
     ]);
   }
 
@@ -389,15 +395,21 @@ export class Materials implements OnInit, OnDestroy {
     this.managerMessage = `Uploading ${files.length} file${files.length === 1 ? '' : 's'}...`;
     let completed = 0;
     let uploaded = 0;
+    let failed = 0;
     const finishUpload = () => {
       completed++;
       if (completed !== files.length) return;
       if (uploaded > 0) {
-        this.saveContentDraft(`${uploaded} file${uploaded === 1 ? '' : 's'} uploaded and attached to slide.`);
+        this.saveContentDraft(`${uploaded} file${uploaded === 1 ? '' : 's'} uploaded and attached to slide.`, true);
         return;
       }
       this.saving = false;
       this.managerMessage = 'No files were uploaded. Check file size and server logs.';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Upload failed',
+        detail: failed > 1 ? `${failed} files could not be uploaded.` : 'File could not be uploaded.',
+      });
       this.cdr.detectChanges();
     };
     files.forEach((file) => {
@@ -418,6 +430,7 @@ export class Materials implements OnInit, OnDestroy {
           finishUpload();
         },
         error: (error) => {
+          failed++;
           const message = error?.error?.message || error?.message || 'Upload failed.';
           this.managerMessage = message;
           finishUpload();
@@ -426,7 +439,7 @@ export class Materials implements OnInit, OnDestroy {
     });
   }
 
-  saveContentDraft(message = 'Draft saved.') {
+  saveContentDraft(message = 'Draft saved.', showUploadToast = false) {
     if (!this.selectedCourse || !this.selectedContent) return;
     this.saving = true;
     this.managerMessage = 'Saving draft...';
@@ -435,6 +448,13 @@ export class Materials implements OnInit, OnDestroy {
         this.selectedContent = content;
         this.saving = false;
         this.managerMessage = message;
+        if (showUploadToast) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Upload complete',
+            detail: message,
+          });
+        }
         this.cdr.detectChanges();
       },
       error: () => {
@@ -517,15 +537,90 @@ export class Materials implements OnInit, OnDestroy {
   }
 
   blockItemsText(block: ContentBlock): string {
-    return (block.items ?? []).map((item) => item.text).join('\n');
+    return this.itemsToText(block.items ?? []);
+  }
+
+  applyBoldToSelection() {
+    const field = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
+    if (!field || !['INPUT', 'TEXTAREA'].includes(field.tagName)) return;
+    const start = field.selectionStart ?? 0;
+    const end = field.selectionEnd ?? start;
+    const value = field.value;
+    const selected = value.slice(start, end) || 'bold text';
+    const nextValue = `${value.slice(0, start)}**${selected}**${value.slice(end)}`;
+    field.value = nextValue;
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    requestAnimationFrame(() => {
+      field.focus();
+      field.setSelectionRange(start + 2, start + 2 + selected.length);
+    });
+  }
+
+  inlineSegments(value?: string): TextSegment[] {
+    const text = value ?? '';
+    const segments: TextSegment[] = [];
+    const pattern = /\*\*(.+?)\*\*/g;
+    let cursor = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = pattern.exec(text))) {
+      if (match.index > cursor) {
+        segments.push({ text: text.slice(cursor, match.index), bold: false });
+      }
+      segments.push({ text: match[1], bold: true });
+      cursor = match.index + match[0].length;
+    }
+
+    if (cursor < text.length) {
+      segments.push({ text: text.slice(cursor), bold: false });
+    }
+
+    return segments.length ? segments : [{ text, bold: false }];
   }
 
   setBlockItemsText(block: ContentBlock, value: string) {
-    block.items = value
+    block.items = block.type === 'nested_bullet_list'
+      ? this.parseNestedItems(value)
+      : value
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean)
       .map((text) => ({ text }));
+  }
+
+  private itemsToText(items: NestedBulletItem[], level = 0): string {
+    return items
+      .flatMap((item) => [
+        `${'  '.repeat(level)}${item.text}`,
+        ...(item.children?.length ? [this.itemsToText(item.children, level + 1)] : []),
+      ])
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  private parseNestedItems(value: string): NestedBulletItem[] {
+    const roots: NestedBulletItem[] = [];
+    const stack: Array<{ level: number; item: NestedBulletItem }> = [];
+
+    value.split('\n').forEach((rawLine) => {
+      if (!rawLine.trim()) return;
+      const leading = rawLine.match(/^\s*/)?.[0] ?? '';
+      const level = Math.floor(leading.replace(/\t/g, '  ').length / 2);
+      const text = rawLine.trim().replace(/^[-*•]\s*/, '');
+      if (!text) return;
+
+      const item: NestedBulletItem = { text };
+      while (stack.length && stack[stack.length - 1].level >= level) stack.pop();
+      const parent = stack[stack.length - 1]?.item;
+      if (parent) {
+        parent.children = [...(parent.children ?? []), item];
+      } else {
+        roots.push(item);
+      }
+      stack.push({ level, item });
+    });
+
+    return roots;
   }
 
   tableColumnsText(block: ContentBlock): string {

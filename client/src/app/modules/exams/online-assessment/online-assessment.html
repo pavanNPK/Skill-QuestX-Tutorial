@@ -67,8 +67,8 @@
         <h3>{{ currentQuestion.prompt }}</h3>
 
         @if (currentQuestion.type === 'blank') {
-        <input class="blank-input" type="text" placeholder="Type your answer"
-          [(ngModel)]="answers[currentQuestion.id]" />
+        <textarea class="blank-input" rows="4" placeholder="Type your answer"
+          [(ngModel)]="answers[currentQuestion.id]"></textarea>
         }
 
         @if (currentQuestion.type === 'single_select') {

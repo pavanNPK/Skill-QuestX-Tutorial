@@ -197,6 +197,7 @@ export class OnlineAssessment implements OnInit, OnDestroy {
     this.timerId = setInterval(() => {
       this.remainingSeconds = Math.max(0, this.remainingSeconds - 1);
       if (this.remainingSeconds === 0) this.submitAssessment(true);
+      this.cdr.detectChanges();
     }, 1000);
   }
 

@@ -7,7 +7,7 @@
                     @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
                     <span class="breadcrumb-item">
                         <!-- If URL exists, routerLink -->
-                        @if (crumb.url && !last) {
+                        @if (crumb.url && !last && !crumb.command) {
                         <a [routerLink]="crumb.url" class="breadcrumb-link" [pTooltip]="crumb.title || crumb.label"
                             tooltipPosition="bottom">
                             @if (crumb.icon) { <i [class]="crumb.icon"></i> }
@@ -15,7 +15,7 @@
                         </a>
                         }
                         <!-- If Command exists (internal nav), click handler -->
-                        @if (crumb.command && !last) {
+                        @if (crumb.command) {
                         <a (click)="crumb.command()" class="breadcrumb-link clickable"
                             [pTooltip]="crumb.title || crumb.label" tooltipPosition="bottom">
                             @if (crumb.icon) { <i [class]="crumb.icon"></i> }
@@ -23,7 +23,7 @@
                         </a>
                         }
                         <!-- If neither or last, just text -->
-                        @if ((!crumb.url && !crumb.command) || last) {
+                        @if (!crumb.url && !crumb.command || (last && !crumb.command)) {
                         <span class="breadcrumb-current" [pTooltip]="crumb.title || crumb.label"
                             tooltipPosition="bottom">
                             @if (crumb.icon) { <i [class]="crumb.icon"></i> }

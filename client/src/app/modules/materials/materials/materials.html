@@ -198,10 +198,17 @@
                                     <option [value]="option.value">{{ option.label }}</option>
                                     }
                                 </select>
-                                <button type="button" class="asset-delete inline"
-                                    (click)="deleteBlock(block)" aria-label="Delete content block">
-                                    <i class="pi pi-trash"></i>
-                                </button>
+                                <div class="block-editor-actions">
+                                    <button type="button" class="format-btn" (mousedown)="$event.preventDefault()"
+                                        (click)="applyBoldToSelection()" aria-label="Bold selected text">
+                                        <i class="pi pi-bold"></i>
+                                        Bold
+                                    </button>
+                                    <button type="button" class="asset-delete inline"
+                                        (click)="deleteBlock(block)" aria-label="Delete content block">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             @if (block.type !== 'heading') {
@@ -219,7 +226,13 @@
                             <textarea class="manager-textarea rich" rows="6" [(ngModel)]="block.text"
                                 (blur)="saveContentDraft('Content updated.')"></textarea>
                             } @else if (block.type === 'bullet_list' || block.type === 'nested_bullet_list') {
-                            <label class="field-label">List items, one per line</label>
+                            <label class="field-label">
+                                @if (block.type === 'nested_bullet_list') {
+                                List items, indent child items with two spaces
+                                } @else {
+                                List items, one per line
+                                }
+                            </label>
                             <textarea class="manager-textarea rich" rows="6" [ngModel]="blockItemsText(block)"
                                 (ngModelChange)="setBlockItemsText(block, $event)"
                                 (blur)="saveContentDraft('Content updated.')"></textarea>
@@ -301,7 +314,13 @@
                             </button>
                         </div>
                         } @empty {
-                        <div class="empty-state compact">No uploaded files on this slide.</div>
+                        <label class="asset-empty-card">
+                            <span class="asset-empty-icon"><i class="pi pi-cloud-upload"></i></span>
+                            <strong>No uploaded files</strong>
+                            <small>Add images, videos, PPTs, PDFs, or documents for this slide.</small>
+                            <em>Upload files</em>
+                            <input type="file" multiple (change)="onSlideFilesSelected($event)" />
+                        </label>
                         }
                     </div>
                 </div>
@@ -352,17 +371,29 @@
                     }
                     @case ('paragraph') {
                     @if (block.title) { <h3>{{ block.title }}</h3> }
-                    <p>{{ block.text }}</p>
+                    <p>
+                        @for (segment of inlineSegments(block.text); track $index) {
+                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                        }
+                    </p>
                     }
                     @case ('assignment_note') {
                     @if (block.title) { <h3>{{ block.title }}</h3> }
-                    <p>{{ block.text }}</p>
+                    <p>
+                        @for (segment of inlineSegments(block.text); track $index) {
+                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                        }
+                    </p>
                     }
                     @case ('bullet_list') {
                     @if (block.title) { <h3>{{ block.title }}</h3> }
                     <ul class="bullet-list">
                         @for (item of block.items; track item.text) {
-                        <li>{{ item.text }}</li>
+                        <li>
+                            @for (segment of inlineSegments(item.text); track $index) {
+                            @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                            }
+                        </li>
                         }
                     </ul>
                     }
@@ -371,7 +402,12 @@
                     <div class="nested-list">
                         @for (item of flattenedBullets(block.items); track item.text + item.level) {
                         <div class="nested-item" [style.padding-left.rem]="item.level * 1.5">
-                            <span></span>{{ item.text }}
+                            <span></span>
+                            <p>
+                                @for (segment of inlineSegments(item.text); track $index) {
+                                @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                                }
+                            </p>
                         </div>
                         }
                     </div>
@@ -383,7 +419,11 @@
                             <thead>
                                 <tr>
                                     @for (column of block.columns; track column) {
-                                    <th>{{ column }}</th>
+                                    <th>
+                                        @for (segment of inlineSegments(column); track $index) {
+                                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                                        }
+                                    </th>
                                     }
                                 </tr>
                             </thead>
@@ -391,7 +431,11 @@
                                 @for (row of block.rows; track $index) {
                                 <tr>
                                     @for (cell of row; track $index) {
-                                    <td>{{ cell }}</td>
+                                    <td>
+                                        @for (segment of inlineSegments(cell); track $index) {
+                                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                                        }
+                                    </td>
                                     }
                                 </tr>
                                 }
