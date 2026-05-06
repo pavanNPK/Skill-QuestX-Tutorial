@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter } from 'rxjs';
 import { PopoverModule } from 'primeng/popover';
 import { AuthService } from '../../services/auth.service';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
@@ -15,8 +16,30 @@ import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 export class NavbarComponent {
   private router = inject(Router);
   readonly auth = inject(AuthService);
+  @Output() collapsedChange = new EventEmitter<boolean>();
   classesDropdownOpen = signal(false);
   examsDropdownOpen = signal(false);
+  collapsed = signal(this.getStoredCollapsedState());
+
+  toggleSidebar() {
+    this.collapsed.update((value) => {
+      const next = !value;
+      if (next) {
+        this.classesDropdownOpen.set(false);
+        this.examsDropdownOpen.set(false);
+      }
+      this.storeCollapsedState(next);
+      this.collapsedChange.emit(next);
+      return next;
+    });
+  }
+
+  ngOnInit() {
+    this.collapsedChange.emit(this.collapsed());
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(() => this.closeDropdowns());
+  }
 
   toggleClassesDropdown() {
     this.classesDropdownOpen.update((val) => !val);
@@ -24,6 +47,11 @@ export class NavbarComponent {
 
   toggleExamsDropdown() {
     this.examsDropdownOpen.update((val) => !val);
+  }
+
+  closeDropdowns() {
+    this.classesDropdownOpen.set(false);
+    this.examsDropdownOpen.set(false);
   }
 
   isActive(route: string): boolean {
@@ -57,5 +85,15 @@ export class NavbarComponent {
 
   logout() {
     this.auth.logout();
+  }
+
+  private getStoredCollapsedState(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    return localStorage.getItem('sqx-sidebar-collapsed') === 'true';
+  }
+
+  private storeCollapsedState(value: boolean) {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem('sqx-sidebar-collapsed', String(value));
   }
 }

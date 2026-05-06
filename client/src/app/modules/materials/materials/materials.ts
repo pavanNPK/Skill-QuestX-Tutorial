@@ -60,6 +60,7 @@ export class Materials implements OnInit, OnDestroy {
   selectedManageLessonId = '';
   previewBlock: ContentBlock | null = null;
   previewZoom = 1;
+  activeFileIndex = 0;
   newBlockType: ContentBlockType = 'paragraph';
   readonly editableBlockTypes: BlockTypeOption[] = [
     { label: 'Heading', value: 'heading' },
@@ -288,6 +289,7 @@ export class Materials implements OnInit, OnDestroy {
     console.info('[Materials Page] Open index module', module);
     this.selectedModule = module;
     this.currentLessonIndex = 0;
+    this.activeFileIndex = 0;
     this.updateGlobalHeader();
     this.cdr.detectChanges();
   }
@@ -317,6 +319,20 @@ export class Materials implements OnInit, OnDestroy {
 
   selectManageLesson(lesson: ContentLesson) {
     this.selectedManageLessonId = lesson.id;
+  }
+
+  addIndex() {
+    if (!this.selectedContent) return;
+    const module: ContentModule = {
+      id: this.createId('index'),
+      title: `New Index ${this.indexModules.length + 1}`,
+      summary: '',
+      lessons: [],
+    };
+    this.selectedContent.modules = [...this.indexModules, module];
+    this.selectedManageModuleId = module.id;
+    this.selectedManageLessonId = '';
+    this.saveContentDraft('Index added.');
   }
 
   addSlide() {
@@ -446,6 +462,7 @@ export class Materials implements OnInit, OnDestroy {
     this.contentService.saveDraft(this.selectedCourse.id, this.selectedContent).subscribe({
       next: (content) => {
         this.selectedContent = content;
+        this.reconcileManageSelection();
         this.saving = false;
         this.managerMessage = message;
         if (showUploadToast) {
@@ -466,18 +483,33 @@ export class Materials implements OnInit, OnDestroy {
   }
 
   publishContent() {
-    if (!this.selectedCourse) return;
+    if (!this.selectedCourse || !this.selectedContent) return;
     this.saving = true;
-    this.managerMessage = 'Publishing...';
-    this.contentService.publish(this.selectedCourse.id).subscribe({
-      next: (content) => {
-        this.selectedContent = content;
-        this.saving = false;
-        this.managerMessage = 'Published successfully.';
+    this.managerMessage = 'Saving draft before publish...';
+    this.contentService.saveDraft(this.selectedCourse.id, this.selectedContent).subscribe({
+      next: (draftContent) => {
+        this.selectedContent = draftContent;
+        this.reconcileManageSelection();
+        this.managerMessage = 'Publishing...';
+        this.contentService.publish(this.selectedCourse!.id).subscribe({
+          next: (content) => {
+            this.selectedContent = content;
+            this.reconcileManageSelection();
+            this.saving = false;
+            this.managerMessage = 'Published successfully.';
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.saving = false;
+            this.managerMessage = 'Could not publish content.';
+            this.cdr.detectChanges();
+          },
+        });
       },
       error: () => {
         this.saving = false;
-        this.managerMessage = 'Could not publish content.';
+        this.managerMessage = 'Could not save draft before publishing.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -688,6 +720,7 @@ export class Materials implements OnInit, OnDestroy {
   previousSlide() {
     if (this.currentLessonIndex > 0) {
       this.currentLessonIndex--;
+      this.activeFileIndex = 0;
       this.cdr.detectChanges();
     }
   }
@@ -695,8 +728,27 @@ export class Materials implements OnInit, OnDestroy {
   nextSlide() {
     if (this.selectedModule && this.currentLessonIndex < this.selectedModule.lessons.length - 1) {
       this.currentLessonIndex++;
+      this.activeFileIndex = 0;
       this.cdr.detectChanges();
     }
+  }
+
+  activeFileBlock(lesson: ContentLesson): ContentBlock | null {
+    const files = this.fileBlocks(lesson);
+    if (!files.length) return null;
+    return files[Math.min(this.activeFileIndex, files.length - 1)] ?? files[0];
+  }
+
+  previousFile(lesson: ContentLesson) {
+    const files = this.fileBlocks(lesson);
+    if (!files.length) return;
+    this.activeFileIndex = Math.max(0, this.activeFileIndex - 1);
+  }
+
+  nextFile(lesson: ContentLesson) {
+    const files = this.fileBlocks(lesson);
+    if (!files.length) return;
+    this.activeFileIndex = Math.min(files.length - 1, this.activeFileIndex + 1);
   }
 
   viewLesson(lesson: ContentLesson) {
@@ -742,6 +794,14 @@ export class Materials implements OnInit, OnDestroy {
       return `${prefix}-${crypto.randomUUID()}`;
     }
     return `${prefix}-${Date.now()}-${Math.round(Math.random() * 1e6)}`;
+  }
+
+  private reconcileManageSelection() {
+    const selectedModule = this.indexModules.find((module) => module.id === this.selectedManageModuleId);
+    const fallbackModule = selectedModule ?? this.indexModules[0] ?? null;
+    this.selectedManageModuleId = fallbackModule?.id ?? '';
+    const selectedLesson = fallbackModule?.lessons.find((lesson) => lesson.id === this.selectedManageLessonId);
+    this.selectedManageLessonId = selectedLesson?.id ?? fallbackModule?.lessons[0]?.id ?? '';
   }
 
   private emptyStateMessage(): string {

@@ -137,6 +137,16 @@ export class CoursesListComponent implements OnInit {
 
     /** Populated from API (GET /courses) or static fallback. */
     courses: Course[] = [];
+    popularStartIndex = 0;
+
+    get visiblePopularCourses(): Course[] {
+        if (!this.courses.length) return [];
+        const visibleCount = Math.min(3, this.courses.length);
+        return Array.from({ length: visibleCount }, (_, offset) => {
+            const index = (this.popularStartIndex + offset) % this.courses.length;
+            return this.courses[index];
+        });
+    }
 
     myCourses: MyCourse[] = [
         {
@@ -220,6 +230,16 @@ export class CoursesListComponent implements OnInit {
     navigateToAddCourse() {
         if (!this.canAddCourse()) return;
         this.router.navigate(['/courses/add']);
+    }
+
+    previousPopularCourse() {
+        if (!this.courses.length) return;
+        this.popularStartIndex = (this.popularStartIndex - 1 + this.courses.length) % this.courses.length;
+    }
+
+    nextPopularCourse() {
+        if (!this.courses.length) return;
+        this.popularStartIndex = (this.popularStartIndex + 1) % this.courses.length;
     }
 
     calculateDiscountedPrice(price: number, discount: number): string {

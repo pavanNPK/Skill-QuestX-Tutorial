@@ -1,9 +1,14 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.collapsed]="collapsed()">
   <!-- Logo Section -->
   <div class="sidebar-header">
     <div class="logo">
-      <img src="/core/logo_white.svg" alt="SkillQuestX" class="logo-img" />
+      <img [src]="collapsed() ? '/core/logo_head.svg' : '/core/logo_white.svg'" alt="SkillQuestX" class="logo-img" />
     </div>
+    <button type="button" class="sidebar-toggle" (click)="toggleSidebar()"
+      [attr.aria-label]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+      [title]="collapsed() ? 'Expand' : 'Close'">
+      <i [class]="collapsed() ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"></i>
+    </button>
   </div>
 
   <!-- Navigation Items -->
@@ -36,14 +41,16 @@
           <i class="pi pi-video"></i>
           <span>Classes</span>
         </div>
+        @if (!collapsed()) {
         <i class="pi pi-chevron-down dropdown-icon"></i>
+        }
       </div>
       <div class="dropdown-menu">
-        <a routerLink="/classes/recorded" routerLinkActive="active" class="dropdown-item">
+        <a routerLink="/classes/recorded" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-play-circle"></i>
           <span>Recorded</span>
         </a>
-        <a routerLink="/classes/live" routerLinkActive="active" class="dropdown-item">
+        <a routerLink="/classes/live" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-video"></i>
           <span>Live Stream</span>
         </a>
@@ -81,14 +88,16 @@
           <i class="pi pi-file-edit"></i>
           <span>Exams</span>
         </div>
+        @if (!collapsed()) {
         <i class="pi pi-chevron-down dropdown-icon"></i>
+        }
       </div>
       <div class="dropdown-menu">
-        <a routerLink="/exams/assessment" routerLinkActive="active" class="dropdown-item">
+        <a routerLink="/exams/assessment" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-list-check"></i>
           <span>Online</span>
         </a>
-        <a routerLink="/exams/docs" routerLinkActive="active" class="dropdown-item">
+        <a routerLink="/exams/docs" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-file-pdf"></i>
           <span>Documents</span>
         </a>

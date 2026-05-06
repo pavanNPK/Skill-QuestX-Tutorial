@@ -1,5 +1,5 @@
-<sqx-navbar></sqx-navbar>
-<div class="content-area">
+<sqx-navbar (collapsedChange)="setSidebarCollapsed($event)"></sqx-navbar>
+<div class="content-area" [class.sidebar-collapsed]="sidebarCollapsed()">
   <sqx-header></sqx-header>
   <main class="main-content">
     <router-outlet></router-outlet>

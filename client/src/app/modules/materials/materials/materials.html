@@ -115,7 +115,12 @@
 
         <div class="manager-grid">
             <aside class="manager-panel module-panel">
-                <h3>Indexes</h3>
+                <div class="panel-title-row">
+                    <h3>Indexes</h3>
+                    <button type="button" class="icon-btn small" (click)="addIndex()" aria-label="Add index">
+                        <i class="pi pi-plus"></i>
+                    </button>
+                </div>
                 @for (module of indexModules; track module.id; let i = $index) {
                 <button type="button" class="manager-list-item" [class.active]="selectedManageModule?.id === module.id"
                     (click)="selectManageModule(module)">
@@ -362,129 +367,142 @@
                 <span class="slide-course-chip">{{ courseDisplayTitle(selectedCourse) }}</span>
             </div>
 
-            <div class="slide-blocks">
-                @for (block of currentLesson.blocks; track block.id) {
-                <section class="content-block" [ngClass]="block.type">
-                    @switch (block.type) {
-                    @case ('heading') {
-                    <h3>{{ block.text || block.title }}</h3>
-                    }
-                    @case ('paragraph') {
-                    @if (block.title) { <h3>{{ block.title }}</h3> }
-                    <p>
-                        @for (segment of inlineSegments(block.text); track $index) {
-                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+            <div class="slide-reader-grid" [class.has-files]="fileBlocks(currentLesson).length">
+                <div class="slide-blocks">
+                    @for (block of contentBlocks(currentLesson); track block.id) {
+                    <section class="content-block" [ngClass]="block.type">
+                        @switch (block.type) {
+                        @case ('heading') {
+                        <h3>{{ block.text || block.title }}</h3>
                         }
-                    </p>
-                    }
-                    @case ('assignment_note') {
-                    @if (block.title) { <h3>{{ block.title }}</h3> }
-                    <p>
-                        @for (segment of inlineSegments(block.text); track $index) {
-                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
-                        }
-                    </p>
-                    }
-                    @case ('bullet_list') {
-                    @if (block.title) { <h3>{{ block.title }}</h3> }
-                    <ul class="bullet-list">
-                        @for (item of block.items; track item.text) {
-                        <li>
-                            @for (segment of inlineSegments(item.text); track $index) {
+                        @case ('paragraph') {
+                        @if (block.title) { <h3>{{ block.title }}</h3> }
+                        <p>
+                            @for (segment of inlineSegments(block.text); track $index) {
                             @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
                             }
-                        </li>
+                        </p>
                         }
-                    </ul>
-                    }
-                    @case ('nested_bullet_list') {
-                    @if (block.title) { <h3>{{ block.title }}</h3> }
-                    <div class="nested-list">
-                        @for (item of flattenedBullets(block.items); track item.text + item.level) {
-                        <div class="nested-item" [style.padding-left.rem]="item.level * 1.5">
-                            <span></span>
-                            <p>
+                        @case ('assignment_note') {
+                        @if (block.title) { <h3>{{ block.title }}</h3> }
+                        <p>
+                            @for (segment of inlineSegments(block.text); track $index) {
+                            @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                            }
+                        </p>
+                        }
+                        @case ('bullet_list') {
+                        @if (block.title) { <h3>{{ block.title }}</h3> }
+                        <ul class="bullet-list">
+                            @for (item of block.items; track item.text) {
+                            <li>
                                 @for (segment of inlineSegments(item.text); track $index) {
                                 @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
                                 }
-                            </p>
+                            </li>
+                            }
+                        </ul>
+                        }
+                        @case ('nested_bullet_list') {
+                        @if (block.title) { <h3>{{ block.title }}</h3> }
+                        <div class="nested-list">
+                            @for (item of flattenedBullets(block.items); track item.text + item.level) {
+                            <div class="nested-item" [style.padding-left.rem]="item.level * 1.5">
+                                <span></span>
+                                <p>
+                                    @for (segment of inlineSegments(item.text); track $index) {
+                                    @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                                    }
+                                </p>
+                            </div>
+                            }
                         </div>
                         }
-                    </div>
+                        @case ('table') {
+                        @if (block.title) { <h3>{{ block.title }}</h3> }
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        @for (column of block.columns; track column) {
+                                        <th>
+                                            @for (segment of inlineSegments(column); track $index) {
+                                            @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                                            }
+                                        </th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (row of block.rows; track $index) {
+                                    <tr>
+                                        @for (cell of row; track $index) {
+                                        <td>
+                                            @for (segment of inlineSegments(cell); track $index) {
+                                            @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
+                                            }
+                                        </td>
+                                        }
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        }
+                        }
+                    </section>
+                    } @empty {
+                    <div class="empty-state compact">No text content on this slide.</div>
                     }
-                    @case ('table') {
-                    @if (block.title) { <h3>{{ block.title }}</h3> }
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    @for (column of block.columns; track column) {
-                                    <th>
-                                        @for (segment of inlineSegments(column); track $index) {
-                                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
-                                        }
-                                    </th>
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (row of block.rows; track $index) {
-                                <tr>
-                                    @for (cell of row; track $index) {
-                                    <td>
-                                        @for (segment of inlineSegments(cell); track $index) {
-                                        @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }
-                                        }
-                                    </td>
-                                    }
-                                </tr>
+                </div>
+
+                @if (fileBlocks(currentLesson).length) {
+                <aside class="slide-files-panel" aria-label="Slide files">
+                    @if (activeFileBlock(currentLesson); as block) {
+                    <section class="slide-file-card active-file" [class.previewable]="block.type === 'image' || block.type === 'video'"
+                        (click)="block.type === 'image' || block.type === 'video' ? openPreview(block) : null">
+                        @if (fileBlocks(currentLesson).length > 1) {
+                        @if (activeFileIndex > 0) {
+                        <button type="button" class="file-carousel-btn prev" aria-label="Previous file"
+                            (click)="$event.stopPropagation(); previousFile(currentLesson)">
+                            <i class="pi pi-chevron-left"></i>
+                        </button>
+                        }
+                        @if (activeFileIndex < fileBlocks(currentLesson).length - 1) {
+                        <button type="button" class="file-carousel-btn next" aria-label="Next file"
+                            (click)="$event.stopPropagation(); nextFile(currentLesson)">
+                            <i class="pi pi-chevron-right"></i>
+                        </button>
+                        }
+                        }
+                        @if (block.type === 'image') {
+                        <img class="slide-file-image" [src]="blockAssetUrl(block)" [alt]="block.title || 'Slide image'" />
+                        } @else {
+                            <i [class]="getIconForType(block.type)"></i>
+                            <span>{{ block.title || block.text || assetPreviewLabel(block) }}</span>
+                            @if (hasOpenableAsset(block)) {
+                                @if (block.type === 'video') {
+                                <button pButton type="button" icon="pi pi-play" label="Play"
+                                    (click)="$event.stopPropagation(); openPreview(block)"></button>
+                                } @else {
+                                <button pButton type="button" icon="pi pi-external-link" label="Open"
+                                    (click)="openBlock(block)"></button>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        }
+                    </section>
+                    @if (fileBlocks(currentLesson).length > 1) {
+                    <div class="file-carousel-count">{{ activeFileIndex + 1 }} / {{ fileBlocks(currentLesson).length }}</div>
                     }
-                    @case ('image') {
-                    <div class="asset-block previewable" (click)="openPreview(block)">
-                        <i class="pi pi-image"></i>
-                        <span>{{ block.title || block.text || 'Image' }}</span>
-                        @if (hasOpenableAsset(block)) {
-                        <button pButton type="button" icon="pi pi-search-plus" label="Preview"
-                            (click)="$event.stopPropagation(); openPreview(block)"></button>
+                    }
+                    @if (fileBlocks(currentLesson).length > 1) {
+                    <div class="file-carousel-dots" aria-hidden="true">
+                        @for (file of fileBlocks(currentLesson); track file.id; let i = $index) {
+                        <span [class.active]="i === activeFileIndex"></span>
                         }
                     </div>
                     }
-                    @case ('document') {
-                    <div class="asset-block">
-                        <i class="pi pi-file"></i>
-                        <span>{{ block.title || block.text || 'Document' }}</span>
-                        @if (hasOpenableAsset(block)) {
-                        <button pButton type="button" icon="pi pi-external-link" label="Open"
-                            (click)="openBlock(block)"></button>
-                        }
-                    </div>
-                    }
-                    @case ('video') {
-                    <div class="asset-block previewable" (click)="openPreview(block)">
-                        <i class="pi pi-play-circle"></i>
-                        <span>{{ block.title || block.text || 'Video' }}</span>
-                        @if (hasOpenableAsset(block)) {
-                        <button pButton type="button" icon="pi pi-play" label="Play"
-                            (click)="$event.stopPropagation(); openPreview(block)"></button>
-                        }
-                    </div>
-                    }
-                    @case ('link') {
-                    <div class="asset-block">
-                        <i class="pi pi-link"></i>
-                        <span>{{ block.title || block.text || 'Link' }}</span>
-                        @if (hasOpenableAsset(block)) {
-                        <button pButton type="button" icon="pi pi-external-link" label="Open"
-                            (click)="openBlock(block)"></button>
-                        }
-                    </div>
-                    }
-                    }
-                </section>
+                </aside>
                 }
             </div>
         </article>

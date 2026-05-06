@@ -1,5 +1,5 @@
 .courses-container {
-    padding: 2rem;
+    padding: var(--sqx-space-6);
     background: #F3F4F6;
     min-height: 100vh;
 }
@@ -190,21 +190,23 @@
 
 // Courses Carousel
 .courses-carousel {
+    position: relative;
     margin-bottom: 2rem;
+    padding: 0 3rem;
 
-    ::ng-deep .p-carousel-item {
-        padding: 0 0.75rem; // Add gap between items
+    .popular-course-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+        min-width: 0;
     }
 
-    ::ng-deep .p-carousel-indicators {
-        display: none !important; // Hide indicators if not needed or style them
-    }
-
-    // Carousel Navigation Buttons Styling
-    ::ng-deep .p-carousel-prev,
-    ::ng-deep .p-carousel-next {
+    .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
         background-color: white !important;
-        background: white !important; // redundancy for safety
+        background: white !important;
         border: 1px solid #E5E7EB !important;
         color: #6B7280 !important;
         width: 40px !important;
@@ -216,11 +218,13 @@
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        cursor: pointer;
+        z-index: 1;
 
         &:hover {
             color: var(--sqx-color-primary) !important;
             background-color: #F9FAFB !important;
-            transform: scale(1.05);
+            transform: translateY(-50%) scale(1.05);
         }
 
         &:disabled {
@@ -229,11 +233,17 @@
             box-shadow: none !important;
         }
 
-        // Ensure icon is visible
-        .p-icon,
         .pi {
             font-size: 14px !important;
             color: inherit !important;
+        }
+
+        &.prev {
+            left: 0;
+        }
+
+        &.next {
+            right: 0;
         }
     }
 }
@@ -406,6 +416,24 @@
                 font-weight: 600;
                 cursor: default;
             }
+        }
+    }
+}
+
+@media (max-width: 1200px) {
+    .courses-carousel {
+        .popular-course-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .courses-carousel {
+        padding: 0 2.5rem;
+
+        .popular-course-grid {
+            grid-template-columns: 1fr;
         }
     }
 }

@@ -85,8 +85,13 @@
     </div>
 
     <div class="courses-carousel">
-        <p-carousel [value]="courses" [numVisible]="3" [numScroll]="1" [circular]="true">
-            <ng-template let-course pTemplate="item">
+        <button type="button" class="carousel-nav prev" aria-label="Previous popular course"
+            (click)="previousPopularCourse()">
+            <i class="pi pi-chevron-left"></i>
+        </button>
+
+        <div class="popular-course-grid">
+            @for (course of visiblePopularCourses; track course.id) {
                 <div class="course-card">
                     <div class="card-top">
                         <span class="tag">Popular in week</span>
@@ -140,8 +145,13 @@
                         </div>
                     </div>
                 </div>
-            </ng-template>
-        </p-carousel>
+            }
+        </div>
+
+        <button type="button" class="carousel-nav next" aria-label="Next popular course"
+            (click)="nextPopularCourse()">
+            <i class="pi pi-chevron-right"></i>
+        </button>
     </div>
 
 </div>

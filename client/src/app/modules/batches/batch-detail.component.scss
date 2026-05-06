@@ -1,13 +1,12 @@
 .batch-detail-container {
-    padding: var(--sqx-space-8);
+    padding: var(--sqx-space-6);
     min-height: 100vh;
     background: #F9FAFB;
 }
 
 // Batch Detail Content
 .batch-detail-content {
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 // Batch Header Card
