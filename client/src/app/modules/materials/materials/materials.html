@@ -100,8 +100,11 @@
                 <p>Add, update, delete, upload, and publish slide content.</p>
             </div>
             <div class="manager-actions">
-                <button pButton type="button" icon="pi pi-eye" label="Preview Index" class="back-btn"
-                    (click)="stopManage()"></button>
+                <label class="bulk-import-btn">
+                    <i class="pi pi-file-excel"></i>
+                    <span>Bulk Upload</span>
+                    <input type="file" accept=".xlsx" (change)="onBulkWorkbookSelected($event)" />
+                </label>
                 <button pButton type="button" icon="pi pi-save" label="Save Draft" class="back-btn"
                     [disabled]="saving" (click)="saveContentDraft()"></button>
                 <button pButton type="button" icon="pi pi-send" label="Publish" class="back-btn primary"
@@ -122,12 +125,16 @@
                     </button>
                 </div>
                 @for (module of indexModules; track module.id; let i = $index) {
-                <button type="button" class="manager-list-item" [class.active]="selectedManageModule?.id === module.id"
+                <div class="manager-list-item" role="button" tabindex="0" [class.active]="selectedManageModule?.id === module.id"
                     (click)="selectManageModule(module)">
                     <span>{{ i + 1 }}</span>
                     <strong>{{ moduleTitle(module, i) }}</strong>
                     <small>{{ module.lessons.length }} slides</small>
-                </button>
+                    <button type="button" class="manager-item-delete" (click)="confirmDeleteIndex($event, module)"
+                        aria-label="Delete index">
+                        <i class="pi pi-trash"></i>
+                    </button>
+                </div>
                 }
             </aside>
 
@@ -187,7 +194,7 @@
                                 Add block
                             </button>
                         </div>
-                        <button type="button" class="text-btn danger" (click)="deleteSlide(selectedManageLesson)">
+                        <button type="button" class="text-btn danger" (click)="confirmDeleteSlide($event, selectedManageLesson)">
                             <i class="pi pi-trash"></i>
                             Delete slide
                         </button>
@@ -210,7 +217,7 @@
                                         Bold
                                     </button>
                                     <button type="button" class="asset-delete inline"
-                                        (click)="deleteBlock(block)" aria-label="Delete content block">
+                                        (click)="confirmDeleteBlock($event, block)" aria-label="Delete content block">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </div>
@@ -313,7 +320,7 @@
                             }
                             <strong>{{ assetPreviewLabel(block) }}</strong>
                             <small>{{ block.title || block.text || 'Slide item' }}</small>
-                            <button type="button" class="asset-delete" (click)="$event.stopPropagation(); deleteBlock(block)"
+                            <button type="button" class="asset-delete" (click)="confirmDeleteBlock($event, block)"
                                 aria-label="Delete file">
                                 <i class="pi pi-times"></i>
                             </button>
@@ -542,4 +549,5 @@
         </div>
     </div>
     }
+    <p-confirmDialog></p-confirmDialog>
 </div>

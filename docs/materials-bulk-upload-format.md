@@ -86,11 +86,14 @@ Use this sheet only when slide files are already uploaded or stored in a known p
 ## Recommended Workflow
 
 1. Team fills the Excel file using the required sheets.
-2. Admin/instructor uploads the workbook.
-3. System validates the workbook.
-4. System creates/updates draft course content.
-5. User reviews the draft in Materials.
-6. User clicks `Publish` only after review.
+2. Admin/instructor opens `Materials -> View Material -> Manage Slides`.
+3. Click `Bulk Upload` and select the `.xlsx` workbook.
+4. System validates the workbook.
+5. System creates/updates draft course content.
+6. User reviews the draft in Materials.
+7. User clicks `Publish` only after review.
+
+Current implementation note: `Assets` rows are documented for future support, but the current bulk upload flow imports `Indexes`, `Slides`, and `Blocks` only. Slide file assets can still be uploaded manually from the slide editor.
 
 ## Complete Sample Workbook
 

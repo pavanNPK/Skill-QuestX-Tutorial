@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { inflateRawSync } from 'zlib';
 import { Types } from 'mongoose';
 import { ROLES } from '../constants/roles';
 import { ContentAssetModel, type ContentAssetType } from '../models/content-asset.model';
@@ -27,6 +28,19 @@ const blockTypes = new Set<ContentBlockType>([
   'assignment_note',
   'table',
 ]);
+
+const bulkBlockTypes = new Set<ContentBlockType>([
+  'heading',
+  'paragraph',
+  'bullet_list',
+  'nested_bullet_list',
+  'assignment_note',
+  'table',
+]);
+
+interface WorkbookSheets {
+  [sheetName: string]: Record<string, string>[];
+}
 
 export class CourseContentService {
   constructor(
@@ -124,6 +138,17 @@ export class CourseContentService {
     existing.updatedBy = new Types.ObjectId(user.id);
     await existing.save();
     return this.toResponse(courseId, existing.draft, existing.status, true, 'draft', existing.publishedAt, (existing as any).updatedAt);
+  }
+
+  async importWorkbookDraft(courseId: string, file: Express.Multer.File, user: AuthUser) {
+    const course = await this.requireCourse(courseId);
+    this.requireManage(user, course);
+    if (!file?.buffer?.length) throw badRequest('No workbook uploaded.');
+    if (!/\.xlsx$/i.test(file.originalname)) throw badRequest('Bulk upload supports Excel .xlsx files only.');
+
+    const workbook = this.parseXlsxWorkbook(file.buffer);
+    const snapshot = this.workbookToSnapshot(workbook, course.name, course.description ?? '');
+    return this.saveDraft(courseId, snapshot, user);
   }
 
   async publish(courseId: string, user: AuthUser) {
@@ -265,6 +290,248 @@ export class CourseContentService {
 
   private cleanString(value: unknown): string {
     return typeof value === 'string' ? value.trim() : '';
+  }
+
+  private workbookToSnapshot(workbook: WorkbookSheets, fallbackTitle: string, fallbackDescription: string): ContentSnapshot {
+    const indexRows = workbook.Indexes ?? [];
+    const slideRows = workbook.Slides ?? [];
+    const blockRows = workbook.Blocks ?? [];
+    if (!indexRows.length) throw badRequest('Indexes sheet has no data rows.');
+    if (!slideRows.length) throw badRequest('Slides sheet has no data rows.');
+
+    const indexIds = new Set<string>();
+    const slideIds = new Set<string>();
+    const slidesByIndex = new Map<string, Record<string, string>[]>();
+    const blocksBySlide = new Map<string, Record<string, string>[]>();
+
+    indexRows.forEach((row) => {
+      const id = this.cleanString(row.index_id);
+      if (!id) throw badRequest('Indexes sheet has a row without index_id.');
+      if (indexIds.has(id)) throw badRequest(`Duplicate index_id: ${id}`);
+      indexIds.add(id);
+    });
+
+    slideRows.forEach((row) => {
+      const id = this.cleanString(row.slide_id);
+      const indexId = this.cleanString(row.index_id);
+      if (!id) throw badRequest('Slides sheet has a row without slide_id.');
+      if (slideIds.has(id)) throw badRequest(`Duplicate slide_id: ${id}`);
+      if (!indexIds.has(indexId)) throw badRequest(`Slides sheet references unknown index_id: ${indexId}`);
+      slideIds.add(id);
+      slidesByIndex.set(indexId, [...(slidesByIndex.get(indexId) ?? []), row]);
+    });
+
+    blockRows.forEach((row) => {
+      const id = this.cleanString(row.block_id);
+      const slideId = this.cleanString(row.slide_id);
+      if (!id) throw badRequest('Blocks sheet has a row without block_id.');
+      if (!slideIds.has(slideId)) throw badRequest(`Blocks sheet references unknown slide_id: ${slideId}`);
+      blocksBySlide.set(slideId, [...(blocksBySlide.get(slideId) ?? []), row]);
+    });
+
+    const modules: ContentModule[] = this.sortRows(indexRows, 'index_order').map((indexRow, indexIndex) => {
+      const indexId = this.cleanString(indexRow.index_id);
+      const lessons: ContentLesson[] = this.sortRows(slidesByIndex.get(indexId) ?? [], 'slide_order').map((slideRow, slideIndex) => {
+        const slideId = this.cleanString(slideRow.slide_id);
+        const blocks: ContentBlock[] = this.sortRows(blocksBySlide.get(slideId) ?? [], 'block_order').map((blockRow) => this.bulkBlockToContentBlock(blockRow));
+        return {
+          id: slideId || randomUUID(),
+          title: this.cleanString(slideRow.slide_title) || `Slide ${slideIndex + 1}`,
+          summary: this.cleanString(slideRow.slide_summary),
+          durationMinutes: 0,
+          blocks,
+        };
+      });
+      return {
+        id: indexId || randomUUID(),
+        title: this.cleanString(indexRow.index_title) || `Index ${indexIndex + 1}`,
+        summary: this.cleanString(indexRow.index_summary),
+        lessons,
+      };
+    });
+
+    return {
+      title: fallbackTitle,
+      description: fallbackDescription,
+      modules,
+    };
+  }
+
+  private bulkBlockToContentBlock(row: Record<string, string>): ContentBlock {
+    const requestedType = this.cleanString(row.block_type) as ContentBlockType;
+    if (!bulkBlockTypes.has(requestedType)) throw badRequest(`Unsupported block_type: ${requestedType}`);
+    const block: ContentBlock = {
+      id: this.cleanString(row.block_id) || randomUUID(),
+      type: requestedType,
+      title: this.cleanString(row.block_title),
+      text: this.cleanString(row.text),
+      items: [],
+      columns: [],
+      rows: [],
+    };
+
+    if (requestedType === 'bullet_list') {
+      block.items = this.cleanString(row.text)
+        .split(/\r?\n/)
+        .map((text) => text.trim())
+        .filter(Boolean)
+        .map((text) => ({ text }));
+      block.text = '';
+    }
+
+    if (requestedType === 'nested_bullet_list') {
+      block.items = this.parseBulkNestedItems(this.cleanString(row.text));
+      block.text = '';
+    }
+
+    if (requestedType === 'table') {
+      block.columns = this.cleanString(row.columns).split('|').map((column) => column.trim()).filter(Boolean);
+      block.rows = this.cleanString(row.rows)
+        .split(/\r?\n/)
+        .map((tableRow) => tableRow.split('|').map((cell) => cell.trim()))
+        .filter((tableRow) => tableRow.some(Boolean));
+      block.text = '';
+      if (!block.columns.length) throw badRequest(`Table block ${block.id} is missing columns.`);
+    }
+
+    return block;
+  }
+
+  private parseBulkNestedItems(value: string): any[] {
+    const roots: any[] = [];
+    const stack: Array<{ level: number; item: any }> = [];
+    value.split(/\r?\n/).forEach((rawLine) => {
+      if (!rawLine.trim()) return;
+      const level = Math.floor((rawLine.match(/^\s*/)?.[0] ?? '').replace(/\t/g, '  ').length / 2);
+      const item = { text: rawLine.trim(), children: [] };
+      while (stack.length && stack[stack.length - 1].level >= level) stack.pop();
+      const parent = stack[stack.length - 1]?.item;
+      if (parent) parent.children.push(item);
+      else roots.push(item);
+      stack.push({ level, item });
+    });
+    return roots;
+  }
+
+  private sortRows(rows: Record<string, string>[], orderKey: string): Record<string, string>[] {
+    return [...rows].sort((a, b) => Number(a[orderKey] || 0) - Number(b[orderKey] || 0));
+  }
+
+  private parseXlsxWorkbook(buffer: Buffer): WorkbookSheets {
+    const files = this.unzipXlsx(buffer);
+    const workbookXml = this.readZipText(files, 'xl/workbook.xml');
+    const workbookRelsXml = this.readZipText(files, 'xl/_rels/workbook.xml.rels');
+    const sharedStrings = files.has('xl/sharedStrings.xml') ? this.parseSharedStrings(this.readZipText(files, 'xl/sharedStrings.xml')) : [];
+    const relTargets = new Map<string, string>();
+    for (const rel of workbookRelsXml.matchAll(/<Relationship\b[^>]*Id="([^"]+)"[^>]*Target="([^"]+)"/g)) {
+      relTargets.set(rel[1], rel[2]);
+    }
+
+    const workbook: WorkbookSheets = {};
+    for (const sheet of workbookXml.matchAll(/<sheet\b[^>]*name="([^"]+)"[^>]*(?:r:id|id)="([^"]+)"/g)) {
+      const sheetName = this.xmlDecode(sheet[1]);
+      const relId = sheet[2];
+      const target = relTargets.get(relId);
+      if (!target) continue;
+      const normalizedTarget = target.replace(/^\//, '');
+      const path = normalizedTarget.startsWith('xl/') ? normalizedTarget : `xl/${normalizedTarget}`;
+      const rows = this.parseWorksheet(this.readZipText(files, path), sharedStrings);
+      workbook[sheetName] = this.sheetRowsToObjects(rows);
+    }
+    return workbook;
+  }
+
+  private unzipXlsx(buffer: Buffer): Map<string, Buffer> {
+    const files = new Map<string, Buffer>();
+    let eocdOffset = -1;
+    for (let i = buffer.length - 22; i >= Math.max(0, buffer.length - 70000); i--) {
+      if (buffer.readUInt32LE(i) === 0x06054b50) {
+        eocdOffset = i;
+        break;
+      }
+    }
+    if (eocdOffset < 0) throw badRequest('Invalid .xlsx file.');
+    const entryCount = buffer.readUInt16LE(eocdOffset + 10);
+    const centralOffset = buffer.readUInt32LE(eocdOffset + 16);
+    let ptr = centralOffset;
+    for (let i = 0; i < entryCount; i++) {
+      if (buffer.readUInt32LE(ptr) !== 0x02014b50) throw badRequest('Invalid .xlsx central directory.');
+      const method = buffer.readUInt16LE(ptr + 10);
+      const compressedSize = buffer.readUInt32LE(ptr + 20);
+      const fileNameLength = buffer.readUInt16LE(ptr + 28);
+      const extraLength = buffer.readUInt16LE(ptr + 30);
+      const commentLength = buffer.readUInt16LE(ptr + 32);
+      const localOffset = buffer.readUInt32LE(ptr + 42);
+      const fileName = buffer.slice(ptr + 46, ptr + 46 + fileNameLength).toString('utf8');
+      if (buffer.readUInt32LE(localOffset) !== 0x04034b50) throw badRequest('Invalid .xlsx local file header.');
+      const localNameLength = buffer.readUInt16LE(localOffset + 26);
+      const localExtraLength = buffer.readUInt16LE(localOffset + 28);
+      const dataStart = localOffset + 30 + localNameLength + localExtraLength;
+      const compressed = buffer.slice(dataStart, dataStart + compressedSize);
+      if (method === 0) files.set(fileName, compressed);
+      else if (method === 8) files.set(fileName, inflateRawSync(compressed));
+      ptr += 46 + fileNameLength + extraLength + commentLength;
+    }
+    return files;
+  }
+
+  private readZipText(files: Map<string, Buffer>, path: string): string {
+    const file = files.get(path);
+    if (!file) throw badRequest(`Workbook is missing ${path}.`);
+    return file.toString('utf8');
+  }
+
+  private parseSharedStrings(xml: string): string[] {
+    return [...xml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map((match) => {
+      return [...match[1].matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map((textMatch) => this.xmlDecode(textMatch[1])).join('');
+    });
+  }
+
+  private parseWorksheet(xml: string, sharedStrings: string[]): string[][] {
+    const rows: string[][] = [];
+    for (const rowMatch of xml.matchAll(/<row\b[^>]*>([\s\S]*?)<\/row>/g)) {
+      const row: string[] = [];
+      for (const cellMatch of rowMatch[1].matchAll(/<c\b([^>]*)>([\s\S]*?)<\/c>/g)) {
+        const attrs = cellMatch[1];
+        const body = cellMatch[2];
+        const ref = attrs.match(/\br="([A-Z]+)\d+"/)?.[1] ?? 'A';
+        const columnIndex = this.columnIndex(ref);
+        const type = attrs.match(/\bt="([^"]+)"/)?.[1] ?? '';
+        let value = '';
+        if (type === 'inlineStr') {
+          value = [...body.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map((match) => this.xmlDecode(match[1])).join('');
+        } else {
+          const rawValue = this.xmlDecode(body.match(/<v>([\s\S]*?)<\/v>/)?.[1] ?? '');
+          value = type === 's' ? sharedStrings[Number(rawValue)] ?? '' : rawValue;
+        }
+        row[columnIndex] = value;
+      }
+      rows.push(row.map((value) => value ?? ''));
+    }
+    return rows;
+  }
+
+  private sheetRowsToObjects(rows: string[][]): Record<string, string>[] {
+    const headers = (rows[0] ?? []).map((header) => this.cleanString(header));
+    if (!headers.length) return [];
+    return rows.slice(1)
+      .map((row) => Object.fromEntries(headers.map((header, index) => [header, this.cleanString(row[index] ?? '')])))
+      .filter((row) => Object.values(row).some(Boolean));
+  }
+
+  private columnIndex(columnName: string): number {
+    return columnName.split('').reduce((sum, char) => sum * 26 + char.charCodeAt(0) - 64, 0) - 1;
+  }
+
+  private xmlDecode(value: string): string {
+    return value
+      .replace(/&#10;/g, '\n')
+      .replace(/&#xA;/gi, '\n')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
   }
 
   private emptySnapshot(title: string, description: string): ContentSnapshot {

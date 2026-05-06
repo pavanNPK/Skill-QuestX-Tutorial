@@ -4,9 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { HeaderService } from '../../core/services/header.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -39,9 +40,10 @@ interface TextSegment {
 @Component({
   selector: 'sqx-materials',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, TableModule, BreadcrumbModule],
+  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, ConfirmDialogModule, TableModule, BreadcrumbModule],
   templateUrl: './materials.html',
   styleUrl: './materials.scss',
+  providers: [ConfirmationService],
 })
 export class Materials implements OnInit, OnDestroy {
   selectedCourse: AvailableCourseContent | null = null;
@@ -131,6 +133,7 @@ export class Materials implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
   ) { }
 
   ngOnInit() {
@@ -335,6 +338,72 @@ export class Materials implements OnInit, OnDestroy {
     this.saveContentDraft('Index added.');
   }
 
+  deleteIndex(module: ContentModule) {
+    if (!this.selectedContent) return;
+    this.selectedContent.modules = this.indexModules.filter((item) => item.id !== module.id);
+    if (this.selectedManageModuleId === module.id) {
+      this.selectedManageModuleId = this.indexModules[0]?.id ?? '';
+      this.selectedManageLessonId = this.selectedManageModule?.lessons[0]?.id ?? '';
+    }
+    this.saveContentDraft('Index deleted.');
+  }
+
+  confirmDeleteIndex(event: Event, module: ContentModule) {
+    event.stopPropagation();
+    const name = this.moduleTitle(module);
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      header: 'Delete Index',
+      message: `Delete index "${name}" and all ${module.lessons.length} slide${module.lessons.length === 1 ? '' : 's'} inside it?`,
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Cancel',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete Index',
+        severity: 'danger',
+      },
+      accept: () => this.deleteIndex(module),
+    });
+  }
+
+  onBulkWorkbookSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    input.value = '';
+    if (!file || !this.selectedCourse) return;
+    if (!file.name.toLowerCase().endsWith('.xlsx')) {
+      this.managerMessage = 'Upload an Excel .xlsx workbook.';
+      return;
+    }
+    this.saving = true;
+    this.managerMessage = 'Importing workbook...';
+    this.contentService.importWorkbook(this.selectedCourse.id, file).subscribe({
+      next: (content) => {
+        this.selectedContent = content;
+        this.selectedModule = null;
+        this.selectedManageModuleId = this.indexModules[0]?.id ?? '';
+        this.selectedManageLessonId = this.selectedManageModule?.lessons[0]?.id ?? '';
+        this.saving = false;
+        this.managerMessage = 'Workbook imported as draft. Review it before publishing.';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Workbook imported',
+          detail: 'Imported content was saved as draft.',
+        });
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.saving = false;
+        this.managerMessage = error?.error?.message || 'Could not import workbook.';
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   addSlide() {
     const module = this.selectedManageModule;
     if (!module) return;
@@ -356,6 +425,26 @@ export class Materials implements OnInit, OnDestroy {
     module.lessons = module.lessons.filter((item) => item.id !== lesson.id);
     this.selectedManageLessonId = module.lessons[0]?.id ?? '';
     this.saveContentDraft('Slide deleted.');
+  }
+
+  confirmDeleteSlide(event: Event, lesson: ContentLesson) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      header: 'Delete Slide',
+      message: `Delete slide "${lesson.title}"?`,
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Cancel',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete Slide',
+        severity: 'danger',
+      },
+      accept: () => this.deleteSlide(lesson),
+    });
   }
 
   addTextBlock() {
@@ -400,6 +489,28 @@ export class Materials implements OnInit, OnDestroy {
     if (!lesson) return;
     lesson.blocks = lesson.blocks.filter((item) => item.id !== block.id);
     this.saveContentDraft('File removed from slide.');
+  }
+
+  confirmDeleteBlock(event: Event, block: ContentBlock) {
+    event.stopPropagation();
+    const name = block.title || block.text || this.assetPreviewLabel(block);
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      header: 'Delete Block',
+      message: `Delete "${name}" from this slide?`,
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Cancel',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete Block',
+        severity: 'danger',
+      },
+      accept: () => this.deleteBlock(block),
+    });
   }
 
   onSlideFilesSelected(event: Event) {

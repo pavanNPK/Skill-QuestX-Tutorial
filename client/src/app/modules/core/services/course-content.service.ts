@@ -123,6 +123,17 @@ export class CourseContentService {
     );
   }
 
+  importWorkbook(courseId: string, file: File): Observable<CourseContent> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const url = `${this.apiUrl}/courses/${courseId}/content/import-workbook`;
+    this.logRequest('POST', url, { fileName: file.name, fileType: file.type, fileSize: file.size });
+    return this.http.post<CourseContent>(url, formData).pipe(
+      tap((content) => this.logSuccess('POST', url, { courseId: content.courseId, modules: content.modules.length })),
+      catchError((error) => this.logError<CourseContent>('POST', url, error)),
+    );
+  }
+
   saveDraft(courseId: string, payload: unknown): Observable<CourseContent> {
     const url = `${this.apiUrl}/courses/${courseId}/content`;
     this.logRequest('PATCH', url);

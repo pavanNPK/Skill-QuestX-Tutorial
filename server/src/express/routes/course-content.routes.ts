@@ -25,6 +25,11 @@ const upload = multer({
   limits: { fileSize: 100 * 1024 * 1024 },
 });
 
+const workbookUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
+
 export function courseContentRoutes(): Router {
   const router = Router();
 
@@ -61,6 +66,14 @@ export function courseContentRoutes(): Router {
 
   router.post('/:courseId/content/import', authenticate, asyncHandler(async (req: AuthRequest, res) => {
     res.json(await services.courseContentService.saveDraft(String(req.params.courseId), req.body, req.user!));
+  }));
+
+  router.post('/:courseId/content/import-workbook', authenticate, workbookUpload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
+    if (!req.file) {
+      res.status(400).json({ statusCode: 400, message: 'No workbook uploaded' });
+      return;
+    }
+    res.json(await services.courseContentService.importWorkbookDraft(String(req.params.courseId), req.file, req.user!));
   }));
 
   router.patch('/:courseId/content', authenticate, asyncHandler(async (req: AuthRequest, res) => {
