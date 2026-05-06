@@ -4,6 +4,10 @@ Use **Excel `.xlsx`** for bulk material upload.
 
 Reason: materials are structured data in the app: course -> indexes -> slides -> content blocks -> files. Excel maps cleanly to database rows and can be validated before import. PPT is better for visual presentation, but extracting reliable indexes, slide titles, tables, lists, and attached files from PPT is inconsistent.
 
+Sample Excel file: [materials-bulk-upload-sample.xlsx](./materials-bulk-upload-sample.xlsx)
+
+PDF version: [materials-bulk-upload-format.pdf](./materials-bulk-upload-format.pdf)
+
 ## Workbook Rules
 
 The workbook must contain these sheets:
@@ -14,6 +18,8 @@ The workbook must contain these sheets:
 4. `Assets` optional
 
 Do not rename sheets. Do not merge cells. Keep the first row as headers. Every row must have stable IDs so the importer can connect indexes, slides, blocks, and files.
+
+The sample workbook locks the first header row and freezes it while scrolling. Team members should edit only data rows below the headers. Do not add, remove, or rename columns.
 
 ## Sheet: Indexes
 
