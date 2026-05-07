@@ -28,6 +28,7 @@ export interface AppNotification {
 export class HeaderComponent implements OnInit {
   pageTitle = '';
   breadcrumbs: BreadcrumbItem[] = [];
+  private currentRoutePath = '';
 
   // Notification Logic
   showDrawer = signal(false);
@@ -62,14 +63,22 @@ export class HeaderComponent implements OnInit {
         map(() => this.router.url)
       )
       .subscribe((url) => {
-        // On navigation, reset overrides and update from router
-        this.headerService.reset();
-        this.updateFromRouter(url);
+        const nextRoutePath = this.routePath(url);
+        if (nextRoutePath !== this.currentRoutePath) {
+          this.currentRoutePath = nextRoutePath;
+          this.headerService.reset();
+          this.updateFromRouter(url);
+        }
       });
 
     // Initial load
+    this.currentRoutePath = this.routePath(this.router.url);
     this.updateFromRouter(this.router.url);
     this.loadNotifications();
+  }
+
+  private routePath(url: string): string {
+    return url.split('?')[0].split('#')[0];
   }
 
   private formatTimeAgo(createdAt: string): string {

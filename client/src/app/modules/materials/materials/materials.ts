@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -37,6 +37,13 @@ interface TextSegment {
   bold: boolean;
 }
 
+interface MaterialsRouteState {
+  fromRoute?: boolean;
+  mode?: string | null;
+  indexId?: string | null;
+  slideId?: string | null;
+}
+
 @Component({
   selector: 'sqx-materials',
   standalone: true,
@@ -62,6 +69,7 @@ export class Materials implements OnInit, OnDestroy {
   selectedManageLessonId = '';
   previewBlock: ContentBlock | null = null;
   previewZoom = 1;
+  private previousBodyOverflow = '';
   activeFileIndex = 0;
   newBlockType: ContentBlockType = 'paragraph';
   readonly editableBlockTypes: BlockTypeOption[] = [
@@ -130,6 +138,7 @@ export class Materials implements OnInit, OnDestroy {
     private headerService: HeaderService,
     private contentService: CourseContentService,
     private authService: AuthService,
+    private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
@@ -142,11 +151,16 @@ export class Materials implements OnInit, OnDestroy {
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        filter((event) => event.urlAfterRedirects === '/materials'),
+        filter((event) => event.urlAfterRedirects.split('?')[0] === '/materials'),
         takeUntil(this.destroy$),
       )
-      .subscribe(() => {
+      .subscribe((event) => {
         if (this.loading) return;
+        if (this.selectedCourse || event.urlAfterRedirects.includes('?')) {
+          this.updateGlobalHeader();
+          this.cdr.detectChanges();
+          return;
+        }
         console.info('[Materials Page] /materials route activated, refreshing available courses');
         this.selectedCourse = null;
         this.selectedContent = null;
@@ -157,6 +171,7 @@ export class Materials implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.unlockBodyScroll();
     this.destroy$.next();
     this.destroy$.complete();
     this.headerService.reset();
@@ -181,6 +196,7 @@ export class Materials implements OnInit, OnDestroy {
         this.enrolledCourses = normalizedCourses;
         this.loading = false;
         this.error = normalizedCourses.length ? '' : this.emptyStateMessage();
+        this.restoreFromRoute(normalizedCourses);
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -235,11 +251,14 @@ export class Materials implements OnInit, OnDestroy {
     ]);
   }
 
-  selectCourse(course: AvailableCourseContent) {
+  selectCourse(course: AvailableCourseContent, routeState?: MaterialsRouteState) {
     console.info('[Materials Page] Selected course', course);
     this.selectedCourse = course;
     this.loading = true;
     this.error = '';
+    if (!routeState?.fromRoute) {
+      this.updateMaterialsUrl({ courseId: course.id });
+    }
     this.contentService.getContent(course.id).subscribe({
       next: (content) => {
         console.info('[Materials Page] Course content loaded', {
@@ -253,6 +272,7 @@ export class Materials implements OnInit, OnDestroy {
         this.selectedModule = null;
         this.manageMode = false;
         this.currentLessonIndex = 0;
+        this.applyRouteState(routeState);
         this.loading = false;
         this.updateGlobalHeader();
         this.cdr.detectChanges();
@@ -276,6 +296,7 @@ export class Materials implements OnInit, OnDestroy {
     this.selectedModule = null;
     this.manageMode = false;
     this.currentLessonIndex = 0;
+    this.updateMaterialsUrl({});
     this.updateGlobalHeader();
     this.cdr.detectChanges();
   }
@@ -284,6 +305,9 @@ export class Materials implements OnInit, OnDestroy {
     this.selectedModule = null;
     this.manageMode = false;
     this.currentLessonIndex = 0;
+    if (this.selectedCourse) {
+      this.updateMaterialsUrl({ courseId: this.selectedCourse.id });
+    }
     this.updateGlobalHeader();
     this.cdr.detectChanges();
   }
@@ -293,6 +317,7 @@ export class Materials implements OnInit, OnDestroy {
     this.selectedModule = module;
     this.currentLessonIndex = 0;
     this.activeFileIndex = 0;
+    this.updateSlideUrl();
     this.updateGlobalHeader();
     this.cdr.detectChanges();
   }
@@ -304,6 +329,7 @@ export class Materials implements OnInit, OnDestroy {
     this.managerMessage = '';
     this.selectedManageModuleId = this.indexModules[0]?.id ?? '';
     this.selectedManageLessonId = this.selectedManageModule?.lessons[0]?.id ?? '';
+    this.updateMaterialsUrl({ courseId: this.selectedCourse?.id, mode: 'manage' });
     this.updateGlobalHeader();
     this.cdr.detectChanges();
   }
@@ -311,8 +337,84 @@ export class Materials implements OnInit, OnDestroy {
   stopManage() {
     this.manageMode = false;
     this.managerMessage = '';
+    if (this.selectedCourse) {
+      this.updateMaterialsUrl({ courseId: this.selectedCourse.id });
+    }
     this.updateGlobalHeader();
     this.cdr.detectChanges();
+  }
+
+  private restoreFromRoute(courses: AvailableCourseContent[]) {
+    if (this.selectedCourse) return;
+    const params = this.route.snapshot.queryParamMap;
+    const courseId = params.get('course');
+    if (!courseId) return;
+
+    const course = courses.find((item) => item.id === courseId);
+    if (!course) {
+      this.updateMaterialsUrl({}, true);
+      return;
+    }
+
+    this.selectCourse(course, {
+      fromRoute: true,
+      mode: params.get('mode'),
+      indexId: params.get('index'),
+      slideId: params.get('slide'),
+    });
+  }
+
+  private applyRouteState(routeState?: MaterialsRouteState) {
+    if (!routeState?.fromRoute || !this.selectedContent) return;
+
+    if (routeState.mode === 'manage' && this.selectedContent.canManage) {
+      this.manageMode = true;
+      this.selectedModule = null;
+      this.managerMessage = '';
+      this.selectedManageModuleId = this.indexModules[0]?.id ?? '';
+      this.selectedManageLessonId = this.selectedManageModule?.lessons[0]?.id ?? '';
+      return;
+    }
+
+    if (!routeState.indexId) return;
+
+    const module = this.selectedContent.modules.find((item) => item.id === routeState.indexId);
+    if (!module) return;
+
+    this.selectedModule = module;
+    this.manageMode = false;
+    this.activeFileIndex = 0;
+    const slideIndex = routeState.slideId
+      ? module.lessons.findIndex((lesson) => lesson.id === routeState.slideId)
+      : 0;
+    this.currentLessonIndex = slideIndex >= 0 ? slideIndex : 0;
+  }
+
+  private updateSlideUrl() {
+    if (!this.selectedCourse || !this.selectedModule) return;
+    this.updateMaterialsUrl({
+      courseId: this.selectedCourse.id,
+      indexId: this.selectedModule.id,
+      slideId: this.currentLesson?.id,
+    });
+  }
+
+  private updateMaterialsUrl(state: {
+    courseId?: string | null;
+    indexId?: string | null;
+    slideId?: string | null;
+    mode?: string | null;
+  }, replaceUrl = false) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        course: state.courseId || null,
+        index: state.indexId || null,
+        slide: state.slideId || null,
+        mode: state.mode || null,
+      },
+      replaceUrl,
+    });
   }
 
   selectManageModule(module: ContentModule) {
@@ -488,15 +590,19 @@ export class Materials implements OnInit, OnDestroy {
     const lesson = this.selectedManageLesson;
     if (!lesson) return;
     lesson.blocks = lesson.blocks.filter((item) => item.id !== block.id);
-    this.saveContentDraft('File removed from slide.');
+    this.saveContentDraft(this.isFileBlock(block) ? 'File removed from slide.' : 'Content block removed from slide.');
   }
 
   confirmDeleteBlock(event: Event, block: ContentBlock) {
     event.stopPropagation();
     const name = block.title || block.text || this.assetPreviewLabel(block);
+    const isFile = this.isFileBlock(block);
+    const isTable = block.type === 'table';
+    const header = isFile ? 'Delete File' : isTable ? 'Delete Table' : 'Delete Block';
+    const acceptLabel = isFile ? 'Delete File' : isTable ? 'Delete Table' : 'Delete Block';
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      header: 'Delete Block',
+      header,
       message: `Delete "${name}" from this slide?`,
       icon: 'pi pi-exclamation-triangle',
       rejectLabel: 'Cancel',
@@ -506,7 +612,7 @@ export class Materials implements OnInit, OnDestroy {
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Delete Block',
+        label: acceptLabel,
         severity: 'danger',
       },
       accept: () => this.deleteBlock(block),
@@ -629,15 +735,31 @@ export class Materials implements OnInit, OnDestroy {
     if (!['image', 'video'].includes(block.type)) return;
     this.previewBlock = block;
     this.previewZoom = 1;
+    this.lockBodyScroll();
   }
 
   closePreview() {
     this.previewBlock = null;
     this.previewZoom = 1;
+    this.unlockBodyScroll();
   }
 
   zoomPreview(delta: number) {
     this.previewZoom = Math.min(3, Math.max(0.5, this.previewZoom + delta));
+  }
+
+  private lockBodyScroll() {
+    if (typeof document === 'undefined') return;
+    if (!this.previousBodyOverflow) {
+      this.previousBodyOverflow = document.body.style.overflow || 'auto';
+    }
+    document.body.style.overflow = 'hidden';
+  }
+
+  private unlockBodyScroll() {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = this.previousBodyOverflow || '';
+    this.previousBodyOverflow = '';
   }
 
   blockAssetUrl(block: ContentBlock): string {
@@ -810,6 +932,30 @@ export class Materials implements OnInit, OnDestroy {
     if (this.tableColumns(block).length <= 1) return;
     block.columns = this.tableColumns(block).filter((_, index) => index !== columnIndex);
     block.rows = this.tableRows(block).map((row) => row.filter((_, index) => index !== columnIndex));
+    this.saveContentDraft('Table column deleted.');
+  }
+
+  confirmDeleteTableColumn(event: Event, block: ContentBlock, columnIndex: number) {
+    event.stopPropagation();
+    if (this.tableColumns(block).length <= 1) return;
+    const columnName = this.tableColumns(block)[columnIndex] || `Column ${columnIndex + 1}`;
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      header: 'Delete Column',
+      message: `Delete column "${columnName}" from this table?`,
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Cancel',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete Column',
+        severity: 'danger',
+      },
+      accept: () => this.deleteTableColumn(block, columnIndex),
+    });
   }
 
   addTableRow(block: ContentBlock) {
@@ -819,6 +965,29 @@ export class Materials implements OnInit, OnDestroy {
   deleteTableRow(block: ContentBlock, rowIndex: number) {
     if (this.tableRows(block).length <= 1) return;
     block.rows = this.tableRows(block).filter((_, index) => index !== rowIndex);
+    this.saveContentDraft('Table row deleted.');
+  }
+
+  confirmDeleteTableRow(event: Event, block: ContentBlock, rowIndex: number) {
+    event.stopPropagation();
+    if (this.tableRows(block).length <= 1) return;
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      header: 'Delete Row',
+      message: `Delete row ${rowIndex + 1} from this table?`,
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Cancel',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete Row',
+        severity: 'danger',
+      },
+      accept: () => this.deleteTableRow(block, rowIndex),
+    });
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -832,6 +1001,7 @@ export class Materials implements OnInit, OnDestroy {
     if (this.currentLessonIndex > 0) {
       this.currentLessonIndex--;
       this.activeFileIndex = 0;
+      this.updateSlideUrl();
       this.cdr.detectChanges();
     }
   }
@@ -840,6 +1010,7 @@ export class Materials implements OnInit, OnDestroy {
     if (this.selectedModule && this.currentLessonIndex < this.selectedModule.lessons.length - 1) {
       this.currentLessonIndex++;
       this.activeFileIndex = 0;
+      this.updateSlideUrl();
       this.cdr.detectChanges();
     }
   }

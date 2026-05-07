@@ -128,7 +128,12 @@
                 <div class="manager-list-item" role="button" tabindex="0" [class.active]="selectedManageModule?.id === module.id"
                     (click)="selectManageModule(module)">
                     <span>{{ i + 1 }}</span>
+                    @if (selectedManageModule?.id === module.id) {
+                    <input type="text" class="manager-title-input" [(ngModel)]="module.title"
+                        (click)="$event.stopPropagation()" (blur)="saveContentDraft('Index updated.')" />
+                    } @else {
                     <strong>{{ moduleTitle(module, i) }}</strong>
+                    }
                     <small>{{ module.lessons.length }} slides</small>
                     <button type="button" class="manager-item-delete" (click)="confirmDeleteIndex($event, module)"
                         aria-label="Delete index">
@@ -269,7 +274,7 @@
                                                     <input type="text" [(ngModel)]="block.columns![columnIndex]"
                                                         (blur)="saveContentDraft('Content updated.')" />
                                                     <button type="button" class="table-delete"
-                                                        (click)="deleteTableColumn(block, columnIndex)"
+                                                        (click)="confirmDeleteTableColumn($event, block, columnIndex)"
                                                         [disabled]="tableColumns(block).length <= 1">
                                                         <i class="pi pi-times"></i>
                                                     </button>
@@ -289,7 +294,7 @@
                                                 }
                                                 <td class="row-action-cell">
                                                     <button type="button" class="table-delete"
-                                                        (click)="deleteTableRow(block, rowIndex)"
+                                                        (click)="confirmDeleteTableRow($event, block, rowIndex)"
                                                         [disabled]="tableRows(block).length <= 1">
                                                         <i class="pi pi-trash"></i>
                                                     </button>
@@ -520,7 +525,7 @@
     }
 
     @if (previewBlock) {
-    <div class="preview-modal" (click)="closePreview()">
+    <div class="preview-modal" (click)="closePreview()" (wheel)="$event.stopPropagation()">
         <div class="preview-dialog" (click)="$event.stopPropagation()">
             <div class="preview-toolbar">
                 <strong>{{ previewBlock.title || previewBlock.text || 'Preview' }}</strong>
@@ -538,9 +543,9 @@
                     </button>
                 </div>
             </div>
-            <div class="preview-stage">
+            <div class="preview-stage" [class.zoomed]="previewZoom > 1">
                 @if (previewBlock.type === 'image') {
-                <img [src]="blockAssetUrl(previewBlock)" [style.transform]="'scale(' + previewZoom + ')'"
+                <img [src]="blockAssetUrl(previewBlock)" [style.width.%]="previewZoom * 100"
                     [alt]="previewBlock.title || 'Preview image'" />
                 } @else if (previewBlock.type === 'video') {
                 <video [src]="blockAssetUrl(previewBlock)" controls autoplay playsinline controlsList="nodownload"></video>
