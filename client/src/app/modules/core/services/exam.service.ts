@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { timeout } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
@@ -16,6 +17,7 @@ export interface ExamQuestion {
   type: ExamQuestionType;
   prompt: string;
   options: ExamOption[];
+  answer?: string | string[] | null;
 }
 
 export interface ExamSection {
@@ -35,6 +37,7 @@ export interface AvailableExam {
 }
 
 export interface ExamDetail extends AvailableExam {
+  status?: 'draft' | 'published';
   sections: ExamSection[];
 }
 
@@ -80,5 +83,36 @@ export class ExamService {
       answers,
       autoSubmitted,
     }).pipe(timeout(12000));
+  }
+
+  getManagedExams(): Observable<ExamDetail[]> {
+    return this.http.get<ExamDetail[]>(`${this.apiUrl}/exams/manage/all`, {
+      headers: this.noCacheHeaders,
+      params: { t: Date.now() },
+    }).pipe(
+      timeout(12000),
+      catchError(() => this.http.get<ExamDetail[]>(`${this.apiUrl}/exams/manage`, {
+        headers: this.noCacheHeaders,
+        params: { t: Date.now() },
+      }).pipe(timeout(12000))),
+    );
+  }
+
+  createExam(payload: Partial<ExamDetail>): Observable<ExamDetail> {
+    return this.http.post<ExamDetail>(`${this.apiUrl}/exams/manage`, payload).pipe(timeout(12000));
+  }
+
+  updateExam(examId: string, payload: Partial<ExamDetail>): Observable<ExamDetail> {
+    return this.http.put<ExamDetail>(`${this.apiUrl}/exams/manage/${examId}`, payload).pipe(timeout(12000));
+  }
+
+  deleteExam(examId: string): Observable<{ id: string; deleted: boolean }> {
+    return this.http.delete<{ id: string; deleted: boolean }>(`${this.apiUrl}/exams/manage/${examId}`).pipe(timeout(12000));
+  }
+
+  importDocx(files: File[]): Observable<ExamDetail[]> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    return this.http.post<ExamDetail[]>(`${this.apiUrl}/exams/manage/import-docx`, formData).pipe(timeout(30000));
   }
 }

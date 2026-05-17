@@ -1,4 +1,188 @@
 <div class="assessment-page">
+  @if (canManageExams && !manageMode) {
+  <div class="top-actions">
+    <button type="button" class="btn btn-primary" (click)="startManage()">
+      <i class="pi pi-pencil"></i>
+      Manage Online Exams
+    </button>
+  </div>
+  }
+
+  @if (manageMode) {
+  <div class="exam-manager">
+    <div class="manager-header">
+      <div>
+        <h2>Online Exams</h2>
+        <p>Create, edit, bulk upload, draft, and publish online assessments.</p>
+      </div>
+      <div class="manager-actions">
+        <label class="btn btn-import">
+          <i class="pi pi-upload"></i>
+          Bulk DOCX
+          <input type="file" accept=".docx" multiple (change)="onDocxSelected($event)" />
+        </label>
+        <button type="button" class="btn btn-primary" (click)="addExam()" [disabled]="saving">
+          <i class="pi pi-plus"></i>
+          Create Exam
+        </button>
+        <button type="button" class="btn btn-outline" (click)="closeManage()">
+          <i class="pi pi-times"></i>
+          Close
+        </button>
+      </div>
+    </div>
+
+    @if (managerMessage) {
+    <div class="inline-error manager-note">{{ managerMessage }}</div>
+    }
+
+    <div class="manager-grid">
+      <aside class="manager-panel">
+        <h3>Exams</h3>
+        @for (exam of managedExams; track exam.id) {
+        <button type="button" class="manager-list-item" [class.active]="selectedManageExam?.id === exam.id"
+          (click)="selectManageExam(exam)">
+          <span>
+            <strong>{{ exam.title }}</strong>
+            <small>{{ exam.questionCount }} questions • {{ exam.durationMinutes }} mins • {{ exam.status }}</small>
+          </span>
+          <button type="button" class="row-delete-btn" (click)="deleteManagedExam(exam, $event)">
+            <i class="pi pi-trash"></i>
+          </button>
+        </button>
+        } @empty {
+        <div class="empty-state compact">No exams created yet.</div>
+        }
+      </aside>
+
+      @if (selectedManageExam) {
+      <section class="manager-editor">
+        <div class="editor-card">
+          <div class="editor-grid">
+            <label>
+              <span>Exam title</span>
+              <input [(ngModel)]="selectedManageExam.title" />
+            </label>
+            <label>
+              <span>Duration minutes</span>
+              <input type="number" min="1" [(ngModel)]="selectedManageExam.durationMinutes" />
+            </label>
+            <label>
+              <span>Status</span>
+              <select [(ngModel)]="selectedManageExam.status">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            <span>Description</span>
+            <textarea rows="2" [(ngModel)]="selectedManageExam.description"></textarea>
+          </label>
+          <div class="editor-actions">
+            <button type="button" class="btn btn-import" (click)="saveManagedExam()" [disabled]="saving">
+              <i class="pi pi-save"></i>
+              Save Draft
+            </button>
+            <button type="button" class="btn btn-danger" (click)="deleteManagedExam(selectedManageExam)">
+              <i class="pi pi-trash"></i>
+              Delete Exam
+            </button>
+          </div>
+        </div>
+
+        <div class="section-question-grid">
+          <aside class="manager-panel">
+            <div class="panel-title">
+              <h3>Sections</h3>
+              <button type="button" class="icon-btn" (click)="addSection()"><i class="pi pi-plus"></i></button>
+            </div>
+            @for (section of selectedManageExam.sections; track section.id) {
+            <button type="button" class="manager-list-item" [class.active]="selectedManageSection?.id === section.id"
+              (click)="selectedManageSectionId = section.id; syncManageSelection()">
+              <span>
+                <strong>{{ section.title }}</strong>
+                <small>{{ section.questions.length }} questions</small>
+              </span>
+              <button type="button" class="row-delete-btn" (click)="$event.stopPropagation(); deleteSection(section)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </button>
+            }
+          </aside>
+
+          <aside class="manager-panel">
+            <div class="panel-title">
+              <h3>Questions</h3>
+              <button type="button" class="icon-btn" (click)="addQuestion()"><i class="pi pi-plus"></i></button>
+            </div>
+            @if (selectedManageSection) {
+            <input class="section-title-input" [(ngModel)]="selectedManageSection.title" placeholder="Section title" />
+            @for (question of selectedManageSection.questions; track question.id; let i = $index) {
+            <button type="button" class="manager-list-item" [class.active]="selectedManageQuestion?.id === question.id"
+              (click)="selectedManageQuestionId = question.id">
+              <span>
+                <strong>Q{{ i + 1 }}</strong>
+                <small>{{ question.type }}</small>
+              </span>
+              <button type="button" class="row-delete-btn" (click)="$event.stopPropagation(); deleteQuestion(question)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </button>
+            }
+            }
+          </aside>
+
+          <section class="question-editor">
+            @if (selectedManageQuestion) {
+            <label>
+              <span>Question type</span>
+              <select [ngModel]="selectedManageQuestion.type" (ngModelChange)="updateQuestionType(selectedManageQuestion, $any($event))">
+                @for (type of questionTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              <span>Question</span>
+              <textarea rows="5" [(ngModel)]="selectedManageQuestion.prompt"></textarea>
+            </label>
+            @if (selectedManageQuestion.type !== 'blank') {
+            <div class="options-editor">
+              <div class="panel-title">
+                <h3>Options</h3>
+                <button type="button" class="icon-btn" (click)="addOption(selectedManageQuestion)"><i class="pi pi-plus"></i></button>
+              </div>
+              @for (option of selectedManageQuestion.options; track option.value) {
+              <div class="option-editor-row">
+                <input [(ngModel)]="option.value" />
+                <input [(ngModel)]="option.label" />
+                <button type="button" class="icon-btn danger" (click)="deleteOption(selectedManageQuestion, option)">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+              }
+            </div>
+            }
+            } @else {
+            <div class="empty-state compact">Select or create a question.</div>
+            }
+          </section>
+        </div>
+      </section>
+      } @else {
+      <section class="manager-editor">
+        <div class="editor-card empty-editor">
+          <h3>Create or bulk upload an exam to start editing.</h3>
+          <p>Use Create Exam for manual entry, or Bulk DOCX to import question files.</p>
+        </div>
+      </section>
+      }
+    </div>
+  </div>
+  }
+
+  @if (!manageMode) {
   @if (loading && availableExams.length === 0) {
   <div class="empty-state">Loading online assessments...</div>
   } @else if (error && mode() !== 'exam') {
@@ -117,6 +301,28 @@
     <span>Submitted automatically when the timer ended.</span>
     }
     <button class="btn btn-primary" (click)="mode.set('list'); selectedExam = null; selectedSection = null">Back to exams</button>
+  </div>
+  }
+  }
+
+  @if (pendingConfirm) {
+  <div class="confirm-backdrop" role="presentation" (click)="cancelConfirmation()">
+    <div class="confirm-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <div class="confirm-copy">
+        <h3>{{ pendingConfirm.title }}</h3>
+        <p>{{ pendingConfirm.message }}</p>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-outline" (click)="cancelConfirmation()">Cancel</button>
+        <button type="button" class="btn btn-danger solid" (click)="confirmPendingAction()">
+          <i class="pi pi-trash"></i>
+          {{ pendingConfirm.actionLabel }}
+        </button>
+      </div>
+    </div>
   </div>
   }
 </div>
