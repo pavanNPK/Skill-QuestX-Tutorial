@@ -18,8 +18,8 @@
       <div class="manager-actions">
         <label class="btn btn-import">
           <i class="pi pi-upload"></i>
-          Bulk DOCX
-          <input type="file" accept=".docx" multiple (change)="onDocxSelected($event)" />
+          Bulk XLSX
+          <input type="file" accept=".xlsx" (change)="onWorkbookSelected($event)" />
         </label>
         <button type="button" class="btn btn-primary" (click)="addExam()" [disabled]="saving">
           <i class="pi pi-plus"></i>
@@ -175,7 +175,7 @@
       <section class="manager-editor">
         <div class="editor-card empty-editor">
           <h3>Create or bulk upload an exam to start editing.</h3>
-          <p>Use Create Exam for manual entry, or Bulk DOCX to import question files.</p>
+          <p>Use Create Exam for manual entry, or Bulk XLSX to import question files.</p>
         </div>
       </section>
       }

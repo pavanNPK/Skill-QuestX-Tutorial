@@ -109,9 +109,9 @@ export class ExamService {
     return this.http.delete<{ id: string; deleted: boolean }>(`${this.apiUrl}/exams/manage/${examId}`).pipe(timeout(12000));
   }
 
-  importDocx(files: File[]): Observable<ExamDetail[]> {
+  importWorkbook(file: File): Observable<ExamDetail[]> {
     const formData = new FormData();
-    files.forEach((file) => formData.append('files', file));
-    return this.http.post<ExamDetail[]>(`${this.apiUrl}/exams/manage/import-docx`, formData).pipe(timeout(30000));
+    formData.append('file', file);
+    return this.http.post<ExamDetail[]>(`${this.apiUrl}/exams/manage/import-xlsx`, formData).pipe(timeout(30000));
   }
 }

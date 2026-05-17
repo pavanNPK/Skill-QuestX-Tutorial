@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import {
   AvailableExam,
@@ -64,6 +65,7 @@ export class OnlineAssessment implements OnInit, OnDestroy {
     private examService: ExamService,
     private auth: AuthService,
     private headerService: HeaderService,
+    private messageService: MessageService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -168,11 +170,14 @@ export class OnlineAssessment implements OnInit, OnDestroy {
           ? this.managedExams.find((exam) => exam.id === this.selectedManageExam?.id) ?? this.managedExams[0] ?? null
           : this.managedExams[0] ?? null;
         this.syncManageSelection();
+        if (this.selectedManageExam) this.hydrateManageExam(this.selectedManageExam);
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
         this.managerMessage = 'Could not load exam manager. You can still create a new exam.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -213,10 +218,22 @@ export class OnlineAssessment implements OnInit, OnDestroy {
         this.syncManageSelection();
         this.saving = false;
         this.managerMessage = message;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Exam saved',
+          detail: message,
+        });
+        this.cdr.detectChanges();
       },
       error: () => {
         this.saving = false;
         this.managerMessage = 'Could not save exam.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Save failed',
+          detail: this.managerMessage,
+        });
+        this.cdr.detectChanges();
       },
     });
   }
@@ -237,17 +254,38 @@ export class OnlineAssessment implements OnInit, OnDestroy {
       this.selectedManageExam = this.managedExams[0] ?? null;
       this.syncManageSelection();
       this.managerMessage = 'Draft removed.';
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Draft removed',
+        detail: `"${exam.title}" was removed.`,
+      });
+      this.cdr.detectChanges();
       return;
     }
+    this.saving = true;
     this.examService.deleteExam(exam.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.managedExams = this.managedExams.filter((item) => item.id !== exam.id);
         this.selectedManageExam = this.managedExams[0] ?? null;
         this.syncManageSelection();
+        this.saving = false;
         this.managerMessage = 'Exam deleted.';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Exam deleted',
+          detail: `"${exam.title}" was deleted.`,
+        });
+        this.cdr.detectChanges();
       },
       error: () => {
+        this.saving = false;
         this.managerMessage = 'Could not delete exam.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Delete failed',
+          detail: this.managerMessage,
+        });
+        this.cdr.detectChanges();
       },
     });
   }
@@ -347,23 +385,50 @@ export class OnlineAssessment implements OnInit, OnDestroy {
     action?.();
   }
 
-  onDocxSelected(event: Event) {
+  onWorkbookSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []);
+    const file = input.files?.[0] ?? null;
     input.value = '';
-    if (!files.length) return;
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.xlsx')) {
+      this.managerMessage = 'Upload an Excel .xlsx workbook.';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Invalid file',
+        detail: this.managerMessage,
+      });
+      return;
+    }
     this.saving = true;
-    this.examService.importDocx(files).pipe(takeUntil(this.destroy$)).subscribe({
+    this.managerMessage = `Uploading ${file.name}...`;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Upload started',
+      detail: 'Validating Excel workbook.',
+    });
+    this.examService.importWorkbook(file).pipe(takeUntil(this.destroy$)).subscribe({
       next: (created) => {
-        this.managedExams = [...created, ...this.managedExams];
+        this.managedExams = [...created];
         this.selectedManageExam = created[0] ?? this.selectedManageExam;
-        this.syncManageSelection();
+        this.syncManageSelection(true);
         this.saving = false;
-        this.managerMessage = `${created.length} exam${created.length === 1 ? '' : 's'} imported as draft.`;
+        this.managerMessage = `${created.length} exam${created.length === 1 ? '' : 's'} uploaded and published.`;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Upload complete',
+          detail: this.managerMessage,
+        });
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (error) => {
         this.saving = false;
-        this.managerMessage = 'Could not import DOCX questions.';
+        this.managerMessage = error?.error?.message || 'Could not import Excel questions.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Upload failed',
+          detail: this.managerMessage,
+        });
+        this.cdr.detectChanges();
       },
     });
   }
@@ -484,16 +549,20 @@ export class OnlineAssessment implements OnInit, OnDestroy {
     ]);
   }
 
-  syncManageSelection() {
+  syncManageSelection(preferFirst = false) {
     const exam = this.selectedManageExam;
     if (!exam) {
       this.selectedManageSectionId = '';
       this.selectedManageQuestionId = '';
       return;
     }
-    const section = exam.sections.find((item) => item.id === this.selectedManageSectionId) ?? exam.sections[0] ?? null;
+    const section = preferFirst
+      ? exam.sections[0] ?? null
+      : exam.sections.find((item) => item.id === this.selectedManageSectionId) ?? exam.sections[0] ?? null;
     this.selectedManageSectionId = section?.id ?? '';
-    const question = section?.questions.find((item) => item.id === this.selectedManageQuestionId) ?? section?.questions[0] ?? null;
+    const question = preferFirst
+      ? section?.questions[0] ?? null
+      : section?.questions.find((item) => item.id === this.selectedManageQuestionId) ?? section?.questions[0] ?? null;
     this.selectedManageQuestionId = question?.id ?? '';
   }
 
@@ -526,11 +595,13 @@ export class OnlineAssessment implements OnInit, OnDestroy {
         this.managedExams = this.managedExams.map((item) => item.id === hydrated.id ? hydrated : item);
         if (this.selectedManageExam?.id === hydrated.id) {
           this.selectedManageExam = hydrated;
-          this.syncManageSelection();
+          this.syncManageSelection(true);
+          this.cdr.detectChanges();
         }
       },
       error: () => {
         this.managerMessage = 'Could not load full exam details. Try reopening Manage Online Exams.';
+        this.cdr.detectChanges();
       },
     });
   }

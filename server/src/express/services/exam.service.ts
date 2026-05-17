@@ -8,9 +8,13 @@ import type { AuthUser } from '../types/request';
 
 const questionTypes = new Set(['blank', 'single_select', 'multi_select']);
 
+interface WorkbookSheets {
+  [sheetName: string]: Record<string, string>[];
+}
+
 export class ExamService {
   async getAvailableExams() {
-    const exams = await ExamModel.find({ status: 'published' }).sort({ createdAt: -1 }).lean().exec();
+    const exams = await ExamModel.find({ status: 'published' }).sort({ createdAt: 1 }).lean().exec();
     return exams.map((exam: any) => ({
       id: exam._id.toString(),
       title: exam.title,
@@ -30,7 +34,7 @@ export class ExamService {
 
   async getManagedExams(user: AuthUser) {
     this.requireManage(user);
-    const exams = await ExamModel.find({}).sort({ createdAt: -1 }).lean().exec();
+    const exams = await ExamModel.find({}).sort({ createdAt: 1 }).lean().exec();
     return exams.map((exam: any) => this.toResponse(exam, true));
   }
 
@@ -63,16 +67,15 @@ export class ExamService {
     return { id: examId, deleted: true };
   }
 
-  async importDocx(files: Express.Multer.File[], user: AuthUser) {
+  async importWorkbook(file: Express.Multer.File, user: AuthUser) {
     this.requireManage(user);
-    if (!files.length) throw badRequest('Upload at least one .docx file.');
-    const created = [];
-    for (const file of files) {
-      if (!/\.docx$/i.test(file.originalname)) throw badRequest('Bulk upload supports .docx files only.');
-      const exam = await ExamModel.create(this.examFromDocx(file));
-      created.push(this.toResponse(exam, true));
-    }
-    return created;
+    if (!file?.buffer?.length) throw badRequest('Upload an Excel .xlsx workbook.');
+    if (!/\.xlsx$/i.test(file.originalname)) throw badRequest('Bulk upload supports Excel .xlsx files only.');
+    const imported = this.examsFromWorkbook(this.parseXlsxWorkbook(file.buffer));
+    if (!imported.length) throw badRequest('Workbook does not contain any exams.');
+    await ExamModel.deleteMany({}).exec();
+    const created = await ExamModel.insertMany(imported);
+    return created.map((exam: any) => this.toResponse(exam, true));
   }
 
   async submit(examId: string, body: any, user: AuthUser) {
@@ -115,75 +118,127 @@ export class ExamService {
     };
   }
 
-  private examFromDocx(file: Express.Multer.File) {
-    const title = this.clean(file.originalname.replace(/\.docx$/i, '').replace(/\s+/g, ' ')) || 'Imported Exam';
-    const paragraphs = this.docxParagraphs(file.buffer);
-    const questions = paragraphs
-      .map((text, index) => this.questionFromText(text, index))
-      .filter(Boolean) as ExamQuestion[];
-    if (!questions.length) throw badRequest(`${file.originalname} does not contain questions.`);
-    return this.normalize({
-      title,
-      description: `Imported from ${file.originalname}`,
-      durationMinutes: 30,
-      status: 'draft',
-      sections: [{
-        id: 'section-1',
-        title,
-        summary: '',
-        questions,
-      }],
+  private examsFromWorkbook(workbook: WorkbookSheets) {
+    const examRows = workbook.Exams ?? [];
+    const sectionRows = workbook.Sections ?? [];
+    const questionRows = workbook.Questions ?? [];
+    const optionRows = workbook.Options ?? [];
+    if (!examRows.length) throw badRequest('Exams sheet has no data rows.');
+    if (!sectionRows.length) throw badRequest('Sections sheet has no data rows.');
+    if (!questionRows.length) throw badRequest('Questions sheet has no data rows.');
+
+    const sectionsByExam = new Map<string, Record<string, string>[]>();
+    const questionsBySection = new Map<string, Record<string, string>[]>();
+    const optionsByQuestion = new Map<string, Record<string, string>[]>();
+    const examIds = new Set<string>();
+    const sectionIds = new Set<string>();
+    const questionIds = new Set<string>();
+
+    examRows.forEach((row) => {
+      const id = this.clean(row.exam_id);
+      if (!id) throw badRequest('Exams sheet has a row without exam_id.');
+      if (examIds.has(id)) throw badRequest(`Duplicate exam_id: ${id}`);
+      examIds.add(id);
     });
+
+    sectionRows.forEach((row) => {
+      const id = this.clean(row.section_id);
+      const examId = this.clean(row.exam_id);
+      if (!id) throw badRequest('Sections sheet has a row without section_id.');
+      if (sectionIds.has(id)) throw badRequest(`Duplicate section_id: ${id}`);
+      if (!examIds.has(examId)) throw badRequest(`Sections sheet references unknown exam_id: ${examId}`);
+      sectionIds.add(id);
+      sectionsByExam.set(examId, [...(sectionsByExam.get(examId) ?? []), row]);
+    });
+
+    questionRows.forEach((row) => {
+      const id = this.clean(row.question_id);
+      const sectionId = this.clean(row.section_id);
+      if (!id) throw badRequest('Questions sheet has a row without question_id.');
+      if (questionIds.has(id)) throw badRequest(`Duplicate question_id: ${id}`);
+      if (!sectionIds.has(sectionId)) throw badRequest(`Questions sheet references unknown section_id: ${sectionId}`);
+      questionIds.add(id);
+      questionsBySection.set(sectionId, [...(questionsBySection.get(sectionId) ?? []), row]);
+    });
+
+    optionRows.forEach((row) => {
+      const questionId = this.clean(row.question_id);
+      if (!questionIds.has(questionId)) throw badRequest(`Options sheet references unknown question_id: ${questionId}`);
+      optionsByQuestion.set(questionId, [...(optionsByQuestion.get(questionId) ?? []), row]);
+    });
+
+    return this.sortRows(examRows, 'exam_order').map((examRow, examIndex) => this.normalize({
+      title: this.clean(examRow.exam_title) || `Exam ${examIndex + 1}`,
+      description: this.clean(examRow.exam_description),
+      durationMinutes: Number(examRow.duration_minutes || 30),
+      status: 'published',
+      sections: this.sortRows(sectionsByExam.get(this.clean(examRow.exam_id)) ?? [], 'section_order').map((sectionRow, sectionIndex) => {
+        const sectionId = this.clean(sectionRow.section_id) || `section-${sectionIndex + 1}`;
+        return {
+          id: sectionId,
+          title: this.clean(sectionRow.section_title) || `Section ${sectionIndex + 1}`,
+          summary: this.clean(sectionRow.section_summary),
+          questions: this.sortRows(questionsBySection.get(sectionId) ?? [], 'question_order').map((questionRow, questionIndex) => {
+            const questionId = this.clean(questionRow.question_id) || `q-${questionIndex + 1}`;
+            const options = this.sortRows(optionsByQuestion.get(questionId) ?? [], 'option_order')
+              .map((optionRow, optionIndex) => ({
+                value: this.clean(optionRow.option_value) || String.fromCharCode(97 + optionIndex),
+                label: this.clean(optionRow.option_label),
+              }))
+              .filter((option) => option.label);
+            const type = this.normalizeQuestionType(this.clean(questionRow.question_type), options.length);
+            return {
+              id: questionId,
+              type,
+              prompt: this.clean(questionRow.question) || `Question ${questionIndex + 1}`,
+              options,
+              answer: this.normalizeAnswer(this.clean(questionRow.answer), type),
+            };
+          }),
+        };
+      }),
+    }));
   }
 
-  private questionFromText(text: string, index: number): ExamQuestion | null {
-    const cleanText = this.clean(text.replace(/\s+/g, ' '));
-    if (!cleanText) return null;
-    const optionMatches = [...cleanText.matchAll(/\b([A-D])\.\s*([^A-D]+?)(?=\s+[A-D]\.\s*|$)/g)];
-    if (!optionMatches.length) {
-      return {
-        id: `q-${index + 1}`,
-        type: 'blank',
-        prompt: cleanText.replace(/_{3,}/g, '__________'),
-        options: [],
-      };
-    }
-    const firstOptionIndex = cleanText.search(/\b[A-D]\.\s*/);
-    const prompt = this.clean(cleanText.slice(0, firstOptionIndex).replace(/\[\s*\]/g, ''));
-    return {
-      id: `q-${index + 1}`,
-      type: 'single_select',
-      prompt: prompt || `Question ${index + 1}`,
-      options: optionMatches.map((match) => ({
-        value: match[1].toLowerCase(),
-        label: this.clean(match[2]),
-      })).filter((option) => option.label),
-    };
+  private normalizeQuestionType(value: string, optionCount: number): ExamQuestion['type'] {
+    const normalized = value.toLowerCase().replace(/[\s-]+/g, '_');
+    if (normalized === 'single' || normalized === 'mcq' || normalized === 'single_choice') return 'single_select';
+    if (normalized === 'multi' || normalized === 'multiple' || normalized === 'multi_choice') return 'multi_select';
+    if (normalized === 'blank' || normalized === 'text' || normalized === 'text_area' || normalized === 'textarea') return 'blank';
+    return optionCount ? 'single_select' : 'blank';
   }
 
-  private docxParagraphs(buffer: Buffer): string[] {
+  private normalizeAnswer(value: string, type: ExamQuestion['type']): string | string[] | null {
+    if (!value) return type === 'multi_select' ? [] : null;
+    if (type === 'multi_select') return value.split(/[|,]/).map((item) => this.clean(item)).filter(Boolean);
+    return value;
+  }
+
+  private sortRows(rows: Record<string, string>[], orderKey: string): Record<string, string>[] {
+    return [...rows].sort((a, b) => Number(a[orderKey] || 0) - Number(b[orderKey] || 0));
+  }
+
+  private parseXlsxWorkbook(buffer: Buffer): WorkbookSheets {
     const files = this.unzip(buffer);
-    const xml = files.get('word/document.xml')?.toString('utf8');
-    if (!xml) throw badRequest('Invalid .docx file.');
-    const paragraphs = [...xml.matchAll(/<w:p\b[\s\S]*?<\/w:p>/g)]
-      .map((match) => [...match[0].matchAll(/<w:t\b[^>]*>([\s\S]*?)<\/w:t>/g)]
-        .map((text) => this.xmlDecode(text[1]))
-        .join('')
-        .trim())
-      .filter(Boolean);
-
-    const combined: string[] = [];
-    for (const paragraph of paragraphs) {
-      const previous = combined[combined.length - 1] ?? '';
-      const continuesQuestion = previous && !/[.?)]\s*$/.test(previous) && !/_{3,}\s*$/.test(previous);
-      const startsOptionLine = /^\s*(?:\[?\s*\]?\s*)?[A-D]\.\s+/i.test(paragraph);
-      if (combined.length && (startsOptionLine || continuesQuestion)) {
-        combined[combined.length - 1] = `${previous} ${paragraph}`.trim();
-      } else {
-        combined.push(paragraph);
-      }
+    const workbookXml = this.readZipText(files, 'xl/workbook.xml');
+    const workbookRelsXml = this.readZipText(files, 'xl/_rels/workbook.xml.rels');
+    const sharedStrings = files.has('xl/sharedStrings.xml') ? this.parseSharedStrings(this.readZipText(files, 'xl/sharedStrings.xml')) : [];
+    const relTargets = new Map<string, string>();
+    for (const rel of workbookRelsXml.matchAll(/<Relationship\b[^>]*Id="([^"]+)"[^>]*Target="([^"]+)"/g)) {
+      relTargets.set(rel[1], rel[2]);
     }
-    return combined;
+
+    const workbook: WorkbookSheets = {};
+    for (const sheet of workbookXml.matchAll(/<sheet\b[^>]*name="([^"]+)"[^>]*(?:r:id|id)="([^"]+)"/g)) {
+      const sheetName = this.xmlDecode(sheet[1]);
+      const target = relTargets.get(sheet[2]);
+      if (!target) continue;
+      const normalizedTarget = target.replace(/^\//, '');
+      const path = normalizedTarget.startsWith('xl/') ? normalizedTarget : `xl/${normalizedTarget}`;
+      const rows = this.parseWorksheet(this.readZipText(files, path), sharedStrings);
+      workbook[sheetName] = this.sheetRowsToObjects(rows);
+    }
+    return workbook;
   }
 
   private unzip(buffer: Buffer): Map<string, Buffer> {
@@ -195,12 +250,12 @@ export class ExamService {
         break;
       }
     }
-    if (eocdOffset < 0) throw badRequest('Invalid .docx file.');
+    if (eocdOffset < 0) throw badRequest('Invalid .xlsx file.');
     const entryCount = buffer.readUInt16LE(eocdOffset + 10);
     const centralOffset = buffer.readUInt32LE(eocdOffset + 16);
     let ptr = centralOffset;
     for (let i = 0; i < entryCount; i++) {
-      if (buffer.readUInt32LE(ptr) !== 0x02014b50) throw badRequest('Invalid .docx central directory.');
+      if (buffer.readUInt32LE(ptr) !== 0x02014b50) throw badRequest('Invalid .xlsx central directory.');
       const method = buffer.readUInt16LE(ptr + 10);
       const compressedSize = buffer.readUInt32LE(ptr + 20);
       const fileNameLength = buffer.readUInt16LE(ptr + 28);
@@ -217,6 +272,54 @@ export class ExamService {
       ptr += 46 + fileNameLength + extraLength + commentLength;
     }
     return files;
+  }
+
+  private readZipText(files: Map<string, Buffer>, path: string): string {
+    const file = files.get(path);
+    if (!file) throw badRequest(`Workbook is missing ${path}.`);
+    return file.toString('utf8');
+  }
+
+  private parseSharedStrings(xml: string): string[] {
+    return [...xml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map((match) => {
+      return [...match[1].matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map((textMatch) => this.xmlDecode(textMatch[1])).join('');
+    });
+  }
+
+  private parseWorksheet(xml: string, sharedStrings: string[]): string[][] {
+    const rows: string[][] = [];
+    for (const rowMatch of xml.matchAll(/<row\b[^>]*>([\s\S]*?)<\/row>/g)) {
+      const row: string[] = [];
+      for (const cellMatch of rowMatch[1].matchAll(/<c\b([^>]*)>([\s\S]*?)<\/c>/g)) {
+        const attrs = cellMatch[1];
+        const body = cellMatch[2];
+        const ref = attrs.match(/\br="([A-Z]+)\d+"/)?.[1] ?? 'A';
+        const columnIndex = this.columnIndex(ref);
+        const type = attrs.match(/\bt="([^"]+)"/)?.[1] ?? '';
+        let value = '';
+        if (type === 'inlineStr') {
+          value = [...body.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map((match) => this.xmlDecode(match[1])).join('');
+        } else {
+          const rawValue = this.xmlDecode(body.match(/<v>([\s\S]*?)<\/v>/)?.[1] ?? '');
+          value = type === 's' ? sharedStrings[Number(rawValue)] ?? '' : rawValue;
+        }
+        row[columnIndex] = value;
+      }
+      rows.push(row.map((value) => value ?? ''));
+    }
+    return rows;
+  }
+
+  private sheetRowsToObjects(rows: string[][]): Record<string, string>[] {
+    const headers = (rows[0] ?? []).map((header) => this.clean(header));
+    if (!headers.length) return [];
+    return rows.slice(1)
+      .map((row) => Object.fromEntries(headers.map((header, index) => [header, this.clean(row[index] ?? '')])))
+      .filter((row) => Object.values(row).some(Boolean));
+  }
+
+  private columnIndex(columnName: string): number {
+    return columnName.split('').reduce((sum, char) => sum * 26 + char.charCodeAt(0) - 64, 0) - 1;
   }
 
   private xmlDecode(value: string): string {

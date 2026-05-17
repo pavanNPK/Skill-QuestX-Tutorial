@@ -297,16 +297,21 @@
 
 .section-question-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) minmax(220px, 280px) minmax(0, 1fr);
-  gap: 1rem;
+  grid-template-columns: minmax(250px, 320px) minmax(250px, 320px) minmax(0, 1fr);
+  gap: 1.5rem;
   align-items: start;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 .manager-panel,
 .question-editor,
 .editor-card {
   padding: 1rem;
+}
+
+.manager-panel,
+.question-editor {
+  min-width: 0;
 }
 
 .manager-editor {
@@ -350,6 +355,7 @@
 }
 
 .manager-list-item {
+  box-sizing: border-box;
   width: 100%;
   border: 1px solid transparent;
   border-radius: 10px;
@@ -398,6 +404,10 @@
     outline: 3px solid rgba(91, 75, 196, 0.2);
     outline-offset: 2px;
   }
+}
+
+.manager-panel .manager-list-item {
+  margin-top: 0.75rem;
 }
 
 .row-delete-btn {
@@ -458,6 +468,10 @@
   color: #111827;
   font: inherit;
   background: #FFFFFF;
+}
+
+.section-title-input {
+  margin: 0 0 0.75rem;
 }
 
 .options-editor {

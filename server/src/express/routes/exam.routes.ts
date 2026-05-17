@@ -5,7 +5,7 @@ import { asyncHandler } from '../middleware/async-handler';
 import { services } from '../services';
 import type { AuthRequest } from '../types/request';
 
-const docUpload = multer({
+const workbookUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024, files: 20 },
 });
@@ -36,8 +36,8 @@ export function examRoutes(): Router {
     res.json(await services.examService.create(req.body, req.user!));
   }));
 
-  router.post('/manage/import-docx', authenticate, docUpload.array('files', 20), asyncHandler(async (req: AuthRequest, res) => {
-    res.json(await services.examService.importDocx((req.files ?? []) as Express.Multer.File[], req.user!));
+  router.post('/manage/import-xlsx', authenticate, workbookUpload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
+    res.json(await services.examService.importWorkbook(req.file as Express.Multer.File, req.user!));
   }));
 
   router.put('/manage/:examId', authenticate, asyncHandler(async (req: AuthRequest, res) => {
