@@ -25,6 +25,7 @@ import {
 interface FlattenedBullet {
   text: string;
   level: number;
+  marker?: string;
 }
 
 interface BlockTypeOption {
@@ -1054,12 +1055,41 @@ export class Materials implements OnInit, OnDestroy {
     return lesson.blocks.filter((block) => ['document', 'image', 'video', 'link', 'paragraph', 'assignment_note', 'heading', 'bullet_list', 'nested_bullet_list', 'table'].includes(block.type));
   }
 
-  flattenedBullets(items?: NestedBulletItem[], level = 0): FlattenedBullet[] {
+  flattenedBullets(items?: NestedBulletItem[], level = 0, parentOrdered = false): FlattenedBullet[] {
     if (!Array.isArray(items)) return [];
-    return items.flatMap((item) => [
-      { text: item.text, level },
-      ...this.flattenedBullets(item.children, level + 1),
-    ]);
+    return items.flatMap((item, index) => {
+      const ordered = this.extractOrderedMarker(item.text);
+      const marker = ordered?.marker ?? (parentOrdered ? `${this.toRoman(index + 1)}.` : '');
+      return [
+        { text: ordered?.text ?? item.text, level, marker },
+        ...this.flattenedBullets(item.children, level + 1, !!ordered),
+      ];
+    });
+  }
+
+  private extractOrderedMarker(text: string): { marker: string; text: string } | null {
+    const match = text.trim().match(/^((?:\d+|[IVXLCDM]+|[A-Z])[\.)])\s+(.+)$/i);
+    if (!match) return null;
+    return { marker: match[1], text: match[2] };
+  }
+
+  private toRoman(value: number): string {
+    const numerals: Array<[number, string]> = [
+      [10, 'X'],
+      [9, 'IX'],
+      [5, 'V'],
+      [4, 'IV'],
+      [1, 'I'],
+    ];
+    let remaining = value;
+    let result = '';
+    for (const [number, symbol] of numerals) {
+      while (remaining >= number) {
+        result += symbol;
+        remaining -= number;
+      }
+    }
+    return result;
   }
 
   hasOpenableAsset(block: ContentBlock): boolean {

@@ -1110,12 +1110,27 @@
     }
 
     span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         width: 7px;
         height: 7px;
         border-radius: 50%;
         background: var(--sqx-color-primary);
         flex: 0 0 auto;
         margin-top: 0.65rem;
+
+        &.has-marker {
+            width: 2rem;
+            height: auto;
+            border-radius: 0;
+            background: transparent;
+            color: #1F2937;
+            font-weight: 600;
+            justify-content: flex-end;
+            margin-top: 0;
+            line-height: 1.65;
+        }
     }
 }
 

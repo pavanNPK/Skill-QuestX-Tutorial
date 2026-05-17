@@ -420,7 +420,7 @@
                         <div class="nested-list">
                             @for (item of flattenedBullets(block.items); track item.text + item.level) {
                             <div class="nested-item" [style.padding-left.rem]="item.level * 1.5">
-                                <span></span>
+                                <span [class.has-marker]="item.marker">{{ item.marker }}</span>
                                 <p>
                                     @for (segment of inlineSegments(item.text); track $index) {
                                     @if (segment.bold) { <strong>{{ segment.text }}</strong> } @else { <ng-container>{{ segment.text }}</ng-container> }

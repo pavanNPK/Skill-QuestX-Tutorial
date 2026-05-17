@@ -147,7 +147,12 @@ export class CourseContentService {
     if (!/\.xlsx$/i.test(file.originalname)) throw badRequest('Bulk upload supports Excel .xlsx files only.');
 
     const workbook = this.parseXlsxWorkbook(file.buffer);
-    const snapshot = this.workbookToSnapshot(workbook, course.name, course.description ?? '');
+    const importedSnapshot = this.workbookToSnapshot(workbook, course.name, course.description ?? '');
+    const existing = await CourseContentModel.findOne({ courseId: new Types.ObjectId(courseId) }).lean().exec();
+    const baseSnapshot = existing?.draft
+      ? this.normalizeSnapshot(existing.draft, course.name, course.description ?? '')
+      : this.emptySnapshot(course.name, course.description ?? '');
+    const snapshot = this.mergeImportedModules(baseSnapshot, importedSnapshot);
     return this.saveDraft(courseId, snapshot, user);
   }
 
@@ -251,6 +256,21 @@ export class CourseContentService {
       title: this.cleanString(module?.title) || 'Untitled Module',
       summary: this.cleanString(module?.summary),
       lessons: Array.isArray(module?.lessons) ? module.lessons.map((lesson: any) => this.normalizeLesson(lesson)) : [],
+    };
+  }
+
+  private mergeImportedModules(base: ContentSnapshot, imported: ContentSnapshot): ContentSnapshot {
+    const importedById = new Map(imported.modules.map((module) => [module.id, module]));
+    const mergedModules = base.modules.map((module) => importedById.get(module.id) ?? module);
+    const existingIds = new Set(mergedModules.map((module) => module.id));
+    imported.modules.forEach((module) => {
+      if (!existingIds.has(module.id)) mergedModules.push(module);
+    });
+
+    return {
+      title: base.title || imported.title,
+      description: base.description || imported.description || '',
+      modules: mergedModules,
     };
   }
 
