@@ -145,6 +145,7 @@ export class OnlineAssessment implements OnInit, OnDestroy {
     this.manageMode = true;
     this.mode.set('list');
     this.updateGlobalHeader();
+    this.seedManagedExamsFromAvailable();
     this.loadManagedExams();
   }
 
@@ -161,7 +162,8 @@ export class OnlineAssessment implements OnInit, OnDestroy {
     this.managerMessage = '';
     this.examService.getManagedExams().pipe(takeUntil(this.destroy$)).subscribe({
       next: (exams) => {
-        this.managedExams = Array.isArray(exams) ? exams : [];
+        const loadedExams = Array.isArray(exams) ? exams : [];
+        this.managedExams = loadedExams.length ? loadedExams : this.managedExams;
         this.selectedManageExam = this.selectedManageExam
           ? this.managedExams.find((exam) => exam.id === this.selectedManageExam?.id) ?? this.managedExams[0] ?? null
           : this.managedExams[0] ?? null;
@@ -178,6 +180,7 @@ export class OnlineAssessment implements OnInit, OnDestroy {
   selectManageExam(exam: ExamDetail) {
     this.selectedManageExam = exam;
     this.syncManageSelection();
+    this.hydrateManageExam(exam);
   }
 
   addExam() {
@@ -496,6 +499,40 @@ export class OnlineAssessment implements OnInit, OnDestroy {
 
   private requestConfirmation(confirmState: PendingConfirm) {
     this.pendingConfirm = confirmState;
+  }
+
+  private seedManagedExamsFromAvailable() {
+    if (!this.availableExams.length) return;
+    const existingIds = new Set(this.managedExams.map((exam) => exam.id));
+    const seedExams: ExamDetail[] = this.availableExams
+      .filter((exam) => !existingIds.has(exam.id))
+      .map((exam) => ({
+        ...exam,
+        status: 'published',
+        sections: [],
+      }));
+    if (!seedExams.length) return;
+    this.managedExams = [...this.managedExams, ...seedExams];
+    this.selectedManageExam = this.selectedManageExam ?? this.managedExams[0] ?? null;
+    this.syncManageSelection();
+    if (this.selectedManageExam) this.hydrateManageExam(this.selectedManageExam);
+  }
+
+  private hydrateManageExam(exam: ExamDetail) {
+    if (this.isLocalExam(exam) || exam.sections.length) return;
+    this.examService.getExam(exam.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (detail) => {
+        const hydrated: ExamDetail = { ...detail, status: exam.status ?? 'published' };
+        this.managedExams = this.managedExams.map((item) => item.id === hydrated.id ? hydrated : item);
+        if (this.selectedManageExam?.id === hydrated.id) {
+          this.selectedManageExam = hydrated;
+          this.syncManageSelection();
+        }
+      },
+      error: () => {
+        this.managerMessage = 'Could not load full exam details. Try reopening Manage Online Exams.';
+      },
+    });
   }
 
   private isLocalExam(exam: ExamDetail): boolean {

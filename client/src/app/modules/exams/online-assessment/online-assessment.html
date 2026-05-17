@@ -40,8 +40,8 @@
       <aside class="manager-panel">
         <h3>Exams</h3>
         @for (exam of managedExams; track exam.id) {
-        <button type="button" class="manager-list-item" [class.active]="selectedManageExam?.id === exam.id"
-          (click)="selectManageExam(exam)">
+        <div class="manager-list-item" role="button" tabindex="0" [class.active]="selectedManageExam?.id === exam.id"
+          (click)="selectManageExam(exam)" (keydown.enter)="selectManageExam(exam)">
           <span>
             <strong>{{ exam.title }}</strong>
             <small>{{ exam.questionCount }} questions • {{ exam.durationMinutes }} mins • {{ exam.status }}</small>
@@ -49,7 +49,7 @@
           <button type="button" class="row-delete-btn" (click)="deleteManagedExam(exam, $event)">
             <i class="pi pi-trash"></i>
           </button>
-        </button>
+        </div>
         } @empty {
         <div class="empty-state compact">No exams created yet.</div>
         }
@@ -98,8 +98,9 @@
               <button type="button" class="icon-btn" (click)="addSection()"><i class="pi pi-plus"></i></button>
             </div>
             @for (section of selectedManageExam.sections; track section.id) {
-            <button type="button" class="manager-list-item" [class.active]="selectedManageSection?.id === section.id"
-              (click)="selectedManageSectionId = section.id; syncManageSelection()">
+            <div class="manager-list-item" role="button" tabindex="0" [class.active]="selectedManageSection?.id === section.id"
+              (click)="selectedManageSectionId = section.id; syncManageSelection()"
+              (keydown.enter)="selectedManageSectionId = section.id; syncManageSelection()">
               <span>
                 <strong>{{ section.title }}</strong>
                 <small>{{ section.questions.length }} questions</small>
@@ -107,7 +108,7 @@
               <button type="button" class="row-delete-btn" (click)="$event.stopPropagation(); deleteSection(section)">
                 <i class="pi pi-trash"></i>
               </button>
-            </button>
+            </div>
             }
           </aside>
 
@@ -119,8 +120,8 @@
             @if (selectedManageSection) {
             <input class="section-title-input" [(ngModel)]="selectedManageSection.title" placeholder="Section title" />
             @for (question of selectedManageSection.questions; track question.id; let i = $index) {
-            <button type="button" class="manager-list-item" [class.active]="selectedManageQuestion?.id === question.id"
-              (click)="selectedManageQuestionId = question.id">
+            <div class="manager-list-item" role="button" tabindex="0" [class.active]="selectedManageQuestion?.id === question.id"
+              (click)="selectedManageQuestionId = question.id" (keydown.enter)="selectedManageQuestionId = question.id">
               <span>
                 <strong>Q{{ i + 1 }}</strong>
                 <small>{{ question.type }}</small>
@@ -128,7 +129,7 @@
               <button type="button" class="row-delete-btn" (click)="$event.stopPropagation(); deleteQuestion(question)">
                 <i class="pi pi-trash"></i>
               </button>
-            </button>
+            </div>
             }
             }
           </aside>
