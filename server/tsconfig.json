@@ -19,6 +19,13 @@
     "noFallthroughCasesInSwitch": true,
     "paths": { "@/*": ["src/*"] }
   },
-  "include": ["src/express/**/*"],
+  "include": [
+    "src/server.ts",
+    "src/business/**/*",
+    "src/controller/**/*",
+    "src/core/**/*",
+    "src/data/**/*",
+    "src/presentation/**/*"
+  ],
   "exclude": ["node_modules", "dist"]
 }

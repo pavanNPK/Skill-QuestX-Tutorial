@@ -1,12 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ToastModule } from 'primeng/toast';
 import { LoaderOverlayComponent } from './shared/components/loader-overlay/loader-overlay.component';
 import { LoaderService } from './shared/services/loader.service';
 
 @Component({
   selector: 'sqx-root',
-  imports: [RouterOutlet, ToastModule, LoaderOverlayComponent],
+  imports: [RouterOutlet, LoaderOverlayComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

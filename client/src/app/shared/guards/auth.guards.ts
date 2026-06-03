@@ -1,14 +1,12 @@
 import { CanActivateChildFn, CanActivateFn, CanMatchFn, UrlTree } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthStore } from '../../core/auth/auth.store';
 
 
 // Helper function to handle authentication checks with localStorage safety
 const checkAuth = (url: string): boolean | UrlTree => {
-  try {
-    const token = localStorage.getItem('auth_token');
-    return !!token;
-  } catch {
-    return false;
-  }
+  const authStore = inject(AuthStore);
+  return authStore.isAuthenticated();
 }
 // Protects main routes
 export const authGuard: CanActivateFn = (route, state) => {

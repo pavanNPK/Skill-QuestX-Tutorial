@@ -1,0 +1,101 @@
+<section class="flex flex-column lg:flex-row h-screen overflow-hidden p-2 box-border bg-white">
+  <div class="w-full lg:w-6 p-0 hidden lg:block h-full relative">
+    <img class="w-full h-full block object-cover" src="/assets/images/auth.jpg" alt="Login banner" />
+    <div class="absolute bottom-0 left-0 p-4 lg:p-5 text-white">
+      <div class="hero-content">
+        <div class="hero-slides">
+          @for (item of carouselItems; track item) {
+            <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
+              <div class="hero-title-stack">
+                <h3 class="hero-title m-0">{{ item.title }}</h3>
+                <div class="hero-quote">
+                  <span class="quote-mark">“</span>{{ item.subtitle }}<span class="quote-mark">”</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="hero-dots">
+          @for (item of carouselItems; track item) {
+            <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
+            (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white"
+    [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+    <div class="flex justify-content-center lg:justify-content-start">
+      <img src="/core/logo.svg" alt="SkillQuestX" class="w-15rem" />
+    </div>
+    <div>
+      <h2 class="m-0">Welcome</h2>
+      <p class="mt-2 mb-0">Enter your Email Id and password to Login</p>
+    </div>
+
+    <div class="flex flex-column gap-3">
+      <div class="flex flex-column gap-1">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email Id</mat-label>
+          <mat-icon matPrefix>mail</mat-icon>
+          <input id="login-email" matInput type="email" formControlName="email" autocomplete="email" />
+        </mat-form-field>
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+          <small class="form-error">
+            Enter a valid email address.
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-column gap-1">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Password</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input
+            id="login-password"
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+            (click)="hidePassword.set(!hidePassword())"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+          <small class="form-error">
+            Password must be at least 6 characters.
+          </small>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-2">
+      <a routerLink="/forgot-password" class="brand-link text-sm">Forgot password?</a>
+      <div class="text-sm">
+        Don’t have an account? <a routerLink="/register" class="brand-link">Sign up</a>
+      </div>
+    </div>
+
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      class="login-button w-full"
+      [disabled]="loginForm.invalid || submitting()"
+    >
+      @if (submitting()) {
+        <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
+      }
+      <span>Login</span>
+    </button>
+  </form>
+</section>

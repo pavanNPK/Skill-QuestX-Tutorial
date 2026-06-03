@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'sqx-loader-overlay',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './loader-overlay.component.html',
   styleUrl: './loader-overlay.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

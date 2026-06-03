@@ -1,0 +1,553 @@
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, signal } from '@angular/core';
+
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { getFriendlyErrorMessage } from '../../../shared/utils/error-messages.util';
+import { compressImage, validateImageFile, formatFileSize } from '../../../shared/utils/image-compress.util';
+import { ButtonModule } from 'primeng/button';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { ChipModule } from 'primeng/chip';
+import { KnobModule } from 'primeng/knob';
+import { TooltipModule } from 'primeng/tooltip';
+
+@Component({
+  selector: 'sqx-register',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    FormsModule,
+    RouterLink,
+    ButtonModule,
+    FloatLabelModule,
+    IconFieldModule,
+    InputIconModule,
+    InputTextModule,
+    PasswordModule,
+    ToastModule,
+    ChipModule,
+    KnobModule,
+    TooltipModule
+],
+  providers: [MessageService],
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class RegisterComponent implements OnDestroy {
+  carouselItems = [
+    {
+      title: 'REDEFINE',
+      subtitle: 'Boost your learning and career path'
+    },
+    {
+      title: 'UPSKILL',
+      subtitle: 'Gain modern, in-demand technical expertise'
+    },
+    {
+      title: 'SUCCEED',
+      subtitle: 'Land your dream role or promotion'
+    }
+  ];
+
+  activeIndex = 0;
+  currentStep = 1; // 1: Form, 2: OTP, 3: Password
+
+  /** True while any submit request is in progress. */
+  readonly submitting = signal(false);
+
+  // Forms
+  registerForm: FormGroup;
+  passwordForm: FormGroup;
+
+  // File uploads
+  profileImage: File | null = null;
+  /** Empty by default; show placeholder until user uploads. */
+  profileImagePreview: string = '';
+  /** Compressed base64 profile image to send with registration */
+  profileImageBase64: string = '';
+  resumeFile: File | null = null;
+  resumeFileName: string = '';
+  /** URL returned from server after resume upload */
+  resumeUploadedUrl: string = '';
+  isCompressingImage = false;
+  isUploadingResume = false;
+
+  // Skills
+  skills: string[] = [];
+  skillInput: string = '';
+
+  // OTP
+  otpCode: string = '';
+  otpSent: boolean = false;
+  canResendOTP: boolean = false;
+  resendTimer: number = 180; // 3 minutes
+  otpExpired: boolean = false;
+
+  // Calculate OTP progress percentage for knob
+  get otpProgress(): number {
+    return Math.round((this.resendTimer / 180) * 100);
+  }
+  private rotationTimer?: ReturnType<typeof setInterval>;
+  private resendInterval?: ReturnType<typeof setInterval>;
+
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private messageService: MessageService,
+    private auth: AuthService
+  ) {
+    this.registerForm = this.fb.group({
+      firstName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
+      lastName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      phoneCountry: ['+91'],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+      underGraduate: ['', Validators.required],
+    });
+
+    this.passwordForm = this.fb.group({
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+
+    this.rotationTimer = setInterval(() => {
+      this.activeIndex = (this.activeIndex + 1) % this.carouselItems.length;
+      this.cdr.markForCheck();
+    }, 3000);
+  }
+
+  setActive(index: number) {
+    this.activeIndex = index;
+  }
+
+  // Profile Image Upload
+  triggerProfileImageUpload() {
+    const fileInput = document.getElementById('profile-image-input') as HTMLInputElement;
+    fileInput?.click();
+  }
+
+  async onProfileImageSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Validate file
+      const validationError = validateImageFile(file, 5);
+      if (validationError) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Invalid File',
+          detail: validationError,
+          life: 3000
+        });
+        return;
+      }
+
+      this.profileImage = file;
+      this.isCompressingImage = true;
+      this.cdr.markForCheck();
+
+      try {
+        // Compress image to max 400x400, ~200KB
+        const compressed = await compressImage(file, {
+          maxWidth: 400,
+          maxHeight: 400,
+          quality: 0.8,
+          maxSizeKB: 200
+        });
+
+        this.profileImageBase64 = compressed;
+        this.profileImagePreview = compressed;
+
+        const sizeKB = Math.round((compressed.split(',')[1].length * 3) / 4 / 1024);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Image Ready',
+          detail: `Compressed to ${sizeKB}KB`,
+          life: 2000
+        });
+      } catch (err) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Compression Failed',
+          detail: 'Could not process image. Try another file.',
+          life: 3000
+        });
+        this.profileImage = null;
+        this.profileImageBase64 = '';
+      } finally {
+        this.isCompressingImage = false;
+        this.cdr.markForCheck();
+      }
+    }
+  }
+
+  // Resume Upload - uploads immediately to server
+  onResumeSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Validate file type (PDF, DOC, DOCX, Excel)
+      const validTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ];
+      if (!validTypes.includes(file.type)) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Invalid File Type',
+          detail: 'Please select a valid file (PDF, DOC, DOCX, or Excel)',
+          life: 3000
+        });
+        return;
+      }
+
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'File Too Large',
+          detail: 'Resume size must be less than 5MB',
+          life: 3000
+        });
+        return;
+      }
+
+      this.resumeFile = file;
+      this.resumeFileName = file.name;
+      this.isUploadingResume = true;
+      this.cdr.markForCheck();
+
+      // Upload resume to server immediately
+      this.auth.uploadResume(file).subscribe({
+        next: (res) => {
+          this.resumeUploadedUrl = res.url;
+          this.isUploadingResume = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Resume Uploaded',
+            detail: `${formatFileSize(res.size)} uploaded`,
+            life: 2000
+          });
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.isUploadingResume = false;
+          this.resumeFile = null;
+          this.resumeFileName = '';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Upload Failed',
+            detail: getFriendlyErrorMessage(err, { default: 'Could not upload resume. Try again.' }),
+            life: 3000
+          });
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  // Skills Management
+  addSkill(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    const skill = this.skillInput.trim();
+
+    if (!skill) {
+      return;
+    }
+
+    if (this.skills.length >= 10) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Maximum Reached',
+        detail: 'Maximum 10 skills allowed',
+        life: 3000
+      });
+      return;
+    }
+
+    if (this.skills.includes(skill)) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Duplicate Skill',
+        detail: 'Skill already added',
+        life: 3000
+      });
+      return;
+    }
+
+    this.skills.push(skill);
+    this.skillInput = '';
+    this.cdr.markForCheck();
+  }
+
+  removeSkill(skill: string) {
+    const index = this.skills.indexOf(skill);
+    if (index > -1) {
+      this.skills.splice(index, 1);
+    }
+    this.cdr.markForCheck();
+  }
+
+  // Step 1: Submit Profile Form
+  submitStep1() {
+    if (this.registerForm.invalid || this.submitting()) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    // Validate profile image (must be compressed)
+    if (!this.profileImageBase64) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Profile Image Required',
+        detail: 'Please upload a profile image',
+        life: 3000
+      });
+      return;
+    }
+
+    // Validate resume (must be uploaded)
+    if (!this.resumeUploadedUrl) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Resume Required',
+        detail: 'Please upload your resume',
+        life: 3000
+      });
+      return;
+    }
+
+    // Check if still uploading
+    if (this.isCompressingImage || this.isUploadingResume) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Please Wait',
+        detail: 'Files are still being processed',
+        life: 3000
+      });
+      return;
+    }
+
+    // Validate skills (at least 1 skill required)
+    if (this.skills.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Skills Required',
+        detail: 'Please add at least one skill',
+        life: 3000
+      });
+      return;
+    }
+
+    this.submitting.set(true);
+    const email = this.registerForm.get('email')?.value;
+    this.auth.sendOtp(email).subscribe({
+      next: () => {
+        this.otpSent = true;
+        this.currentStep = 2;
+        this.startResendTimer();
+        this.messageService.add({
+          severity: 'info',
+          summary: 'OTP Sent',
+          detail: 'Check your email for the OTP',
+          life: 3000
+        });
+        this.submitting.set(false);
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.otpSent = true;
+        this.currentStep = 2;
+        this.startResendTimer();
+        this.submitting.set(false);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Send OTP (resend)
+  sendOTP() {
+    const email = this.registerForm.get('email')?.value;
+    this.auth.sendOtp(email).subscribe({
+      next: () => {
+        this.otpSent = true;
+        this.currentStep = 2;
+        this.startResendTimer();
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Resend OTP Timer
+  startResendTimer() {
+    this.canResendOTP = false;
+    this.resendTimer = 180; // 3 minutes
+
+    this.resendInterval = setInterval(() => {
+      this.resendTimer--;
+      if (this.resendTimer <= 0) {
+        this.canResendOTP = true;
+        if (this.resendInterval) {
+          clearInterval(this.resendInterval);
+        }
+      }
+      this.cdr.markForCheck();
+    }, 1000);
+  }
+
+  // Resend OTP
+  resendOTP() {
+    if (!this.canResendOTP) return;
+
+    console.log('Resending OTP to:', this.registerForm.get('email')?.value);
+    this.sendOTP();
+  }
+
+  // Step 2: Submit OTP
+  submitOTP() {
+    if (this.otpCode.length !== 6 || this.submitting()) {
+      if (this.otpCode.length !== 6) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Invalid OTP',
+          detail: 'Please enter a valid 6-digit OTP',
+          life: 3000
+        });
+      }
+      return;
+    }
+    this.submitting.set(true);
+    const email = this.registerForm.get('email')?.value;
+    this.auth.verifyOtp(email, this.otpCode).subscribe({
+      next: (res) => {
+        if (res.valid) {
+          this.currentStep = 3;
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Invalid OTP',
+            detail: 'OTP is invalid or expired',
+            life: 3000
+          });
+        }
+        this.submitting.set(false);
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.submitting.set(false);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Could not verify OTP',
+          life: 3000
+        });
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Step 3: Submit Password
+  submitPassword() {
+    if (this.passwordForm.invalid || this.submitting()) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+    this.submitting.set(true);
+    const password = this.passwordForm.get('password')?.value;
+    const { firstName, lastName, email, phoneCountry, phoneNumber, underGraduate } = this.registerForm.value;
+    this.auth.register({
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneCountry: phoneCountry || undefined,
+      phoneNumber: phoneNumber || undefined,
+      underGraduate: underGraduate || undefined,
+      profileImageUrl: this.profileImageBase64 || undefined,
+      resumeUrl: this.resumeUploadedUrl || undefined,
+      skills: this.skills.length ? this.skills : undefined
+    }).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Registration Successful',
+          detail: 'Welcome! Redirecting to dashboard.',
+          life: 3000
+        });
+        this.submitting.set(false);
+        setTimeout(() => this.router.navigate(['/dashboard']), 1500);
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        const msg = getFriendlyErrorMessage(err, {
+          default: 'This email may already be registered. Try logging in.'
+        });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Registration Failed',
+          detail: msg,
+          life: 5000
+        });
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Password Match Validator
+  passwordMatchValidator(group: FormGroup) {
+    const password = group.get('password')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordMismatch: true };
+  }
+
+  // Get Password Strength
+  getPasswordStrength(): string {
+    const password = this.passwordForm.get('password')?.value || '';
+
+    if (password.length === 0) return '';
+    if (password.length < 8) return 'weak';
+
+    let strength = 0;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+    if (strength <= 2) return 'weak';
+    if (strength === 3) return 'medium';
+    return 'strong';
+  }
+
+  // Format time in MM:SS format
+  formatTime(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  ngOnDestroy(): void {
+    if (this.rotationTimer) {
+      clearInterval(this.rotationTimer);
+    }
+    if (this.resendInterval) {
+      clearInterval(this.resendInterval);
+    }
+  }
+}
