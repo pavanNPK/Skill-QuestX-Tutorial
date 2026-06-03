@@ -1,3 +1,5 @@
+// use of this file is:
+// Core component file. It renders app-wide UI used across routes.
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';

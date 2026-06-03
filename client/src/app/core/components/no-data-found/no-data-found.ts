@@ -1,3 +1,5 @@
+// use of this file is:
+// Core component file. It renders app-wide UI used across routes.
 import { Component } from '@angular/core';
 
 @Component({

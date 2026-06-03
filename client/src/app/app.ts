@@ -1,3 +1,5 @@
+// use of this file is:
+// Angular source file. It connects one part of the frontend application.
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LoaderOverlayComponent } from './shared/components/loader-overlay/loader-overlay.component';

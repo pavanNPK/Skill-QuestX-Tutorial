@@ -1,3 +1,5 @@
+// use of this file is:
+// Core service file. It provides app-wide API/state helpers shared by multiple features.
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -93,6 +95,8 @@ export class CourseContentService {
   private readonly debugLogs = !environment.production && globalThis.localStorage?.getItem('debugCourseContentApi') === 'true';
 
   getAvailableCourses(): Observable<AvailableCourseContent[]> {
+    // use of this is:
+    // Loads lightweight course material cards; MaterialsStore caches this result.
     const url = `${this.apiUrl}/courses/content/available`;
     this.logRequest('GET', url);
     return this.http.get<AvailableCourseContent[]>(url).pipe(
@@ -102,6 +106,8 @@ export class CourseContentService {
   }
 
   getContent(courseId: string): Observable<CourseContent> {
+    // use of this is:
+    // Loads full draft/published content for one course.
     const url = `${this.apiUrl}/courses/${courseId}/content`;
     this.logRequest('GET', url);
     return this.http.get<CourseContent>(url).pipe(
@@ -116,6 +122,8 @@ export class CourseContentService {
   }
 
   importContent(courseId: string, payload: unknown): Observable<CourseContent> {
+    // use of this is:
+    // Imports raw JSON content into the selected course draft.
     const url = `${this.apiUrl}/courses/${courseId}/content/import`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, payload).pipe(
@@ -125,6 +133,8 @@ export class CourseContentService {
   }
 
   importWorkbook(courseId: string, file: File): Observable<CourseContent> {
+    // use of this is:
+    // Uploads an XLSX workbook and receives normalized draft content.
     const formData = new FormData();
     formData.append('file', file);
     const url = `${this.apiUrl}/courses/${courseId}/content/import-workbook`;
@@ -136,6 +146,8 @@ export class CourseContentService {
   }
 
   saveDraft(courseId: string, payload: unknown): Observable<CourseContent> {
+    // use of this is:
+    // Persists editor changes to backend draft snapshot.
     const url = `${this.apiUrl}/courses/${courseId}/content`;
     this.logRequest('PATCH', url);
     return this.http.patch<CourseContent>(url, payload).pipe(
@@ -145,6 +157,8 @@ export class CourseContentService {
   }
 
   publish(courseId: string): Observable<CourseContent> {
+    // use of this is:
+    // Copies backend draft into published content for students.
     const url = `${this.apiUrl}/courses/${courseId}/content/publish`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, {}).pipe(
@@ -154,6 +168,8 @@ export class CourseContentService {
   }
 
   unpublish(courseId: string): Observable<CourseContent> {
+    // use of this is:
+    // Hides published content while keeping draft available to managers.
     const url = `${this.apiUrl}/courses/${courseId}/content/unpublish`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, {}).pipe(
@@ -163,6 +179,8 @@ export class CourseContentService {
   }
 
   uploadAsset(courseId: string, file: File): Observable<ContentAsset> {
+    // use of this is:
+    // Uploads slide/material asset and returns metadata for content blocks.
     const formData = new FormData();
     formData.append('file', file);
     const url = `${this.apiUrl}/courses/${courseId}/content/assets`;
@@ -174,22 +192,30 @@ export class CourseContentService {
   }
 
   absoluteAssetUrl(url?: string): string {
+    // use of this is:
+    // Converts backend relative upload paths into browser-openable absolute URLs.
     if (!url) return '';
     if (/^https?:\/\//.test(url)) return url;
     return `${this.apiUrl.replace(/\/api$/, '')}${url}`;
   }
 
   private logRequest(method: string, url: string, details?: unknown): void {
+    // use of this is:
+    // Optional debug logging controlled by localStorage to avoid slowing normal page loading.
     if (!this.debugLogs) return;
     console.info('[CourseContent API] Request', { method, url, details });
   }
 
   private logSuccess(method: string, url: string, details?: unknown): void {
+    // use of this is:
+    // Optional success log for debugging API flow during development.
     if (!this.debugLogs) return;
     console.info('[CourseContent API] Success', { method, url, details });
   }
 
   private logError<T>(method: string, url: string, error: unknown): Observable<T> {
+    // use of this is:
+    // Preserves RxJS error flow while optionally logging debug details.
     if (this.debugLogs) console.error('[CourseContent API] Error', { method, url, error });
     return throwError(() => error);
   }

@@ -1,3 +1,5 @@
+// use of this file is:
+// Angular source file. It connects one part of the frontend application.
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';

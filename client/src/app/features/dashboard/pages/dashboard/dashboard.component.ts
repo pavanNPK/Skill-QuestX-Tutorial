@@ -1,3 +1,5 @@
+// use of this file is:
+// Feature page/container file. It connects route UI, feature state, services, and user actions.
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CarouselModule } from 'primeng/carousel';

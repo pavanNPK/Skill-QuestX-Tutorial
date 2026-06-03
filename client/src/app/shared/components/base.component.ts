@@ -1,3 +1,5 @@
+// use of this file is:
+// Shared component file. It provides reusable UI or base behavior across features.
 import { Directive, OnDestroy } from '@angular/core';
 import { MonoTypeOperatorFunction, Subject, takeUntil } from 'rxjs';
 

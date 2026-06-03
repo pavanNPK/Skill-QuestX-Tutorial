@@ -1,3 +1,5 @@
+// use of this file is:
+// Feature SignalStore file. It stores feature state, async status, cache, and computed values.
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
@@ -8,6 +10,8 @@ import {
   CourseContentService,
 } from '../../../core/services/course-content.service';
 
+// use of this is:
+// Materials state keeps course list, loaded course content cache, active lesson selection, and async flags together.
 interface MaterialsState {
   courses: AvailableCourseContent[];
   contentByCourseId: Record<string, CourseContent>;
@@ -21,6 +25,8 @@ interface MaterialsState {
   loadedCourses: boolean;
 }
 
+// use of this is:
+// Initial values make the page render instantly, then API results fill the store without local component duplicates.
 const initialState: MaterialsState = {
   courses: [],
   contentByCourseId: {},

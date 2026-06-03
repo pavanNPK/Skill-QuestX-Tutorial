@@ -1,3 +1,5 @@
+// use of this file is:
+// Core service file. It provides app-wide API/state helpers shared by multiple features.
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -134,6 +136,8 @@ export class AuthService {
 
   readonly currentUser = signal<AuthUser | null>(this.getStoredUser());
 
+  // use of this is:
+  // Reads the saved user from localStorage during app startup so the UI can render session state immediately.
   private getStoredUser(): AuthUser | null {
     try {
       const raw = localStorage.getItem(this.userKey);
@@ -143,10 +147,14 @@ export class AuthService {
     }
   }
 
+  // use of this is:
+  // Returns JWT token used by auth.interceptor.ts to attach Authorization header.
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
+  // use of this is:
+  // Quick local check used by guards and UI before calling protected APIs.
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
@@ -220,6 +228,8 @@ export class AuthService {
   }
 
   login(body: LoginRequest): Observable<AuthResult> {
+    // use of this is:
+    // Calls backend login, stores token/user locally, and syncs AuthStore for guards/navigation.
     return this.http.post<AuthResult>(`${this.apiUrl}/auth/login`, body).pipe(
       tap((res) => {
         localStorage.setItem(this.tokenKey, res.access_token);
@@ -231,6 +241,8 @@ export class AuthService {
   }
 
   register(body: RegisterRequest): Observable<AuthResult> {
+    // use of this is:
+    // Registers a student account and stores the returned session just like login().
     return this.http.post<AuthResult>(`${this.apiUrl}/auth/register`, body).pipe(
       tap((res) => {
         localStorage.setItem(this.tokenKey, res.access_token);
@@ -243,36 +255,50 @@ export class AuthService {
 
   /** SA or Admin only: create Admin or Instructor. Omit password to send set-password email. */
   createUser(body: CreateUserRequest): Observable<CreateUserResult> {
+    // use of this is:
+    // Admin/Super Admin creates staff users through backend role checks.
     return this.http.post<CreateUserResult>(`${this.apiUrl}/auth/create-user`, body);
   }
 
   /** SA / Admin / Instructor: list users (role-based payload). */
   listUsers(): Observable<ListUsersResponse> {
+    // use of this is:
+    // Loads role-specific user-management data for the Users feature.
     return this.http.get<ListUsersResponse>(`${this.apiUrl}/auth/users`);
   }
 
   /** SA or Admin: set user active status (SA: any user; Admin: instructor/student only). */
   setUserStatus(userId: string, active: boolean): Observable<{ user: AuthUser }> {
+    // use of this is:
+    // Activates or deactivates a user from the admin screen.
     return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/users/${userId}/status`, { active });
   }
 
   /** SA only: grant or revoke head permission for an Admin. That Admin can then add users and set user status. */
   setHeadPermission(userId: string, head: boolean): Observable<{ user: AuthUser }> {
+    // use of this is:
+    // Super Admin grants/revokes admin-head permission.
     return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/users/${userId}/head`, { head });
   }
 
   /** SA and Admin: list courses (for assigning instructors on Add User). Returns at least id, name. */
   listCourses(): Observable<CourseOption[]> {
+    // use of this is:
+    // Loads compact course options for assigning instructors while creating users.
     return this.http.get<CourseOption[]>(`${this.apiUrl}/auth/courses`);
   }
 
   /** All authenticated users: list courses with full data (Popular Courses). */
   listCoursesForDisplay(): Observable<CourseForDisplay[]> {
+    // use of this is:
+    // Loads public/full course cards for course listing screens.
     return this.http.get<CourseForDisplay[]>(`${this.apiUrl}/courses`);
   }
 
   /** Set password using token from invite email (no auth). */
   setPassword(token: string, newPassword: string): Observable<{ message: string; user: AuthUser }> {
+    // use of this is:
+    // Completes invite flow by setting password with a token from email.
     return this.http.post<{ message: string; user: AuthUser }>(`${this.apiUrl}/auth/set-password`, {
       token,
       newPassword,
@@ -280,20 +306,28 @@ export class AuthService {
   }
 
   sendOtp(email: string): Observable<{ message: string }> {
+    // use of this is:
+    // Requests OTP for email verification flows.
     return this.http.post<{ message: string }>(`${this.apiUrl}/auth/send-otp`, { email });
   }
 
   verifyOtp(email: string, otp: string): Observable<{ valid: boolean }> {
+    // use of this is:
+    // Verifies the OTP code before registration/reset steps continue.
     return this.http.post<{ valid: boolean }>(`${this.apiUrl}/auth/verify-otp`, { email, otp });
   }
 
   /** Forgot password: send OTP only if account exists. Returns message and sent flag. */
   forgotPasswordSendOtp(email: string): Observable<{ message: string; sent: boolean }> {
+    // use of this is:
+    // Starts forgot-password flow by asking backend to email a reset OTP.
     return this.http.post<{ message: string; sent: boolean }>(`${this.apiUrl}/auth/forgot-password/send-otp`, { email });
   }
 
   /** Reset password after OTP verified. */
   resetPassword(email: string, otp: string, newPassword: string): Observable<{ message: string }> {
+    // use of this is:
+    // Finishes forgot-password flow after OTP validation.
     return this.http.post<{ message: string }>(`${this.apiUrl}/auth/forgot-password/reset`, {
       email,
       otp,
@@ -303,6 +337,8 @@ export class AuthService {
 
   /** Authenticated user: change password (current + new). Server returns message; client should logout or re-login. */
   changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    // use of this is:
+    // Authenticated password change from profile/settings.
     return this.http.patch<{ message: string }>(`${this.apiUrl}/auth/change-password`, {
       currentPassword,
       newPassword,
@@ -311,6 +347,8 @@ export class AuthService {
 
   /** Authenticated user: update own profile (firstName, lastName only). Role and email/username are read-only. Refreshes stored user. */
   updateProfile(payload: { firstName: string; lastName: string }): Observable<AuthUser> {
+    // use of this is:
+    // Updates allowed profile fields and refreshes both localStorage and AuthStore.
     return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/profile`, payload).pipe(
       tap((res) => {
         this.currentUser.set(res.user);
@@ -323,6 +361,8 @@ export class AuthService {
 
   /** Validate JWT and refresh current user from server. Call on app init when token exists. */
   getMe(): Observable<AuthUser> {
+    // use of this is:
+    // Validates token on app startup and refreshes the current user from backend.
     return this.http.get<{ user: AuthUser }>(`${this.apiUrl}/auth/me`).pipe(
       tap((res) => {
         this.currentUser.set(res.user);
@@ -335,12 +375,16 @@ export class AuthService {
 
   /** Upload resume file and get URL. Public endpoint (for registration). */
   uploadResume(file: File): Observable<UploadResumeResponse> {
+    // use of this is:
+    // Uploads resume before registration submit and returns the stored file URL.
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<UploadResumeResponse>(`${this.apiUrl}/upload/resume`, formData);
   }
 
   logout(): void {
+    // use of this is:
+    // Clears local session state and redirects to login after user logout or 401.
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
     this.currentUser.set(null);

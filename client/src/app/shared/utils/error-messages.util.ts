@@ -1,3 +1,5 @@
+// use of this file is:
+// Shared utility file. It keeps reusable pure helper logic out of components.
 import { HttpErrorResponse } from '@angular/common/http';
 
 /** Technical messages we must never show to users. */

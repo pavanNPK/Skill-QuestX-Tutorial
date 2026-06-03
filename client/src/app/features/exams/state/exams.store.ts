@@ -1,6 +1,10 @@
+// use of this file is:
+// Feature SignalStore file. It stores feature state, async status, cache, and computed values.
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 
+// use of this is:
+// Exams state separates loading exam data from submitting answers so screens can disable the correct actions.
 interface ExamsState {
   selectedExamId: string | null;
   loading: boolean;
@@ -8,6 +12,8 @@ interface ExamsState {
   error: string;
 }
 
+// use of this is:
+// Initial values keep exam pages idle until a list/detail/submit flow starts.
 const initialState: ExamsState = {
   selectedExamId: null,
   loading: false,

@@ -1,3 +1,5 @@
+// use of this file is:
+// Shared component file. It provides reusable UI or base behavior across features.
 import { TestBed } from '@angular/core/testing';
 
 import { UtilitiesDemoComponent } from './utilities-demo.component';

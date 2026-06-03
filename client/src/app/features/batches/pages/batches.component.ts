@@ -1,3 +1,5 @@
+// use of this file is:
+// Feature page/container file. It connects route UI, feature state, services, and user actions.
 import { Component, signal, computed, OnInit, inject } from '@angular/core';
 
 import { Router } from '@angular/router';

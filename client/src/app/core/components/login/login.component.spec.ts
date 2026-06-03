@@ -1,3 +1,5 @@
+// use of this file is:
+// Core component file. It renders app-wide UI used across routes.
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';

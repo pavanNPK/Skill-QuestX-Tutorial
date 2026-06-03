@@ -1,3 +1,5 @@
+// use of this file is:
+// Feature page/container file. It connects route UI, feature state, services, and user actions.
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../../../../core/components/navbar/navbar.component';

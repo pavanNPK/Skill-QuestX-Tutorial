@@ -1,3 +1,5 @@
+// use of this file is:
+// Shared component file. It provides reusable UI or base behavior across features.
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 

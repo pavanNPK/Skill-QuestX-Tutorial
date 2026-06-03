@@ -1,3 +1,5 @@
+// use of this file is:
+// Feature domain file. It stores models, DTOs, enums, and contracts used by this feature.
 export interface Student {
     id: number;
     name: string;

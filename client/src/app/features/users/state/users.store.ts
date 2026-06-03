@@ -1,6 +1,10 @@
+// use of this file is:
+// Feature SignalStore file. It stores feature state, async status, cache, and computed values.
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 
+// use of this is:
+// Users state keeps admin user-management selection and async flags in one predictable place.
 interface UsersState {
   selectedUserId: string | null;
   loading: boolean;
@@ -8,6 +12,8 @@ interface UsersState {
   error: string;
 }
 
+// use of this is:
+// Initial values keep the user-management page empty and idle until data is loaded.
 const initialState: UsersState = {
   selectedUserId: null,
   loading: false,

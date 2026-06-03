@@ -1,8 +1,12 @@
+// use of this file is:
+// Shared guard file. It protects routes using app state and role/session rules.
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
-/** Allow only SA and Admin to access the Users page. Instructor sees all other screens but not Users. */
+// use of this is:
+// Allow only Super Admin and Admin users to access user-management routes.
+// Instructors can use other app areas but should not load the Users feature.
 export const usersPageGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);

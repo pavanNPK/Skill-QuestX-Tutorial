@@ -1,3 +1,5 @@
+// use of this file is:
+// Feature page/container file. It connects route UI, feature state, services, and user actions.
 import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';

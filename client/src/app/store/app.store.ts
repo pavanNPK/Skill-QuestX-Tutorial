@@ -1,12 +1,18 @@
+// use of this file is:
+// Root store file. It stores app-wide state that is not owned by one feature.
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 
+// use of this is:
+// Root app state belongs here when it affects the whole shell and should not be duplicated inside features.
 interface AppState {
   initialized: boolean;
   activeRequests: number;
   shellReady: boolean;
 }
 
+// use of this is:
+// Initial root values keep the app shell usable immediately while request counters start from zero.
 const initialState: AppState = {
   initialized: true,
   activeRequests: 0,

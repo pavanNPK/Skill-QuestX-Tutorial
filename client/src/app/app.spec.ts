@@ -1,3 +1,5 @@
+// use of this file is:
+// Test file. It verifies the component or service behavior for this source file.
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { App } from './app';

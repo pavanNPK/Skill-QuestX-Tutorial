@@ -1,6 +1,10 @@
+// use of this file is:
+// Feature SignalStore file. It stores feature state, async status, cache, and computed values.
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 
+// use of this is:
+// Tasks state tracks selected task and separates read loading from write/save operations.
 interface TasksState {
   selectedTaskId: string | null;
   loading: boolean;
@@ -8,6 +12,8 @@ interface TasksState {
   error: string;
 }
 
+// use of this is:
+// Initial values keep task screens idle before any task is selected or saved.
 const initialState: TasksState = {
   selectedTaskId: null,
   loading: false,

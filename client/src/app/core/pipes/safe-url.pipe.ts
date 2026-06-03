@@ -1,3 +1,5 @@
+// use of this file is:
+// Core pipe file. It formats or sanitizes values reused across the app.
 import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 

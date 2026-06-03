@@ -1,3 +1,5 @@
+// use of this file is:
+// Route file. It declares Angular routes and lazy-loads feature pages.
 import { Routes } from '@angular/router';
 
 import { AccessDeniedComponent } from './core/components/access-denied/access-denied.component';
@@ -16,7 +18,8 @@ import { ChangePasswordComponent } from './core/components/change-password/chang
 import { ProfileSettingsComponent } from './core/components/profile-settings/profile-settings.component';
 
 export const routes: Routes = [
-  // Auth routes (public)
+  // use of this section is:
+  // Public routes render without authGuard because users need them before login.
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotComponent },
   { path: 'register', component: RegisterComponent },
@@ -27,7 +30,9 @@ export const routes: Routes = [
   { path: 'terms-and-conditions', component: TermsAndConditionsComponent },
   { path: 'utilities-demo', component: UtilitiesDemoComponent },
 
-  // Protected routes (with auth guard) - at root level
+  // use of this route is:
+  // Protected app shell. canMatch blocks lazy loading for anonymous users;
+  // canActivate protects the shell after matching.
   {
     path: '',
     component: HomeComponent,
@@ -36,14 +41,17 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
+        // Dashboard is lazy-loaded so the first app bundle stays smaller.
         path: 'dashboard',
         loadChildren: () => import('./features/dashboard/dashboard.routes').then((m) => m.dashboardRoutes)
       },
       {
+        // Courses feature owns course list and course-content management entry points.
         path: 'courses',
         loadChildren: () => import('./features/courses/courses.routes').then((m) => m.coursesRoutes)
       },
       {
+        // Materials feature uses MaterialsStore cache for fast revisit/loading.
         path: 'materials',
         loadChildren: () => import('./features/materials/materials.routes').then((m) => m.materialsRoutes)
       },
@@ -76,10 +84,11 @@ export const routes: Routes = [
     ]
   },
 
-  // Redirect empty path to login when not authenticated (canMatch above failed)
+  // use of this route is:
+  // Redirect anonymous empty path visits to login after protected canMatch fails.
   { path: '', pathMatch: 'full', redirectTo: 'login' },
 
-  // 404
+  // use of this route is:
+  // Catch every unknown URL and show a stable not-found page.
   { path: '**', component: PageNotFoundComponent }
 ];
-

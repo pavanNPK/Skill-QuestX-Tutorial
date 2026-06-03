@@ -1,3 +1,5 @@
+// use of this file is:
+// Core service file. It provides app-wide API/state helpers shared by multiple features.
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -12,6 +14,8 @@ export class PushRegistrationService {
 
   /** Register SW, request permission, subscribe, and send subscription to backend. Call when user is logged in. */
   async register(): Promise<void> {
+    // use of this is:
+    // Registers service worker, requests permission, subscribes browser, and saves subscription.
     if (!this.supported()) return;
     try {
       const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
@@ -31,6 +35,8 @@ export class PushRegistrationService {
   }
 
   private supported(): boolean {
+    // use of this is:
+    // Checks browser support before touching service worker or Push APIs.
     return typeof navigator !== 'undefined' &&
       'serviceWorker' in navigator &&
       'PushManager' in window &&
@@ -38,11 +44,15 @@ export class PushRegistrationService {
   }
 
   private async getVapidPublicKey(): Promise<string | null> {
+    // use of this is:
+    // Reads backend public VAPID key needed by PushManager.subscribe().
     const res = await firstValueFrom(this.http.get<{ publicKey: string | null }>(`${this.apiUrl}/notifications/vapid-public-key`));
     return res?.publicKey ?? null;
   }
 
   private urlBase64ToUint8Array(base64String: string): Uint8Array {
+    // use of this is:
+    // Converts base64url VAPID key into Uint8Array format required by browser Push API.
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = atob(base64);
@@ -52,6 +62,8 @@ export class PushRegistrationService {
   }
 
   private async sendSubscriptionToBackend(sub: PushSubscriptionJSON): Promise<void> {
+    // use of this is:
+    // Sends browser subscription keys to backend so it can deliver push notifications later.
     const p256dh = sub.keys?.['p256dh'];
     const auth = sub.keys?.['auth'];
     if (!sub.endpoint || !p256dh || !auth) return;

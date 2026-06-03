@@ -1,6 +1,10 @@
+// use of this file is:
+// Feature SignalStore file. It stores feature state, async status, cache, and computed values.
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 
+// use of this is:
+// Batches state owns active batch selection plus read/write flags for batch screens.
 interface BatchesState {
   selectedBatchId: string | null;
   loading: boolean;
@@ -8,6 +12,8 @@ interface BatchesState {
   error: string;
 }
 
+// use of this is:
+// Initial values keep batch pages idle before the first load or save operation.
 const initialState: BatchesState = {
   selectedBatchId: null,
   loading: false,

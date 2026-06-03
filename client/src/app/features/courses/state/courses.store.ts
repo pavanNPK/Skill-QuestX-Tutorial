@@ -1,12 +1,18 @@
+// use of this file is:
+// Feature SignalStore file. It stores feature state, async status, cache, and computed values.
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 
+// use of this is:
+// Courses state owns only feature-level UI state; API entity lists can be added here when course pages need caching.
 interface CoursesState {
   selectedCourseId: string | null;
   loading: boolean;
   error: string;
 }
 
+// use of this is:
+// Initial values mean no course is selected and no async course work is active on first load.
 const initialState: CoursesState = {
   selectedCourseId: null,
   loading: false,

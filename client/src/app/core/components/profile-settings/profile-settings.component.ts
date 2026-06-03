@@ -1,3 +1,5 @@
+// use of this file is:
+// Core component file. It renders app-wide UI used across routes.
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';

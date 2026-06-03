@@ -1,3 +1,5 @@
+// use of this file is:
+// Core component file. It renders app-wide UI used across routes.
 import { Component, OnInit, signal, inject } from '@angular/core';
 
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
