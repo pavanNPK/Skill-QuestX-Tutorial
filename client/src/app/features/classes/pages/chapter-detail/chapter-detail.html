@@ -1,27 +1,27 @@
 <!-- use of this template is: Render the component view, bind signals/state, and expose user actions without API logic. -->
 <div class="chapter-detail-container">
     <!-- Page Header -->
-    <h1 class="page-title">{{ chapterTitle }}</h1>
+    <h1 class="page-title">{{ chapterTitle() }}</h1>
 
     <!-- Course Info -->
     <div class="course-info">
-        <h2 class="course-title">{{ courseTitle }}</h2>
-        <p class="course-description">{{ courseDescription }}</p>
+        <h2 class="course-title">{{ courseTitle() }}</h2>
+        <p class="course-description">{{ courseDescription() }}</p>
     </div>
 
-    @if (loading) {
+    @if (loading()) {
     <div class="empty-state">Loading class content...</div>
-    } @else if (error) {
-    <div class="empty-state">{{ error }}</div>
-    } @else if (modules.length === 0) {
+    } @else if (error()) {
+    <div class="empty-state">{{ error() }}</div>
+    } @else if (modules().length === 0) {
     <div class="empty-state">No lessons uploaded yet.</div>
     }
 
     <!-- Modules Accordion -->
-    @if (modules.length) {
+    @if (modules().length) {
     <div class="modules-section">
         <p-accordion [value]="'0'">
-            @for (module of modules; track module.id; let i = $index) {
+            @for (module of modules(); track module.id; let i = $index) {
             <p-accordion-panel [value]="i.toString()">
                 <p-accordion-header>
                     <ng-template #toggleicon let-active="active">
@@ -75,14 +75,14 @@
     </div>
     }
 
-    @if (selectedLesson) {
+    @if (selectedLesson()) {
     <div class="modules-section">
-        <h2 class="course-title">{{ selectedLesson.title }}</h2>
-        @if (selectedLesson.summary) {
-        <p class="course-description">{{ selectedLesson.summary }}</p>
+        <h2 class="course-title">{{ selectedLesson()!.title }}</h2>
+        @if (selectedLesson()!.summary) {
+        <p class="course-description">{{ selectedLesson()!.summary }}</p>
         }
         <div class="videos-list">
-            @for (block of selectedLesson.blocks; track block.id) {
+            @for (block of selectedLesson()!.blocks; track block.id) {
             <div class="video-item">
                 <div class="video-info">
                     @if (block.type === 'heading') {

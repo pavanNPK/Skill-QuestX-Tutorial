@@ -1,6 +1,6 @@
 // use of this file is:
 // Feature page/container file. It connects route UI, feature state, services, and user actions.
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -138,17 +138,18 @@ export class CoursesListComponent implements OnInit {
     ];
 
     /** Populated from API (GET /courses) or static fallback. */
-    courses: Course[] = [];
-    popularStartIndex = 0;
+    readonly courses = signal<Course[]>([]);
+    readonly popularStartIndex = signal(0);
 
-    get visiblePopularCourses(): Course[] {
-        if (!this.courses.length) return [];
-        const visibleCount = Math.min(3, this.courses.length);
+    readonly visiblePopularCourses = computed<Course[]>(() => {
+        const courses = this.courses();
+        if (!courses.length) return [];
+        const visibleCount = Math.min(3, courses.length);
         return Array.from({ length: visibleCount }, (_, offset) => {
-            const index = (this.popularStartIndex + offset) % this.courses.length;
-            return this.courses[index];
+            const index = (this.popularStartIndex() + offset) % courses.length;
+            return courses[index];
         });
-    }
+    });
 
     myCourses: MyCourse[] = [
         {
@@ -176,11 +177,11 @@ export class CoursesListComponent implements OnInit {
     constructor(private router: Router) { }
 
     ngOnInit(): void {
-        this.courses = this.staticCourses.slice();
+        this.courses.set(this.staticCourses.slice());
         this.courseContent.getAvailableCourses().subscribe({
             next: (list) => {
                 if (!list.length) return;
-                this.courses = list.map((c) => ({
+                this.courses.set(list.map((c) => ({
                     id: c.id,
                     title: c.title ?? c.name,
                     description: c.description ?? '',
@@ -191,7 +192,7 @@ export class CoursesListComponent implements OnInit {
                     author: c.author,
                     ratingAverage: 0,
                     ratingCount: 0,
-                }));
+                })));
             },
             error: () => this.loadDisplayCoursesFallback(),
         });
@@ -200,7 +201,7 @@ export class CoursesListComponent implements OnInit {
     private loadDisplayCoursesFallback(): void {
         this.auth.listCoursesForDisplay().subscribe({
             next: (list) => {
-                this.courses = list.map((c: CourseForDisplay) => ({
+                this.courses.set(list.map((c: CourseForDisplay) => ({
                     id: c.id,
                     title: c.title ?? c.name,
                     description: c.description ?? '',
@@ -211,10 +212,10 @@ export class CoursesListComponent implements OnInit {
                     author: c.author,
                     ratingAverage: c.ratingAverage ?? 0,
                     ratingCount: c.ratingCount ?? 0,
-                }));
+                })));
             },
             error: () => {
-                this.courses = this.staticCourses.slice();
+                this.courses.set(this.staticCourses.slice());
             },
         });
     }
@@ -235,13 +236,15 @@ export class CoursesListComponent implements OnInit {
     }
 
     previousPopularCourse() {
-        if (!this.courses.length) return;
-        this.popularStartIndex = (this.popularStartIndex - 1 + this.courses.length) % this.courses.length;
+        const courses = this.courses();
+        if (!courses.length) return;
+        this.popularStartIndex.update((index) => (index - 1 + courses.length) % courses.length);
     }
 
     nextPopularCourse() {
-        if (!this.courses.length) return;
-        this.popularStartIndex = (this.popularStartIndex + 1) % this.courses.length;
+        const courses = this.courses();
+        if (!courses.length) return;
+        this.popularStartIndex.update((index) => (index + 1) % courses.length);
     }
 
     calculateDiscountedPrice(price: number, discount: number): string {

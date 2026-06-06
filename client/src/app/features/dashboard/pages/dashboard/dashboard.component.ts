@@ -1,9 +1,10 @@
 // use of this file is:
 // Feature page/container file. It connects route UI, feature state, services, and user actions.
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CarouselModule } from 'primeng/carousel';
 import { ButtonModule } from 'primeng/button';
+import { AnimateOnScroll } from 'primeng/animateonscroll';
 
 interface Task {
   id: number;
@@ -67,16 +68,16 @@ interface Student {
 @Component({
   selector: 'sqx-dashboard',
   standalone: true,
-  imports: [CommonModule, CarouselModule, ButtonModule],
+  imports: [CommonModule, CarouselModule, ButtonModule, AnimateOnScroll],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
-  currentDate = new Date();
-  selectedDay: number | null = null;
-  currentMonth: string = '';
-  currentYear: number = 0;
-  calendarDays: (number | null)[] = [];
+  readonly currentDate = signal(new Date());
+  readonly selectedDay = signal<number | null>(null);
+  readonly currentMonth = signal('');
+  readonly currentYear = signal(0);
+  readonly calendarDays = signal<(number | null)[]>([]);
 
   // Mock Data for Top Students
   students: Student[] = [
@@ -192,64 +193,71 @@ export class DashboardComponent implements OnInit {
     }
   ];
 
-  courseProgress = 80;
-  completedTasks = 12;
-  unfinishedTasks = 3;
+  readonly courseProgress = signal(80);
+  readonly completedTasks = signal(12);
+  readonly unfinishedTasks = signal(3);
+  readonly progressPercentage = computed(() => {
+    const completed = this.completedTasks();
+    const unfinished = this.unfinishedTasks();
+    return (completed / (completed + unfinished)) * 100;
+  });
 
   ngOnInit() {
-    this.selectedDay = this.currentDate.getDate();
+    this.selectedDay.set(this.currentDate().getDate());
     this.updateCalendar();
   }
 
   updateCalendar() {
-    const year = this.currentDate.getFullYear();
-    const month = this.currentDate.getMonth();
+    const currentDate = this.currentDate();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
-    this.currentYear = year;
-    this.currentMonth = this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    this.currentYear.set(year);
+    this.currentMonth.set(currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    this.calendarDays = [];
+    const days: (number | null)[] = [];
 
     // Add empty cells for days before the first day
     for (let i = 0; i < firstDay; i++) {
-      this.calendarDays.push(null);
+      days.push(null);
     }
 
     // Add the days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      this.calendarDays.push(day);
+      days.push(day);
     }
+
+    this.calendarDays.set(days);
   }
 
   previousMonth() {
-    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1);
+    const currentDate = this.currentDate();
+    this.currentDate.set(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
     this.updateCalendar();
   }
 
   nextMonth() {
-    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
+    const currentDate = this.currentDate();
+    this.currentDate.set(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
     this.updateCalendar();
   }
 
   selectDay(day: number | null) {
     if (day) {
-      this.selectedDay = day;
+      this.selectedDay.set(day);
     }
   }
 
   isToday(day: number | null): boolean {
     if (!day) return false;
     const today = new Date();
+    const currentDate = this.currentDate();
     return day === today.getDate() &&
-      this.currentDate.getMonth() === today.getMonth() &&
-      this.currentDate.getFullYear() === today.getFullYear();
-  }
-
-  get progressPercentage(): number {
-    return (this.completedTasks / (this.completedTasks + this.unfinishedTasks)) * 100;
+      currentDate.getMonth() === today.getMonth() &&
+      currentDate.getFullYear() === today.getFullYear();
   }
 
   // Helper to darken/lighten hex color for gradient

@@ -4,11 +4,9 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AuthService } from '../../services/auth.service';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import { getFriendlyErrorMessage } from '../../../shared/utils/error-messages.util';
@@ -20,11 +18,9 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
+    ButtonModule,
+    InputTextModule,
+    ProgressSpinnerModule,
     SafeUrlPipe
 ],
   templateUrl: './profile-settings.component.html',

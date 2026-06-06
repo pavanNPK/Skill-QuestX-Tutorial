@@ -4,11 +4,9 @@ import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AuthService } from '../../services/auth.service';
 import { getFriendlyErrorMessage } from '../../../shared/utils/error-messages.util';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
@@ -19,11 +17,9 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
+    ButtonModule,
+    InputTextModule,
+    ProgressSpinnerModule,
 ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -47,7 +43,7 @@ export class LoginComponent implements OnDestroy {
     }
   ];
 
-  activeIndex = 0;
+  readonly activeIndex = signal(0);
 
   /** True while login request is in progress (prevents double submit). */
   readonly submitting = signal(false);
@@ -63,12 +59,12 @@ export class LoginComponent implements OnDestroy {
   ) {
     this.loginForm = this.buildLoginForm();
     this.rotationTimer = setInterval(() => {
-      this.activeIndex = (this.activeIndex + 1) % this.carouselItems.length;
+      this.activeIndex.update((index) => (index + 1) % this.carouselItems.length);
     }, 3000);
   }
 
   setActive(index: number) {
-    this.activeIndex = index;
+    this.activeIndex.set(index);
   }
 
   private buildLoginForm() {

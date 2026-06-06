@@ -1,18 +1,15 @@
-/* use of this stylesheet is: Define component/page styling while keeping layout and visual behavior scoped to this file. */
-// Content area (header + main)
 .content-area {
-    margin-left: 220px; // Width of sidebar
+    margin-left: var(--sqx-sidebar-width);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     transition: margin-left 0.2s ease;
 
     &.sidebar-collapsed {
-        margin-left: 76px;
+        margin-left: var(--sqx-sidebar-collapsed-width);
     }
 }
 
-// Main Content
 .main-content {
     flex: 1;
     background: var(--sqx-color-bg);

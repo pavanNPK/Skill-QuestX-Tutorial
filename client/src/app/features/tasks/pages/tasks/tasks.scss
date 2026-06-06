@@ -170,15 +170,6 @@
 }
 
 .student-detail-download-wrap {
-  .p-button-outlined {
-    border-color: #d1d5db;
-    color: #374151;
-
-    &:hover {
-      border-color: var(--sqx-color-primary, #5B4BC4);
-      color: var(--sqx-color-primary, #5B4BC4);
-    }
-  }
 }
 
 .student-start-task-wrap {
@@ -356,14 +347,7 @@
 
     .action-buttons {
         .create-btn {
-            // Use PrimeNG default size; color from global primary override
-            background: var(--sqx-color-primary);
-            border: none;
             box-shadow: none;
-
-            &:hover:not(:disabled) {
-                background: var(--sqx-color-primary-dark);
-            }
         }
     }
 }
@@ -506,25 +490,14 @@ $drawer-input-font: 'Sen', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe 
         padding: 0.75rem 1rem !important;
     }
 
-    // PrimeNG Select – minimal styling to match PrimeNG defaults
     .create-task-select {
         width: 100%;
 
         ::ng-deep .p-select {
             width: 100%;
-
-            &:hover:not(.p-disabled) {
-                border-color: var(--sqx-color-primary);
-            }
-
-            &.p-focus {
-                border-color: var(--sqx-color-primary);
-                box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.2);
-            }
         }
     }
 
-    // PrimeNG DatePicker – same look as inputs and selects
     .form-datepicker.p-datepicker,
     .p-datepicker.form-datepicker,
     .p-drawer-content p-datepicker,
@@ -532,72 +505,26 @@ $drawer-input-font: 'Sen', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe 
         display: block;
         width: 100% !important;
         min-width: 0;
-        font-family: $drawer-input-font;
 
         .p-inputtext {
             width: 100% !important;
             min-width: 0;
-            min-height: 2.75rem;
-            padding: $drawer-input-padding !important;
             box-sizing: border-box;
-            border-radius: $drawer-input-radius;
-            border: $drawer-input-border;
-            font-size: 0.875rem;
-            font-family: $drawer-input-font;
-            transition: border-color 0.2s, box-shadow 0.2s;
-
-            &::placeholder {
-                font-family: $drawer-input-font;
-                color: #9ca3af;
-            }
-        }
-
-        &.p-focus .p-inputtext,
-        .p-inputtext:focus {
-            border-color: #6c5ce7;
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
-            outline: none;
         }
     }
 
-    // All text inputs in drawer content – padding and font
     .p-drawer-content {
         .p-inputtext {
             width: 100% !important;
             min-width: 0;
             box-sizing: border-box;
-            padding: $drawer-input-padding !important;
-            font-family: $drawer-input-font;
-
-            &::placeholder {
-                font-family: $drawer-input-font;
-            }
         }
 
         .p-inputtextarea {
             width: 100% !important;
             min-width: 0;
             box-sizing: border-box;
-            padding: 0.75rem 1rem !important;
-            font-family: $drawer-input-font;
-            font-size: 0.875rem;
-            line-height: 1.5;
             resize: vertical;
-            min-height: 6rem;
-            border-radius: $drawer-input-radius;
-            border: $drawer-input-border;
-            transition: border-color 0.2s, box-shadow 0.2s;
-
-            &::placeholder {
-                font-family: $drawer-input-font;
-                color: #9ca3af;
-            }
-
-            &:focus {
-                border-color: #6c5ce7;
-                box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
-                outline: none;
-            }
         }
     }
 }
@@ -1026,25 +953,6 @@ $task-details-pending-bg: #f1f5f9;
         ::ng-deep .p-select,
         ::ng-deep .p-datepicker {
             width: 100%;
-            border-radius: 8px;
-            height: 42px;
-            border-color: #dfe6e9;
-            align-items: center;
-
-            &:hover {
-                border-color: #b2bec3;
-            }
-
-            &.p-focus {
-                border-color: #6c5ce7;
-                box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1);
-            }
-        }
-
-        ::ng-deep .p-inputtext {
-            border-radius: 8px;
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
         }
     }
 }

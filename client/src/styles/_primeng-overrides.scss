@@ -1,68 +1,83 @@
-/* use of this stylesheet is: Define component/page styling while keeping layout and visual behavior scoped to this file. */
-// App-wide PrimeNG button styling. Do not add custom width/height — use PrimeNG defaults.
-// Primary: #5B4BC4. Yes/Confirm/Save/Update/Edit = filled; No/Cancel/Close = outlined.
-// No outline, no box-shadow on any button.
+$brand: #5B4BC4;
+$brand-dark: #4a3da3;
+$brand-soft: #EEEDF9;
+$surface: #ffffff;
 
-.p-button,
-.p-button.p-button-primary,
-.p-button-primary,
-.p-button.p-button-outlined,
-.p-button-outlined,
-.p-button-text,
-.p-button-secondary,
-.p-button-danger {
-  box-shadow: none !important;
-  outline: none !important;
-  text-decoration: none !important;
+:root {
+  --p-primary-color: #{$brand};
+  --p-primary-contrast-color: #{$surface};
+  --p-primary-hover-color: #{$brand-dark};
+  --p-primary-active-color: #{$brand-dark};
+  --p-focus-ring-color: rgba(91, 75, 196, 0.18);
+  --p-button-primary-background: #{$brand};
+  --p-button-primary-border-color: #{$brand};
+  --p-button-primary-color: #{$surface};
+  --p-button-primary-hover-background: #{$brand-dark};
+  --p-button-primary-hover-border-color: #{$brand-dark};
+  --p-button-primary-active-background: #{$brand-dark};
+  --p-button-primary-active-border-color: #{$brand-dark};
+  --p-button-outlined-primary-color: #{$brand};
+  --p-button-outlined-primary-border-color: #{$brand};
+  --p-button-text-primary-color: #{$brand};
+  --p-button-secondary-background: #{$brand-soft};
+  --p-button-secondary-border-color: #{$brand-soft};
+  --p-button-secondary-color: #{$brand};
+  --p-form-field-focus-border-color: #{$brand};
+  --p-form-field-focus-ring-color: rgba(91, 75, 196, 0.18);
 }
 
-.p-button:hover,
-.p-button:focus,
-.p-button:active,
-.p-button.p-button-outlined:hover,
-.p-button.p-button-outlined:focus,
-.p-button.p-button-outlined:active {
-  text-decoration: none !important;
+.p-tabs,
+.p-tabview {
+  .p-tab-active,
+  .p-tabview-selected .p-tabview-nav-link {
+    color: $brand;
+  }
+
+  .p-tablist-active-bar {
+    background: $brand;
+  }
 }
 
-.p-button.p-button-primary,
-.p-button-primary {
-  background: var(--sqx-color-primary) !important;
-  border: none !important;
-  color: #ffffff !important;
+.sqx-animate {
+  animation-duration: 0.36s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.p-button.p-button-primary:hover:not(:disabled),
-.p-button-primary:hover:not(:disabled) {
-  background: var(--sqx-color-primary-dark) !important;
-  color: #ffffff !important;
+.sqx-enter-up {
+  animation-name: sqx-enter-up;
 }
 
-.p-button.p-button-primary:focus,
-.p-button.p-button-primary:active,
-.p-button-primary:focus,
-.p-button-primary:active {
-  background: var(--sqx-color-primary) !important;
-  color: #ffffff !important;
+.sqx-enter-fade {
+  animation-name: sqx-enter-fade;
 }
 
-.p-button.p-button-outlined {
-  border: 1px solid var(--sqx-color-primary) !important;
-  color: var(--sqx-color-primary) !important;
-  background: transparent !important;
+@keyframes sqx-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.p-button.p-button-outlined:hover:not(:disabled),
-.p-button.p-button-outlined:focus,
-.p-button.p-button-outlined:active {
-  border-color: var(--sqx-color-primary) !important;
-  color: var(--sqx-color-primary) !important;
-  background: rgba(91, 75, 196, 0.08) !important;
+@keyframes sqx-enter-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
-// Outlined secondary/danger (e.g. Delete, Cancel) — border only, no shadow
-.p-button.p-button-outlined.p-button-danger,
-.p-button.p-button-outlined.p-button-secondary {
-  box-shadow: none !important;
-  outline: none !important;
+@media (prefers-reduced-motion: reduce) {
+  .sqx-animate,
+  .sqx-enter-up,
+  .sqx-enter-fade {
+    animation: none !important;
+  }
 }

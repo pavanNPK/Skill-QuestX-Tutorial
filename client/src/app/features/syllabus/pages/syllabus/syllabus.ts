@@ -1,6 +1,6 @@
 // use of this file is:
 // Feature page/container file. It connects route UI, feature state, services, and user actions.
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { AccordionModule } from 'primeng/accordion';
 import { CourseContent, CourseContentService, AvailableCourseContent } from '../../../../core/services/course-content.service';
@@ -15,48 +15,48 @@ import { CourseContent, CourseContentService, AvailableCourseContent } from '../
 export class Syllabus implements OnInit {
   private contentService = inject(CourseContentService);
 
-  courses: AvailableCourseContent[] = [];
-  selectedCourseId = '';
-  content: CourseContent | null = null;
-  loading = true;
-  error = '';
+  readonly courses = signal<AvailableCourseContent[]>([]);
+  readonly selectedCourseId = signal('');
+  readonly content = signal<CourseContent | null>(null);
+  readonly loading = signal(true);
+  readonly error = signal('');
 
   ngOnInit() {
     this.contentService.getAvailableCourses().subscribe({
       next: (courses) => {
-        this.courses = courses;
-        this.selectedCourseId = courses[0]?.id ?? '';
-        if (this.selectedCourseId) this.loadContent();
+        this.courses.set(courses);
+        this.selectedCourseId.set(courses[0]?.id ?? '');
+        if (this.selectedCourseId()) this.loadContent();
         else {
-          this.loading = false;
-          this.error = 'No course content is available yet.';
+          this.loading.set(false);
+          this.error.set('No course content is available yet.');
         }
       },
       error: () => {
-        this.loading = false;
-        this.error = 'Could not load course syllabus.';
+        this.loading.set(false);
+        this.error.set('Could not load course syllabus.');
       },
     });
   }
 
   onCourseChange(event: Event) {
-    this.selectedCourseId = (event.target as HTMLSelectElement).value;
+    this.selectedCourseId.set((event.target as HTMLSelectElement).value);
     this.loadContent();
   }
 
   loadContent() {
-    if (!this.selectedCourseId) return;
-    this.loading = true;
-    this.error = '';
-    this.contentService.getContent(this.selectedCourseId).subscribe({
+    if (!this.selectedCourseId()) return;
+    this.loading.set(true);
+    this.error.set('');
+    this.contentService.getContent(this.selectedCourseId()).subscribe({
       next: (content) => {
-        this.content = content;
-        this.loading = false;
+        this.content.set(content);
+        this.loading.set(false);
       },
       error: () => {
-        this.content = null;
-        this.loading = false;
-        this.error = 'Content is not published or you are not enrolled in this course.';
+        this.content.set(null);
+        this.loading.set(false);
+        this.error.set('Content is not published or you are not enrolled in this course.');
       },
     });
   }

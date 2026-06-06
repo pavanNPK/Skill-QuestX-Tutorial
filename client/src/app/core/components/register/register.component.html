@@ -8,7 +8,7 @@
       <div class="hero-content">
         <div class="hero-slides">
           @for (item of carouselItems; track item) {
-          <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
+          <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex()">
             <div class="hero-title-stack">
               <h3 class="hero-title m-0">{{ item.title }}</h3>
               <div class="hero-quote">
@@ -20,7 +20,7 @@
         </div>
         <div class="hero-dots">
           @for (item of carouselItems; track item) {
-          <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
+          <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex()"
             (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
           }
         </div>
@@ -30,7 +30,7 @@
 
   <div class="w-full lg:w-6 h-full p-4 lg:p-6 flex flex-column justify-content-center gap-3 bg-white">
     <div class="register-scroll-container w-full overflow-y-auto">
-      @if (currentStep === 1) {
+      @if (currentStep() === 1) {
       <form class="register-form" [formGroup]="registerForm" (ngSubmit)="submitStep1()">
         <div class="flex justify-content-center lg:justify-content-start">
           <img src="/core/logo.svg" alt="SkillQuestX" class="w-15rem" />
@@ -47,15 +47,15 @@
 
             <div class="flex justify-content-center lg:justify-content-start mb-3">
               <div class="profile-avatar-wrapper" (click)="triggerProfileImageUpload()">
-                @if (profileImagePreview) {
-                  <img [src]="profileImagePreview" alt="Profile" class="profile-avatar" />
+                @if (profileImagePreview()) {
+                  <img [src]="profileImagePreview()" alt="Profile" class="profile-avatar" />
                 } @else {
                   <div class="profile-avatar-placeholder">
                     <i class="pi pi-user-plus"></i>
                     <span>Add Photo</span>
                   </div>
                 }
-                <button type="button" class="avatar-edit-btn" pButton [icon]="profileImagePreview ? 'pi pi-pencil' : 'pi pi-camera'" [pTooltip]="profileImagePreview ? 'Change photo' : 'Add photo'"></button>
+                <button type="button" class="avatar-edit-btn" pButton [icon]="profileImagePreview() ? 'pi pi-pencil' : 'pi pi-camera'" [pTooltip]="profileImagePreview() ? 'Change photo' : 'Add photo'"></button>
                 <input type="file" #profileImageInput id="profile-image-input" accept="image/jpeg,image/jpg,image/png"
                   (change)="onProfileImageSelect($event)" hidden />
               </div>
@@ -163,10 +163,10 @@
                 <label class="resume-label">Resume</label>
                 <input type="file" #resumeInput id="resume-input" accept=".pdf,.doc,.docx,.xls,.xlsx"
                   (change)="onResumeSelect($event)" hidden />
-                <button pButton type="button" [label]="resumeFileName || 'Upload updated Resume'" icon="pi pi-paperclip"
+                <button pButton type="button" [label]="resumeFileName() || 'Upload updated Resume'" icon="pi pi-paperclip"
                   class="resume-upload-btn w-full" (click)="resumeInput.click()"></button>
-                @if (resumeFileName) {
-                <small class="text-xs text-500">{{ resumeFileName }}</small>
+                @if (resumeFileName()) {
+                <small class="text-xs text-500">{{ resumeFileName() }}</small>
                 }
               </div>
             </div>
@@ -187,13 +187,13 @@
 
               <div class="flex flex-column gap-1">
                 <label class="skills-section-label">Skills added</label>
-                @if (skills.length === 0) {
+                @if (skills().length === 0) {
                 <div class="no-skills-card">
                   <span class="text-500">No skills added. Press Enter to add</span>
                 </div>
                 } @else {
                 <div class="skills-container">
-                  @for (skill of skills; track skill) {
+                  @for (skill of skills(); track skill) {
                   <p-chip [label]="skill" [removable]="true" (onRemove)="removeSkill(skill)"
                     styleClass="skill-chip"></p-chip>
                   }
@@ -213,7 +213,7 @@
       </form>
       }
 
-      @if (currentStep === 2) {
+      @if (currentStep() === 2) {
       <form class="register-form" (ngSubmit)="submitOTP()">
         <div class="flex justify-content-center lg:justify-content-start">
           <img src="/core/logo.svg" alt="SkillQuestX" class="w-15rem" />
@@ -241,21 +241,21 @@
             <div class="otp-timer">
               <p-knob [ngModel]="otpProgress" [ngModelOptions]="{ standalone: true }" [readonly]="true"
                 [strokeWidth]="8" [size]="90" [showValue]="false"></p-knob>
-              <div class="otp-timer-label text-sm font-medium">{{ formatTime(resendTimer) }}</div>
+              <div class="otp-timer-label text-sm font-medium">{{ formatTime(resendTimer()) }}</div>
             </div>
           </div>
 
           <div class="flex flex-column sm:flex-row gap-2">
             <button pButton type="submit" label="Verify OTP" class="login-button w-full"
               [loading]="submitting()" [disabled]="otpCode.length !== 6 || submitting()"></button>
-            <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full" [disabled]="!canResendOTP"
+            <button pButton type="button" label="Resend OTP" class="p-button-outlined w-full" [disabled]="!canResendOTP()"
               (click)="resendOTP()"></button>
           </div>
         </div>
       </form>
       }
 
-      @if (currentStep === 3) {
+      @if (currentStep() === 3) {
       <form class="register-form" [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
         <div class="flex justify-content-center lg:justify-content-start">
           <img src="/core/logo.svg" alt="SkillQuestX" class="w-15rem" />

@@ -6,7 +6,7 @@
       <div class="hero-content">
         <div class="hero-slides">
           @for (item of carouselItems; track item) {
-            <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex">
+            <div class="hero-slide" [class.active]="carouselItems.indexOf(item) === activeIndex()">
               <div class="hero-title-stack">
                 <h3 class="hero-title m-0">{{ item.title }}</h3>
                 <div class="hero-quote">
@@ -18,7 +18,7 @@
         </div>
         <div class="hero-dots">
           @for (item of carouselItems; track item) {
-            <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex"
+            <button type="button" [class.active]="carouselItems.indexOf(item) === activeIndex()"
             (click)="setActive(carouselItems.indexOf(item))" aria-label="Show slide"></button>
           }
         </div>
@@ -38,11 +38,11 @@
 
     <div class="flex flex-column gap-3">
       <div class="flex flex-column gap-1">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Email Id</mat-label>
-          <mat-icon matPrefix>mail</mat-icon>
-          <input id="login-email" matInput type="email" formControlName="email" autocomplete="email" />
-        </mat-form-field>
+        <label class="field-label" for="login-email">Email Id</label>
+        <span class="input-shell">
+          <i class="pi pi-envelope"></i>
+          <input id="login-email" pInputText type="email" formControlName="email" autocomplete="email" />
+        </span>
         @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
           <small class="form-error">
             Enter a valid email address.
@@ -51,26 +51,25 @@
       </div>
 
       <div class="flex flex-column gap-1">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Password</mat-label>
-          <mat-icon matPrefix>lock</mat-icon>
+        <label class="field-label" for="login-password">Password</label>
+        <span class="input-shell">
+          <i class="pi pi-lock"></i>
           <input
             id="login-password"
-            matInput
+            pInputText
             [type]="hidePassword() ? 'password' : 'text'"
             formControlName="password"
             autocomplete="current-password"
           />
           <button
-            mat-icon-button
-            matSuffix
+            class="input-icon-button"
             type="button"
             [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
             (click)="hidePassword.set(!hidePassword())"
           >
-            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+            <i [class]="hidePassword() ? 'pi pi-eye' : 'pi pi-eye-slash'"></i>
           </button>
-        </mat-form-field>
+        </span>
         @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
           <small class="form-error">
             Password must be at least 6 characters.
@@ -87,14 +86,13 @@
     </div>
 
     <button
-      mat-flat-button
-      color="primary"
+      pButton
       type="submit"
       class="login-button w-full"
       [disabled]="loginForm.invalid || submitting()"
     >
       @if (submitting()) {
-        <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
+        <p-progress-spinner strokeWidth="6" ariaLabel="Logging in" />
       }
       <span>Login</span>
     </button>

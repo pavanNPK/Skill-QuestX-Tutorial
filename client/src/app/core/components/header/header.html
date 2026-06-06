@@ -3,9 +3,9 @@
     <div class="header-content">
         <div class="header-left">
             <div class="title-section">
-                <h1 class="page-title">{{ pageTitle }}</h1>
+                <h1 class="page-title">{{ pageTitle() }}</h1>
                 <nav class="breadcrumbs">
-                    @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
+                    @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
                     <span class="breadcrumb-item">
                         <!-- If URL exists, routerLink -->
                         @if (crumb.url && !last && !crumb.command) {
@@ -62,7 +62,7 @@
 
     <ng-template pTemplate="content">
         <div class="notifications-list">
-            @for (notification of notifications; track notification.id) {
+            @for (notification of notifications(); track notification.id) {
             <div class="notification-item" [class.unread]="!notification.read" (click)="markAsRead(notification)">
                 @if (!notification.read) {
                 <div class="notification-indicator"></div>
@@ -75,7 +75,7 @@
             </div>
             }
 
-            @if (notifications.length === 0) {
+            @if (notifications().length === 0) {
             <div class="empty-state">
                 <i class="pi pi-inbox"></i>
                 <p>No notifications</p>

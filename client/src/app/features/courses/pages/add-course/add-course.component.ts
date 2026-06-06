@@ -1,6 +1,6 @@
 // use of this file is:
 // Feature page/container file. It connects route UI, feature state, services, and user actions.
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { HeaderService } from '../../../../core/services/header.service';
 import { AuthService, CourseOption } from '../../../../core/services/auth.service';
 import { CourseContent, CourseContentService } from '../../../../core/services/course-content.service';
@@ -30,14 +30,14 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     private courseContent = inject(CourseContentService);
 
     courseForm: FormGroup;
-    selectedFileName: string = '';
-    courses: CourseOption[] = [];
-    selectedCourseId = '';
-    content: CourseContent | null = null;
-    importJson = this.sampleImportJson();
-    contentMessage = '';
-    contentError = '';
-    uploadedAssetUrl = '';
+    readonly selectedFileName = signal('');
+    readonly courses = signal<CourseOption[]>([]);
+    readonly selectedCourseId = signal('');
+    readonly content = signal<CourseContent | null>(null);
+    readonly importJson = signal(this.sampleImportJson());
+    readonly contentMessage = signal('');
+    readonly contentError = signal('');
+    readonly uploadedAssetUrl = signal('');
 
     constructor(
         private fb: FormBuilder,
@@ -74,7 +74,7 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     onFileSelected(event: any) {
         const file = event.target.files[0];
         if (file) {
-            this.selectedFileName = file.name;
+            this.selectedFileName.set(file.name);
             this.courseForm.patchValue({ video: file });
         }
     }
@@ -101,9 +101,9 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     loadCourses() {
         this.courseContent.getAvailableCourses().subscribe({
             next: (courses) => {
-                this.courses = courses.map((course) => ({ id: course.id, name: course.title || course.name }));
-                if (!this.selectedCourseId && courses.length) {
-                    this.selectedCourseId = courses[0].id;
+                this.courses.set(courses.map((course) => ({ id: course.id, name: course.title || course.name })));
+                if (!this.selectedCourseId() && courses.length) {
+                    this.selectedCourseId.set(courses[0].id);
                     this.loadContent();
                 }
             },
@@ -112,40 +112,42 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     }
 
     onCourseChange(event: Event) {
-        this.selectedCourseId = (event.target as HTMLSelectElement).value;
+        this.selectedCourseId.set((event.target as HTMLSelectElement).value);
         this.loadContent();
     }
 
     loadContent() {
-        if (!this.selectedCourseId) return;
-        this.contentMessage = '';
-        this.contentError = '';
-        this.courseContent.getContent(this.selectedCourseId).subscribe({
+        const selectedCourseId = this.selectedCourseId();
+        if (!selectedCourseId) return;
+        this.contentMessage.set('');
+        this.contentError.set('');
+        this.courseContent.getContent(selectedCourseId).subscribe({
             next: (content) => {
-                this.content = content;
-                this.importJson = JSON.stringify({
+                this.content.set(content);
+                this.importJson.set(JSON.stringify({
                     title: content.title,
                     description: content.description,
                     modules: content.modules,
-                }, null, 2);
+                }, null, 2));
             },
             error: () => {
-                this.content = null;
-                this.importJson = this.sampleImportJson();
+                this.content.set(null);
+                this.importJson.set(this.sampleImportJson());
             },
         });
     }
 
     importContent() {
-        if (!this.selectedCourseId) return;
-        this.contentMessage = '';
-        this.contentError = '';
+        const selectedCourseId = this.selectedCourseId();
+        if (!selectedCourseId) return;
+        this.contentMessage.set('');
+        this.contentError.set('');
         try {
-            const payload = JSON.parse(this.importJson);
-            this.courseContent.importContent(this.selectedCourseId, payload).subscribe({
+            const payload = JSON.parse(this.importJson());
+            this.courseContent.importContent(selectedCourseId, payload).subscribe({
                 next: (content) => {
-                    this.content = content;
-                    this.contentMessage = 'Draft content saved.';
+                    this.content.set(content);
+                    this.contentMessage.set('Draft content saved.');
                 },
                 error: () => this.setError('Could not import content. Check permissions and JSON format.'),
             });
@@ -155,24 +157,26 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     }
 
     publishContent() {
-        if (!this.selectedCourseId) return;
-        this.courseContent.publish(this.selectedCourseId).subscribe({
+        const selectedCourseId = this.selectedCourseId();
+        if (!selectedCourseId) return;
+        this.courseContent.publish(selectedCourseId).subscribe({
             next: (content) => {
-                this.content = content;
-                this.contentMessage = 'Content published for enrolled students.';
-                this.contentError = '';
+                this.content.set(content);
+                this.contentMessage.set('Content published for enrolled students.');
+                this.contentError.set('');
             },
             error: () => this.setError('Could not publish content.'),
         });
     }
 
     unpublishContent() {
-        if (!this.selectedCourseId) return;
-        this.courseContent.unpublish(this.selectedCourseId).subscribe({
+        const selectedCourseId = this.selectedCourseId();
+        if (!selectedCourseId) return;
+        this.courseContent.unpublish(selectedCourseId).subscribe({
             next: (content) => {
-                this.content = content;
-                this.contentMessage = 'Content unpublished from students.';
-                this.contentError = '';
+                this.content.set(content);
+                this.contentMessage.set('Content unpublished from students.');
+                this.contentError.set('');
             },
             error: () => this.setError('Could not unpublish content.'),
         });
@@ -181,12 +185,13 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     onAssetSelected(event: Event) {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
-        if (!file || !this.selectedCourseId) return;
-        this.courseContent.uploadAsset(this.selectedCourseId, file).subscribe({
+        const selectedCourseId = this.selectedCourseId();
+        if (!file || !selectedCourseId) return;
+        this.courseContent.uploadAsset(selectedCourseId, file).subscribe({
             next: (asset) => {
-                this.uploadedAssetUrl = asset.url;
-                this.contentMessage = `Uploaded ${asset.originalName}. Use assetId "${asset.id}" or url "${asset.url}" in a block.`;
-                this.contentError = '';
+                this.uploadedAssetUrl.set(asset.url);
+                this.contentMessage.set(`Uploaded ${asset.originalName}. Use assetId "${asset.id}" or url "${asset.url}" in a block.`);
+                this.contentError.set('');
                 input.value = '';
             },
             error: () => this.setError('Could not upload asset. Check file type and size.'),
@@ -194,8 +199,8 @@ export class AddCourseComponent implements OnInit, OnDestroy {
     }
 
     private setError(message: string) {
-        this.contentError = message;
-        this.contentMessage = '';
+        this.contentError.set(message);
+        this.contentMessage.set('');
     }
 
     private sampleImportJson(): string {

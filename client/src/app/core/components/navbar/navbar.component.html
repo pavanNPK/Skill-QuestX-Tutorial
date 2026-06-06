@@ -3,7 +3,7 @@
   <!-- Logo Section -->
   <div class="sidebar-header">
     <div class="logo">
-      <img [src]="collapsed() ? '/core/logo_head.svg' : '/core/logo_white.svg'" alt="SkillQuestX" class="logo-img" />
+      <img [src]="collapsed() ? '/core/logo_collapsed.svg' : '/core/logo.svg'" alt="SkillQuestX" class="logo-img" />
     </div>
     <button type="button" class="sidebar-toggle" (click)="toggleSidebar()"
       [attr.aria-label]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
@@ -53,7 +53,7 @@
         </a>
         <a routerLink="/classes/live" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-video"></i>
-          <span>Live Stream</span>
+          <span>Live</span>
         </a>
       </div>
     </div>
@@ -119,11 +119,7 @@
   <div class="sidebar-footer">
     <div class="user-profile" (click)="op.toggle($event)">
       <div class="user-avatar">
-        @if (auth.currentUser()?.profileImageUrl) {
-          <img [src]="auth.currentUser()?.profileImageUrl | safeUrl" alt="User" />
-        } @else {
-          <span class="user-avatar-initials">{{ userInitials() }}</span>
-        }
+        <img [src]="auth.currentUser()?.profileImageUrl ? (auth.currentUser()?.profileImageUrl | safeUrl) : '/assets/images/avatar-1.jpg'" alt="User" />
       </div>
       <div class="user-info">
         <span class="user-name">{{ auth.currentUser()?.name ?? 'User' }}</span>
@@ -131,46 +127,40 @@
       </div>
     </div>
 
-    <p-popover #op [dismissable]="true">
+    <p-popover #op [dismissable]="true" styleClass="profile-popover">
       <div class="profile-menu">
-        <!-- Menu Header -->
-        <div class="menu-header">
-          <div class="header-avatar">
-            @if (auth.currentUser()?.profileImageUrl) {
-              <img [src]="auth.currentUser()?.profileImageUrl | safeUrl" alt="User" />
-            } @else {
-              <span class="header-avatar-initials">{{ userInitials() }}</span>
-            }
-          </div>
-          <div class="header-info">
-            <h4 class="header-name">{{ auth.currentUser()?.name ?? 'User' }}</h4>
-            <p class="header-email">{{ auth.currentUser()?.email ?? '' }}</p>
-            <p class="header-designation">{{ auth.roleLabel() }}</p>
-          </div>
+        <div class="profile-card-cover">
+          <img src="/assets/images/banner.jpg" alt="Profile cover" />
         </div>
 
-        <!-- Menu Items -->
-        <div class="menu-items">
-          <button class="menu-item" (click)="goToProfile(); op.hide()">
-            <i class="pi pi-user"></i>
-            <span>Profile Settings</span>
-          </button>
-          <button class="menu-item" (click)="changePassword(); op.hide()">
-            <i class="pi pi-lock"></i>
-            <span>Change Password</span>
-          </button>
-          <button class="menu-item" (click)="userPreferences(); op.hide()">
-            <i class="pi pi-cog"></i>
-            <span>User Preferences</span>
-          </button>
-        </div>
+        <div class="profile-card-body">
+          <div class="profile-card-avatar">
+            <img [src]="auth.currentUser()?.profileImageUrl ? (auth.currentUser()?.profileImageUrl | safeUrl) : '/assets/images/avatar-1.jpg'" alt="User" />
+          </div>
 
-        <!-- Menu Footer -->
-        <div class="menu-footer">
-          <button class="logout-menu-btn" (click)="logout(); op.hide()">
-            <i class="pi pi-sign-out"></i>
-            <span>Logout</span>
-          </button>
+          <div class="profile-card-heading">
+            <h4>{{ auth.currentUser()?.name ?? 'User' }}</h4>
+            <p>{{ auth.roleLabel() }}</p>
+          </div>
+
+          <div class="profile-actions">
+            <button class="profile-action primary" (click)="goToProfile(); op.hide()">
+              <i class="pi pi-user"></i>
+              <span>Profile Settings</span>
+            </button>
+            <button class="profile-action" (click)="changePassword(); op.hide()">
+              <i class="pi pi-lock"></i>
+              <span>Change Password</span>
+            </button>
+            <button class="profile-action" (click)="userPreferences(); op.hide()">
+              <i class="pi pi-cog"></i>
+              <span>User Preferences</span>
+            </button>
+            <button class="profile-action logout" (click)="logout(); op.hide()">
+              <i class="pi pi-sign-out"></i>
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </div>
     </p-popover>

@@ -195,25 +195,13 @@
   background: var(--sqx-color-primary-dark) !important;
 }
 
-// Input fields matching login/forgot
 :host ::ng-deep .register-form .p-iconfield {
   width: 100%;
 }
 
 :host ::ng-deep .register-form .p-inputtext {
   width: 100%;
-  border-radius: 6px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
   padding-left: 44px;
-  box-shadow: none;
-  font-size: 16px;
-}
-
-:host ::ng-deep .register-form .p-inputtext:focus {
-  border-color: var(--sqx-color-primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
 }
 
 :host ::ng-deep .register-form .p-inputicon {
@@ -221,7 +209,6 @@
   font-size: 16px;
 }
 
-// Resume upload button
 .resume-label {
   font-size: 14px;
   font-weight: 500;
@@ -230,20 +217,7 @@
 }
 
 :host ::ng-deep .resume-upload-btn.p-button {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  color: #667085;
   justify-content: flex-start;
-  border-radius: 6px;
-  box-shadow: none !important;
-  outline: none !important;
-  font-weight: 400;
-}
-
-:host ::ng-deep .resume-upload-btn.p-button:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #667085;
 }
 
 // Skills section
@@ -298,34 +272,6 @@
 :host ::ng-deep .login-button.p-button {
   margin-top: 5px;
   width: 100%;
-  color: #ffffff;
-  background: var(--sqx-color-primary);
-  border: none;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: all 0.2s ease;
-  border-radius: 6px;
-}
-
-:host ::ng-deep .login-button.p-button:hover {
-  background: var(--sqx-color-primary-dark);
-  border: none;
-  box-shadow: none;
-}
-
-:host ::ng-deep .login-button.p-button:focus,
-:host ::ng-deep .login-button.p-button:active {
-  background: var(--sqx-color-primary);
-  border: none;
-  color: #ffffff;
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-:host ::ng-deep .login-button.p-button:disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
-  opacity: 1;
 }
 
 // Error messages
@@ -517,24 +463,8 @@
   }
 }
 
-// Add Skill Button
 :host ::ng-deep .add-skill-btn.p-button {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  padding: 0;
-  background: var(--sqx-color-primary);
-  border: none;
-  border-radius: 6px;
-
-  &:hover {
-    background: var(--sqx-color-primary-dark);
-  }
-
-  &:disabled {
-    background: #e5e7eb;
-    color: #9ca3af;
-  }
+  flex-shrink: 0;
 }
 
 // Clickable Profile Avatar
@@ -547,34 +477,8 @@
   }
 }
 
-// Password Component Styling
 :host ::ng-deep .p-password {
   width: 100%;
-
-  input {
-    width: 100%;
-    border-radius: 6px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    padding-left: 44px; // Space for lock icon
-    box-shadow: none;
-    font-size: 16px;
-
-    &:focus {
-      border-color: var(--sqx-color-primary);
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.1);
-    }
-  }
-
-  // Eye icon cursor pointer
-  .p-password-toggle-icon {
-    cursor: pointer;
-  }
-
-  button {
-    cursor: pointer;
-  }
 }
 
 // OTP Timer Styling

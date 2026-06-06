@@ -1,14 +1,25 @@
-/* use of this stylesheet is: Define component/page styling while keeping layout and visual behavior scoped to this file. */
+$header-bg: #F5F5F5;
+$drawer-surface: #ffffff;
+
+@mixin icon-button($size) {
+    width: $size;
+    height: $size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .app-header {
-    background: #F5F5F5;
-    border-bottom: 1px solid var(--sqx-color-primary);
+    // background: $header-bg;
+    background: #F6F4FF;
+    border-bottom: 1px solid var(--sqx-color-border);
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 80;
 }
 
 .header-content {
-    height: 64px;
+    height: var(--sqx-header-height);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -25,7 +36,7 @@
 .title-section {
     display: flex;
     flex-direction: column;
-    gap: 2px; // Increased space between breadcrumbs and title
+    gap: 2px;
 }
 
 .page-title {
@@ -36,20 +47,19 @@
     line-height: 1.2;
 }
 
-// Breadcrumbs
 .breadcrumbs {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 14px;
     color: var(--sqx-color-text-light);
-    flex-wrap: wrap; // Allow wrap on very small screens, or ellipsis? User implies ellipsis.
+    flex-wrap: wrap;
 
     .breadcrumb-item {
         display: flex;
         align-items: center;
         gap: 8px;
-        min-width: 0; // For flex item truncation
+        min-width: 0;
     }
 
     .breadcrumb-link,
@@ -73,7 +83,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 250px; // Default max width
+            max-width: 250px;
             display: inline-block;
             vertical-align: middle;
 
@@ -107,15 +117,11 @@
 
 .notification-btn {
     position: relative;
-    width: 40px;
-    height: 40px;
+    @include icon-button(40px);
     border-radius: 50%;
     border: none;
-    background: white;
+    background: $drawer-surface;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: all 0.2s ease;
 
     i {
@@ -132,7 +138,7 @@
         top: 6px;
         right: 6px;
         background: var(--sqx-color-danger);
-        color: white;
+        color: $drawer-surface;
         font-size: 10px;
         font-weight: 600;
         padding: 2px 5px;
@@ -142,20 +148,23 @@
     }
 }
 
-// Notification Drawer Styles
 ::ng-deep .p-drawer {
     .p-drawer-header {
+        height: var(--sqx-header-height);
+        min-height: var(--sqx-header-height);
         padding: 0 !important;
         border-bottom: 1px solid var(--sqx-color-border);
+        align-items: center;
 
         .p-drawer-title {
-            padding: var(--sqx-space-4) var(--sqx-space-5);
+            padding: 0 var(--sqx-space-5);
             flex: 1;
         }
 
         .p-drawer-close-button {
-            margin: 0;
-            padding: var(--sqx-space-4) var(--sqx-space-5);
+            @include icon-button(40px);
+            margin: 0 var(--sqx-space-4) 0 0;
+            padding: 0;
         }
     }
 
@@ -175,7 +184,7 @@
             font-weight: 700;
             color: var(--sqx-color-text);
             margin: 0;
-            padding: var(--sqx-space-4) var(--sqx-space-5);
+            padding: 0 var(--sqx-space-5);
         }
     }
 
@@ -185,7 +194,7 @@
         align-items: center;
         padding: 0;
         border-top: 1px solid var(--sqx-color-border);
-        background: white;
+        background: $drawer-surface;
 
         .mark-all-btn {
             width: 100%;
@@ -196,7 +205,7 @@
             padding: 16px;
             border: none;
             background: var(--sqx-color-primary);
-            color: white;
+            color: $drawer-surface;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;

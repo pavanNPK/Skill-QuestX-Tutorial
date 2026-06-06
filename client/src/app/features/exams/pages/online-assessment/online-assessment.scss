@@ -271,8 +271,6 @@
 
 .manager-actions .btn,
 .editor-actions .btn {
-  height: 40px;
-  min-height: 40px;
   padding: 0 0.85rem;
   font-size: 14px;
   font-weight: 800;
@@ -612,7 +610,6 @@
 }
 
 .btn {
-  min-height: 40px;
   border: 1px solid transparent;
   border-radius: 8px;
   padding: 0.6rem 0.85rem;

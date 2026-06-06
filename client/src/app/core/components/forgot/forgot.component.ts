@@ -42,11 +42,11 @@ import { getFriendlyErrorMessage } from '../../../shared/utils/error-messages.ut
   providers: [MessageService]
 })
 export class ForgotComponent implements OnDestroy {
-  step: 'email' | 'otp' | 'reset' = 'email';
+  readonly step = signal<'email' | 'otp' | 'reset'>('email');
   otpTotalSeconds = 180;
-  otpSecondsLeft = 0;
-  otpProgress = 0;
-  otpExpired = false;
+  readonly otpSecondsLeft = signal(0);
+  readonly otpProgress = signal(0);
+  readonly otpExpired = signal(false);
 
   carouselItems = [
     {
@@ -63,7 +63,7 @@ export class ForgotComponent implements OnDestroy {
     }
   ];
 
-  activeIndex = 0;
+  readonly activeIndex = signal(0);
 
   /** True while any submit request is in progress. */
   readonly submitting = signal(false);
@@ -72,8 +72,8 @@ export class ForgotComponent implements OnDestroy {
   otpForm: FormGroup;
   resetForm: FormGroup;
 
-  passwordStrength = 0;
-  passwordLabel: 'Weak' | 'Medium' | 'Strong' = 'Weak';
+  readonly passwordStrength = signal(0);
+  readonly passwordLabel = signal<'Weak' | 'Medium' | 'Strong'>('Weak');
 
   private otpTimer?: ReturnType<typeof setInterval>;
   private rotationTimer?: ReturnType<typeof setInterval>;
@@ -106,8 +106,7 @@ export class ForgotComponent implements OnDestroy {
     });
 
     this.rotationTimer = setInterval(() => {
-      this.activeIndex = (this.activeIndex + 1) % this.carouselItems.length;
-      this.cdr.markForCheck();
+      this.activeIndex.update((index) => (index + 1) % this.carouselItems.length);
     }, 3000);
   }
 
@@ -121,7 +120,7 @@ export class ForgotComponent implements OnDestroy {
     this.auth.forgotPasswordSendOtp(email).subscribe({
       next: (res) => {
         if (res.sent) {
-          this.step = 'otp';
+          this.step.set('otp');
           this.messageService.add({
             severity: 'success',
             summary: 'OTP sent',
@@ -155,7 +154,7 @@ export class ForgotComponent implements OnDestroy {
   }
 
   submitOtp() {
-    if (this.otpForm.invalid || this.otpExpired || this.submitting()) {
+    if (this.otpForm.invalid || this.otpExpired() || this.submitting()) {
       this.otpForm.markAllAsTouched();
       return;
     }
@@ -166,7 +165,7 @@ export class ForgotComponent implements OnDestroy {
       next: (res) => {
         if (res.valid) {
           if (this.otpTimer) clearInterval(this.otpTimer);
-          this.step = 'reset';
+          this.step.set('reset');
           this.messageService.add({
             severity: 'success',
             summary: 'OTP verified',
@@ -236,7 +235,7 @@ export class ForgotComponent implements OnDestroy {
   resendOtp() {
     const email = this.emailForm.get('email')?.value;
     this.otpForm.patchValue({ otp: '' });
-    this.otpExpired = false;
+    this.otpExpired.set(false);
     this.auth.forgotPasswordSendOtp(email).subscribe({
       next: (res) => {
         if (res.sent) {
@@ -271,18 +270,18 @@ export class ForgotComponent implements OnDestroy {
   }
 
   get otpTimeLabel() {
-    const minutes = Math.floor(this.otpSecondsLeft / 60)
+    const minutes = Math.floor(this.otpSecondsLeft() / 60)
       .toString()
       .padStart(2, '0');
-    const seconds = (this.otpSecondsLeft % 60).toString().padStart(2, '0');
+    const seconds = (this.otpSecondsLeft() % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
   }
 
   get strengthClass() {
-    if (this.passwordStrength >= 70) {
+    if (this.passwordStrength() >= 70) {
       return 'strength-strong';
     }
-    if (this.passwordStrength >= 40) {
+    if (this.passwordStrength() >= 40) {
       return 'strength-medium';
     }
     return 'strength-weak';
@@ -293,7 +292,7 @@ export class ForgotComponent implements OnDestroy {
   }
 
   setActive(index: number) {
-    this.activeIndex = index;
+    this.activeIndex.set(index);
   }
 
   ngOnDestroy(): void {
@@ -311,18 +310,18 @@ export class ForgotComponent implements OnDestroy {
       clearInterval(this.otpTimer);
     }
 
-    this.otpSecondsLeft = this.otpTotalSeconds - 1;
-    this.otpProgress = Math.max(0, (this.otpSecondsLeft / this.otpTotalSeconds) * 100);
-    this.otpExpired = false;
+    this.otpSecondsLeft.set(this.otpTotalSeconds - 1);
+    this.otpProgress.set(Math.max(0, (this.otpSecondsLeft() / this.otpTotalSeconds) * 100));
+    this.otpExpired.set(false);
     this.cdr.markForCheck();
 
     this.otpTimer = setInterval(() => {
-      this.otpSecondsLeft -= 1;
-      this.otpProgress = Math.max(0, (this.otpSecondsLeft / this.otpTotalSeconds) * 100);
+      this.otpSecondsLeft.update((seconds) => seconds - 1);
+      this.otpProgress.set(Math.max(0, (this.otpSecondsLeft() / this.otpTotalSeconds) * 100));
       this.cdr.markForCheck();
 
-      if (this.otpSecondsLeft <= 0) {
-        this.otpExpired = true;
+      if (this.otpSecondsLeft() <= 0) {
+        this.otpExpired.set(true);
         this.messageService.add({
           severity: 'warn',
           summary: 'OTP expired',
@@ -344,14 +343,14 @@ export class ForgotComponent implements OnDestroy {
     if (/[0-9]/.test(password)) score += 20;
     if (/[^A-Za-z0-9]/.test(password)) score += 20;
 
-    this.passwordStrength = Math.min(100, score);
+    this.passwordStrength.set(Math.min(100, score));
 
-    if (this.passwordStrength >= 70) {
-      this.passwordLabel = 'Strong';
-    } else if (this.passwordStrength >= 40) {
-      this.passwordLabel = 'Medium';
+    if (this.passwordStrength() >= 70) {
+      this.passwordLabel.set('Strong');
+    } else if (this.passwordStrength() >= 40) {
+      this.passwordLabel.set('Medium');
     } else {
-      this.passwordLabel = 'Weak';
+      this.passwordLabel.set('Weak');
     }
   }
 }

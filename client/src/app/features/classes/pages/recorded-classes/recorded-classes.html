@@ -4,16 +4,16 @@
     <!-- Global Breadcrumb is in Header. Local context is removed to avoid duplication. -->
 
     <!-- Level 1: Enrolled Courses List -->
-    @if (currentView === 'courses') {
+    @if (currentView() === 'courses') {
     <div class="view-section fade-in">
-        @if (loading) {
+        @if (loading()) {
         <div class="empty-state">Loading recorded classes...</div>
-        } @else if (error) {
-        <div class="empty-state">{{ error }}</div>
+        } @else if (error()) {
+        <div class="empty-state">{{ error() }}</div>
         }
         <!-- Removed "My Recorded Classes" title as per user feedback about redundancy -->
         <div class="courses-grid">
-            @for (course of courses; track course.id) {
+            @for (course of courses(); track course.id) {
             <div class="course-card-premium" (click)="selectCourse(course)">
                 <div class="card-icon-wrapper">
                     <!-- Placeholder Icon if no image -->
@@ -44,13 +44,13 @@
     }
 
     <!-- Level 2: Chapters (Folder Structure) -->
-    @if (currentView === 'chapters' && selectedCourse) {
+    @if (currentView() === 'chapters' && selectedCourse()) {
     <div class="view-section fade-in">
-        @if (!selectedContent || selectedContent.modules.length === 0) {
+        @if (!selectedContent() || selectedContent()!.modules.length === 0) {
         <div class="empty-state">No modules uploaded yet.</div>
         }
         <div class="folders-grid">
-            @for (chapter of selectedContent?.modules || []; track chapter.id; let moduleIndex = $index) {
+            @for (chapter of selectedContent()?.modules || []; track chapter.id; let moduleIndex = $index) {
             <div class="folder-card" (click)="selectChapter(chapter)">
                 <div class="folder-top" [style.border-bottom-color]="moduleColor(moduleIndex)">
                     <i class="pi pi-folder folder-icon" [style.color]="moduleColor(moduleIndex)"></i>
@@ -67,10 +67,10 @@
     }
 
     <!-- Level 3: Concepts (Grid) -->
-    @if (currentView === 'concepts' && selectedChapter) {
+    @if (currentView() === 'concepts' && selectedChapter()) {
     <div class="view-section fade-in">
         <div class="concepts-grid">
-            @for (concept of selectedChapter.lessons; track concept.id) {
+            @for (concept of selectedChapter()!.lessons; track concept.id) {
             <div class="concept-item" (click)="openConcept(concept)">
                 <div class="concept-icon">
                     <i [class]="lessonType(concept) === 'video' ? 'pi pi-play-circle' : 'pi pi-file'"></i>
@@ -84,7 +84,7 @@
                 </div>
             </div>
             }
-            @if (selectedChapter.lessons.length === 0) {
+            @if (selectedChapter()!.lessons.length === 0) {
             <div class="empty-state">
                 <i class="pi pi-folder-open"></i>
                 <p>No lessons uploaded yet.</p>

@@ -95,15 +95,15 @@
 
   button,
   a {
-    min-height: 40px;
-  }
-
-  button,
-  a {
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
   }
+}
+
+:host ::ng-deep .p-progress-spinner {
+  width: 1rem;
+  height: 1rem;
 }
 
 .form-error {

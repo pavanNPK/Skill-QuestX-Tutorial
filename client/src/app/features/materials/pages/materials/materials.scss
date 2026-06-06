@@ -375,7 +375,6 @@
 .upload-btn,
 .bulk-import-btn,
 .text-btn {
-    min-height: 40px;
     border: 1px solid #D9D6F0;
     border-radius: 8px;
     background: #FFFFFF;
@@ -946,19 +945,7 @@
 
 .reader-actions {
     ::ng-deep .p-button {
-        background: var(--sqx-color-primary) !important;
-        border-color: var(--sqx-color-primary) !important;
-        color: #FFFFFF !important;
-
-        &:hover:not(:disabled) {
-            background: var(--sqx-color-primary-dark) !important;
-            border-color: var(--sqx-color-primary-dark) !important;
-        }
-
         &:disabled {
-            background: #D9D6F0 !important;
-            border-color: #D9D6F0 !important;
-            color: #FFFFFF !important;
             opacity: 1;
         }
     }

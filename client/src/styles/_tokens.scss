@@ -6,7 +6,11 @@
   --sqx-color-primary-light: #8b7dd4;
 
   // Sidebar
+  --sqx-header-height: 64px;
+  --sqx-sidebar-width: 180px;
+  --sqx-sidebar-collapsed-width: 76px;
   --sqx-color-sidebar-bg: #5B4BC4;
+  --sqx-color-sidebar-bg-white: #ffffff;
   --sqx-color-sidebar-text: #ffffff;
   --sqx-color-sidebar-hover: rgba(255, 255, 255, 0.1);
   --sqx-color-sidebar-active: rgba(255, 255, 255, 0.2);

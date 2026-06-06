@@ -24,23 +24,19 @@ export class NavbarComponent {
   collapsed = signal(this.getStoredCollapsedState());
 
   toggleSidebar() {
-    this.collapsed.update((value) => {
-      const next = !value;
-      if (next) {
-        this.classesDropdownOpen.set(false);
-        this.examsDropdownOpen.set(false);
-      }
-      this.storeCollapsedState(next);
-      this.collapsedChange.emit(next);
-      return next;
-    });
+    const next = !this.collapsed();
+    this.collapsed.set(next);
+    this.storeCollapsedState(next);
+    this.collapsedChange.emit(next);
+    this.syncDropdownsWithCurrentRoute();
   }
 
   ngOnInit() {
     this.collapsedChange.emit(this.collapsed());
+    this.syncDropdownsWithCurrentRoute();
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe(() => this.closeDropdowns());
+      .subscribe(() => this.syncDropdownsWithCurrentRoute());
   }
 
   toggleClassesDropdown() {
@@ -97,5 +93,15 @@ export class NavbarComponent {
   private storeCollapsedState(value: boolean) {
     if (typeof localStorage === 'undefined') return;
     localStorage.setItem('sqx-sidebar-collapsed', String(value));
+  }
+
+  private syncDropdownsWithCurrentRoute() {
+    if (this.collapsed()) {
+      this.closeDropdowns();
+      return;
+    }
+
+    this.classesDropdownOpen.set(this.isActive('/classes'));
+    this.examsDropdownOpen.set(this.isActive('/exams'));
   }
 }

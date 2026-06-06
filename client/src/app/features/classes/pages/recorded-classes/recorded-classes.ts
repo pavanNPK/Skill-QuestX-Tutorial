@@ -1,6 +1,6 @@
 // use of this file is:
 // Feature page/container file. It connects route UI, feature state, services, and user actions.
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { CardModule } from 'primeng/card';
@@ -25,13 +25,13 @@ import {
 })
 export class RecordedClasses implements OnInit, OnDestroy {
   // State
-  currentView: 'courses' | 'chapters' | 'concepts' = 'courses';
-  selectedCourse: AvailableCourseContent | null = null;
-  selectedContent: CourseContent | null = null;
-  selectedChapter: ContentModule | null = null;
-  courses: AvailableCourseContent[] = [];
-  loading = true;
-  error = '';
+  readonly currentView = signal<'courses' | 'chapters' | 'concepts'>('courses');
+  readonly selectedCourse = signal<AvailableCourseContent | null>(null);
+  readonly selectedContent = signal<CourseContent | null>(null);
+  readonly selectedChapter = signal<ContentModule | null>(null);
+  readonly courses = signal<AvailableCourseContent[]>([]);
+  readonly loading = signal(true);
+  readonly error = signal('');
 
   constructor(private headerService: HeaderService, private contentService: CourseContentService) {
     this.updateGlobalHeader();
@@ -40,13 +40,13 @@ export class RecordedClasses implements OnInit, OnDestroy {
   ngOnInit() {
     this.contentService.getAvailableCourses().subscribe({
       next: (courses) => {
-        this.courses = courses;
-        this.loading = false;
-        if (!courses.length) this.error = 'No recorded class content is available yet.';
+        this.courses.set(courses);
+        this.loading.set(false);
+        if (!courses.length) this.error.set('No recorded class content is available yet.');
       },
       error: () => {
-        this.loading = false;
-        this.error = 'Could not load recorded classes.';
+        this.loading.set(false);
+        this.error.set('Could not load recorded classes.');
       },
     });
   }
@@ -58,25 +58,25 @@ export class RecordedClasses implements OnInit, OnDestroy {
   // Navigation Methods
 
   selectCourse(course: AvailableCourseContent) {
-    this.selectedCourse = course;
-    this.loading = true;
+    this.selectedCourse.set(course);
+    this.loading.set(true);
     this.contentService.getContent(course.id).subscribe({
       next: (content) => {
-        this.selectedContent = content;
-        this.currentView = 'chapters';
-        this.loading = false;
+        this.selectedContent.set(content);
+        this.currentView.set('chapters');
+        this.loading.set(false);
         this.updateGlobalHeader();
       },
       error: () => {
-        this.loading = false;
-        this.error = 'Content is not published or you are not enrolled in this course.';
+        this.loading.set(false);
+        this.error.set('Content is not published or you are not enrolled in this course.');
       },
     });
   }
 
   selectChapter(chapter: ContentModule) {
-    this.selectedChapter = chapter;
-    this.currentView = 'concepts';
+    this.selectedChapter.set(chapter);
+    this.currentView.set('concepts');
     this.updateGlobalHeader();
   }
 
@@ -102,34 +102,34 @@ export class RecordedClasses implements OnInit, OnDestroy {
       { label: 'Recorded Classes', command: () => this.resetView() }
     ];
 
-    if (this.currentView === 'courses') {
+    if (this.currentView() === 'courses') {
       this.headerService.updateBreadcrumbs([...base]);
-    } else if (this.currentView === 'chapters' && this.selectedCourse) {
+    } else if (this.currentView() === 'chapters' && this.selectedCourse()) {
       this.headerService.updateBreadcrumbs([
         ...base,
         {
-          label: this.selectedCourse.title || 'Course', // Fallback for undefined
-          title: this.selectedCourse.title
+          label: this.selectedCourse()!.title || 'Course', // Fallback for undefined
+          title: this.selectedCourse()!.title
         }
       ]);
-    } else if (this.currentView === 'concepts' && this.selectedCourse && this.selectedChapter) {
+    } else if (this.currentView() === 'concepts' && this.selectedCourse() && this.selectedChapter()) {
       this.headerService.updateBreadcrumbs([
         ...base,
         {
-          label: this.selectedCourse.title || 'Course',
-          title: this.selectedCourse.title,
-          command: () => this.selectCourse(this.selectedCourse!)
+          label: this.selectedCourse()!.title || 'Course',
+          title: this.selectedCourse()!.title,
+          command: () => this.selectCourse(this.selectedCourse()!)
         },
-        { label: this.selectedChapter.title || 'Chapter' }
+        { label: this.selectedChapter()!.title || 'Chapter' }
       ]);
     }
   }
 
   resetView() {
-    this.currentView = 'courses';
-    this.selectedCourse = null;
-    this.selectedContent = null;
-    this.selectedChapter = null;
+    this.currentView.set('courses');
+    this.selectedCourse.set(null);
+    this.selectedContent.set(null);
+    this.selectedChapter.set(null);
     this.updateGlobalHeader();
   }
 

@@ -58,8 +58,8 @@ export class RegisterComponent implements OnDestroy {
     }
   ];
 
-  activeIndex = 0;
-  currentStep = 1; // 1: Form, 2: OTP, 3: Password
+  readonly activeIndex = signal(0);
+  readonly currentStep = signal(1); // 1: Form, 2: OTP, 3: Password
 
   /** True while any submit request is in progress. */
   readonly submitting = signal(false);
@@ -71,30 +71,30 @@ export class RegisterComponent implements OnDestroy {
   // File uploads
   profileImage: File | null = null;
   /** Empty by default; show placeholder until user uploads. */
-  profileImagePreview: string = '';
+  readonly profileImagePreview = signal('');
   /** Compressed base64 profile image to send with registration */
   profileImageBase64: string = '';
   resumeFile: File | null = null;
-  resumeFileName: string = '';
+  readonly resumeFileName = signal('');
   /** URL returned from server after resume upload */
   resumeUploadedUrl: string = '';
-  isCompressingImage = false;
-  isUploadingResume = false;
+  readonly isCompressingImage = signal(false);
+  readonly isUploadingResume = signal(false);
 
   // Skills
-  skills: string[] = [];
+  readonly skills = signal<string[]>([]);
   skillInput: string = '';
 
   // OTP
   otpCode: string = '';
-  otpSent: boolean = false;
-  canResendOTP: boolean = false;
-  resendTimer: number = 180; // 3 minutes
-  otpExpired: boolean = false;
+  readonly otpSent = signal(false);
+  readonly canResendOTP = signal(false);
+  readonly resendTimer = signal(180); // 3 minutes
+  readonly otpExpired = signal(false);
 
   // Calculate OTP progress percentage for knob
   get otpProgress(): number {
-    return Math.round((this.resendTimer / 180) * 100);
+    return Math.round((this.resendTimer() / 180) * 100);
   }
   private rotationTimer?: ReturnType<typeof setInterval>;
   private resendInterval?: ReturnType<typeof setInterval>;
@@ -121,13 +121,12 @@ export class RegisterComponent implements OnDestroy {
     }, { validators: this.passwordMatchValidator });
 
     this.rotationTimer = setInterval(() => {
-      this.activeIndex = (this.activeIndex + 1) % this.carouselItems.length;
-      this.cdr.markForCheck();
+      this.activeIndex.update((index) => (index + 1) % this.carouselItems.length);
     }, 3000);
   }
 
   setActive(index: number) {
-    this.activeIndex = index;
+    this.activeIndex.set(index);
   }
 
   // Profile Image Upload
@@ -154,7 +153,7 @@ export class RegisterComponent implements OnDestroy {
       }
 
       this.profileImage = file;
-      this.isCompressingImage = true;
+      this.isCompressingImage.set(true);
       this.cdr.markForCheck();
 
       try {
@@ -167,7 +166,7 @@ export class RegisterComponent implements OnDestroy {
         });
 
         this.profileImageBase64 = compressed;
-        this.profileImagePreview = compressed;
+        this.profileImagePreview.set(compressed);
 
         const sizeKB = Math.round((compressed.split(',')[1].length * 3) / 4 / 1024);
         this.messageService.add({
@@ -186,7 +185,7 @@ export class RegisterComponent implements OnDestroy {
         this.profileImage = null;
         this.profileImageBase64 = '';
       } finally {
-        this.isCompressingImage = false;
+        this.isCompressingImage.set(false);
         this.cdr.markForCheck();
       }
     }
@@ -228,15 +227,15 @@ export class RegisterComponent implements OnDestroy {
       }
 
       this.resumeFile = file;
-      this.resumeFileName = file.name;
-      this.isUploadingResume = true;
+      this.resumeFileName.set(file.name);
+      this.isUploadingResume.set(true);
       this.cdr.markForCheck();
 
       // Upload resume to server immediately
       this.auth.uploadResume(file).subscribe({
         next: (res) => {
           this.resumeUploadedUrl = res.url;
-          this.isUploadingResume = false;
+          this.isUploadingResume.set(false);
           this.messageService.add({
             severity: 'success',
             summary: 'Resume Uploaded',
@@ -246,9 +245,9 @@ export class RegisterComponent implements OnDestroy {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.isUploadingResume = false;
+          this.isUploadingResume.set(false);
           this.resumeFile = null;
-          this.resumeFileName = '';
+          this.resumeFileName.set('');
           this.messageService.add({
             severity: 'error',
             summary: 'Upload Failed',
@@ -274,7 +273,7 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
-    if (this.skills.length >= 10) {
+    if (this.skills().length >= 10) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Maximum Reached',
@@ -284,7 +283,7 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
-    if (this.skills.includes(skill)) {
+    if (this.skills().includes(skill)) {
       this.messageService.add({
         severity: 'info',
         summary: 'Duplicate Skill',
@@ -294,16 +293,13 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
-    this.skills.push(skill);
+    this.skills.update((skills) => [...skills, skill]);
     this.skillInput = '';
     this.cdr.markForCheck();
   }
 
   removeSkill(skill: string) {
-    const index = this.skills.indexOf(skill);
-    if (index > -1) {
-      this.skills.splice(index, 1);
-    }
+    this.skills.update((skills) => skills.filter((item) => item !== skill));
     this.cdr.markForCheck();
   }
 
@@ -337,7 +333,7 @@ export class RegisterComponent implements OnDestroy {
     }
 
     // Check if still uploading
-    if (this.isCompressingImage || this.isUploadingResume) {
+    if (this.isCompressingImage() || this.isUploadingResume()) {
       this.messageService.add({
         severity: 'info',
         summary: 'Please Wait',
@@ -348,7 +344,7 @@ export class RegisterComponent implements OnDestroy {
     }
 
     // Validate skills (at least 1 skill required)
-    if (this.skills.length === 0) {
+    if (this.skills().length === 0) {
       this.messageService.add({
         severity: 'error',
         summary: 'Skills Required',
@@ -362,8 +358,8 @@ export class RegisterComponent implements OnDestroy {
     const email = this.registerForm.get('email')?.value;
     this.auth.sendOtp(email).subscribe({
       next: () => {
-        this.otpSent = true;
-        this.currentStep = 2;
+        this.otpSent.set(true);
+        this.currentStep.set(2);
         this.startResendTimer();
         this.messageService.add({
           severity: 'info',
@@ -375,8 +371,8 @@ export class RegisterComponent implements OnDestroy {
         this.cdr.markForCheck();
       },
       error: () => {
-        this.otpSent = true;
-        this.currentStep = 2;
+        this.otpSent.set(true);
+        this.currentStep.set(2);
         this.startResendTimer();
         this.submitting.set(false);
         this.cdr.markForCheck();
@@ -389,8 +385,8 @@ export class RegisterComponent implements OnDestroy {
     const email = this.registerForm.get('email')?.value;
     this.auth.sendOtp(email).subscribe({
       next: () => {
-        this.otpSent = true;
-        this.currentStep = 2;
+        this.otpSent.set(true);
+        this.currentStep.set(2);
         this.startResendTimer();
         this.cdr.markForCheck();
       }
@@ -399,13 +395,13 @@ export class RegisterComponent implements OnDestroy {
 
   // Resend OTP Timer
   startResendTimer() {
-    this.canResendOTP = false;
-    this.resendTimer = 180; // 3 minutes
+    this.canResendOTP.set(false);
+    this.resendTimer.set(180); // 3 minutes
 
     this.resendInterval = setInterval(() => {
-      this.resendTimer--;
-      if (this.resendTimer <= 0) {
-        this.canResendOTP = true;
+      this.resendTimer.update((seconds) => seconds - 1);
+      if (this.resendTimer() <= 0) {
+        this.canResendOTP.set(true);
         if (this.resendInterval) {
           clearInterval(this.resendInterval);
         }
@@ -416,7 +412,7 @@ export class RegisterComponent implements OnDestroy {
 
   // Resend OTP
   resendOTP() {
-    if (!this.canResendOTP) return;
+    if (!this.canResendOTP()) return;
 
     console.log('Resending OTP to:', this.registerForm.get('email')?.value);
     this.sendOTP();
@@ -440,7 +436,7 @@ export class RegisterComponent implements OnDestroy {
     this.auth.verifyOtp(email, this.otpCode).subscribe({
       next: (res) => {
         if (res.valid) {
-          this.currentStep = 3;
+          this.currentStep.set(3);
         } else {
           this.messageService.add({
             severity: 'error',
@@ -484,7 +480,7 @@ export class RegisterComponent implements OnDestroy {
       underGraduate: underGraduate || undefined,
       profileImageUrl: this.profileImageBase64 || undefined,
       resumeUrl: this.resumeUploadedUrl || undefined,
-      skills: this.skills.length ? this.skills : undefined
+      skills: this.skills().length ? this.skills() : undefined
     }).subscribe({
       next: () => {
         this.messageService.add({

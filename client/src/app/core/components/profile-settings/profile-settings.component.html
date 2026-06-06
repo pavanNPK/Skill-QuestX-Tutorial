@@ -12,19 +12,15 @@
       </div>
       <form [formGroup]="form" (ngSubmit)="save()" class="profile-details profile-form">
         <div class="form-field">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>First name</mat-label>
-            <input matInput formControlName="firstName" id="firstName" />
-          </mat-form-field>
+          <label class="field-label" for="firstName">First name</label>
+          <input pInputText class="w-full" formControlName="firstName" id="firstName" />
           @if (form.get('firstName')?.touched && form.get('firstName')?.invalid) {
             <small class="form-error">First name is required.</small>
           }
         </div>
         <div class="form-field">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Last name</mat-label>
-            <input matInput formControlName="lastName" id="lastName" />
-          </mat-form-field>
+          <label class="field-label" for="lastName">Last name</label>
+          <input pInputText class="w-full" formControlName="lastName" id="lastName" />
           @if (form.get('lastName')?.touched && form.get('lastName')?.invalid) {
             <small class="form-error">Last name is required.</small>
           }
@@ -38,15 +34,15 @@
           <span class="value">{{ auth.roleLabel() }}</span>
         </div>
         <div class="profile-actions">
-          <button mat-flat-button color="primary" type="submit" [disabled]="submitting() || form.invalid || form.pristine">
+          <button pButton type="submit" [disabled]="submitting() || form.invalid || form.pristine">
             @if (submitting()) {
-              <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
+              <p-progress-spinner strokeWidth="6" ariaLabel="Saving profile" />
             }
-            <span>Save changes</span>
+            <span pButtonLabel>Save changes</span>
           </button>
-          <a mat-stroked-button routerLink="/change-password">
-            <mat-icon>lock</mat-icon>
-            <span>Change password</span>
+          <a pButton class="p-button-outlined" routerLink="/change-password">
+            <i pButtonIcon class="pi pi-lock"></i>
+            <span pButtonLabel>Change password</span>
           </a>
         </div>
       </form>

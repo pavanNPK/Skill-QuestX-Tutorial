@@ -28,14 +28,14 @@ export interface AppNotification {
   styleUrl: './header.scss'
 })
 export class HeaderComponent implements OnInit {
-  pageTitle = '';
-  breadcrumbs: BreadcrumbItem[] = [];
+  readonly pageTitle = signal('');
+  readonly breadcrumbs = signal<BreadcrumbItem[]>([]);
   private currentRoutePath = '';
 
   // Notification Logic
-  showDrawer = signal(false);
-  notifications: AppNotification[] = [];
-  unreadCount = signal(0);
+  readonly showDrawer = signal(false);
+  readonly notifications = signal<AppNotification[]>([]);
+  readonly unreadCount = signal(0);
 
   private router = inject(Router);
   private headerService = inject(HeaderService);
@@ -48,7 +48,7 @@ export class HeaderComponent implements OnInit {
     // Check for overridden breadcrumbs first
     this.headerService.breadcrumbs$.subscribe(crumbs => {
       if (crumbs.length > 0) {
-        this.breadcrumbs = crumbs;
+        this.breadcrumbs.set(crumbs);
       } else {
         // Fallback to Router Logic using current URL (safeguard)
         this.updateFromRouter(this.router.url);
@@ -56,7 +56,7 @@ export class HeaderComponent implements OnInit {
     });
 
     this.headerService.title$.subscribe(title => {
-      if (title) this.pageTitle = title;
+      if (title) this.pageTitle.set(title);
     });
 
     this.router.events
@@ -101,14 +101,14 @@ export class HeaderComponent implements OnInit {
     if (!this.auth.isAuthenticated()) return;
     this.notificationService.getNotifications().subscribe({
       next: (res) => {
-        this.notifications = res.notifications.map((n: ApiNotification) => ({
+        this.notifications.set(res.notifications.map((n: ApiNotification) => ({
           id: n.id,
           title: n.title,
           message: n.message || '',
           time: this.formatTimeAgo(n.createdAt),
           read: n.read,
           link: n.link ?? null,
-        }));
+        })));
         this.unreadCount.set(res.unreadCount);
       },
       error: () => {},
@@ -120,8 +120,8 @@ export class HeaderComponent implements OnInit {
     // Only set if not already set by service (though we reset service on nav, so this is safe)
     // Assuming headerService has these methods or they are placeholders for future implementation
     // For now, we'll just assign directly as the service reset should handle it.
-    this.pageTitle = info.title;
-    this.breadcrumbs = info.breadcrumbs;
+    this.pageTitle.set(info.title);
+    this.breadcrumbs.set(info.breadcrumbs);
   }
 
   getPageInfo(url: string): { title: string, breadcrumbs: BreadcrumbItem[] } {
@@ -151,8 +151,8 @@ export class HeaderComponent implements OnInit {
       title = 'Recorded Classes';
       breadcrumbs = [{ label: 'Classes' }, { label: 'Recorded Classes', url: '/classes/recorded' }];
     } else if (url.includes('/classes/live')) {
-      title = 'Live Stream';
-      breadcrumbs = [{ label: 'Classes' }, { label: 'Live Stream', url: '/classes/live' }];
+      title = 'Live';
+      breadcrumbs = [{ label: 'Classes' }, { label: 'Live', url: '/classes/live' }];
     } else if (url.includes('/tasks')) {
       title = 'Tasks';
       breadcrumbs = [{ label: 'Tasks', url: '/tasks' }];
@@ -200,7 +200,7 @@ export class HeaderComponent implements OnInit {
   markAllAsRead() {
     this.notificationService.markAllAsRead().subscribe({
       next: () => {
-        this.notifications = this.notifications.map((n) => ({ ...n, read: true }));
+        this.notifications.update((items) => items.map((n) => ({ ...n, read: true })));
         this.unreadCount.set(0);
       },
     });
@@ -210,9 +210,9 @@ export class HeaderComponent implements OnInit {
     if (notification.read) return;
     this.notificationService.markAsRead(notification.id).subscribe({
       next: () => {
-        this.notifications = this.notifications.map((n) =>
+        this.notifications.update((items) => items.map((n) =>
           n.id === notification.id ? { ...n, read: true } : n,
-        );
+        ));
         this.unreadCount.update((c) => Math.max(0, c - 1));
       },
     });

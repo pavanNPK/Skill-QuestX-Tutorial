@@ -4,7 +4,7 @@
     <!-- Main Content Area -->
     <div class="main-area">
       <!-- Course Overview Section -->
-      <div class="overview-grid">
+      <div class="overview-grid" pAnimateOnScroll enterClass="sqx-animate sqx-enter-up" [once]="true">
         @for (card of courseOverview; track card.title) {
         <div class="premium-summary-card">
           <div class="card-icon-wrapper" [style.color]="card.color" [style.background-color]="card.bg">
@@ -24,7 +24,7 @@
       </div>
 
       <!-- Premium Banner Carousel -->
-      <div class="banner-carousel-section">
+      <div class="banner-carousel-section" pAnimateOnScroll enterClass="sqx-animate sqx-enter-up" [once]="true">
         <p-carousel [value]="dashboardBanners" [numVisible]="1" [numScroll]="1" [circular]="true"
           [autoplayInterval]="5000" [showIndicators]="false">
           <ng-template let-banner pTemplate="item">
@@ -50,7 +50,7 @@
       </div>
 
       <!-- Extensions Grid (Exams & Projects) -->
-      <div class="extensions-grid">
+      <div class="extensions-grid" pAnimateOnScroll enterClass="sqx-animate sqx-enter-up" [once]="true">
         <!-- Recent Exam Results -->
         <div class="extension-card">
           <div class="card-header">
@@ -106,7 +106,7 @@
       </div>
 
       <!-- Feedbacks (Full Width) -->
-      <div class="feedbacks-section">
+      <div class="feedbacks-section" pAnimateOnScroll enterClass="sqx-animate sqx-enter-up" [once]="true">
         <div class="feedbacks-card">
           <div class="card-header">
             <h3 class="section-title">Feedbacks</h3>
@@ -140,7 +140,7 @@
       </div>
 
       <!-- Tasks Table -->
-      <div class="tasks-section">
+      <div class="tasks-section" pAnimateOnScroll enterClass="sqx-animate sqx-enter-up" [once]="true">
         <h3 class="section-title">Tasks</h3>
         <div class="tasks-table">
           <div class="table-header">
@@ -164,16 +164,16 @@
     <!-- Sidebar Area -->
     <div class="sidebar-area">
       <!-- Course Progress -->
-      <div class="progress-card">
+      <div class="progress-card" pAnimateOnScroll enterClass="sqx-animate sqx-enter-fade" [once]="true">
         <h3 class="section-title">Course Progress</h3>
         <div class="progress-chart">
           <svg viewBox="0 0 200 200" class="donut-chart">
             <circle cx="100" cy="100" r="80" fill="none" stroke="#F3F4F6" stroke-width="15"></circle>
             <circle cx="100" cy="100" r="80" fill="none" [attr.stroke]="'var(--sqx-color-primary)'" stroke-width="15"
-              [attr.stroke-dasharray]="(progressPercentage * 5.027) + ' 502.7'" stroke-linecap="round"
+              [attr.stroke-dasharray]="(progressPercentage() * 5.027) + ' 502.7'" stroke-linecap="round"
               transform="rotate(-90 100 100)"></circle>
             <text x="100" y="100" dy=".3em" text-anchor="middle" font-size="28" font-weight="700"
-              fill="#1f2937">{{progressPercentage | number:'1.0-0'}}%</text>
+              fill="#1f2937">{{progressPercentage() | number:'1.0-0'}}%</text>
           </svg>
           <div class="progress-legend">
             <div class="legend-item">
@@ -189,10 +189,10 @@
       </div>
 
       <!-- Calendar Widget -->
-      <div class="calendar-widget">
+      <div class="calendar-widget" pAnimateOnScroll enterClass="sqx-animate sqx-enter-fade" [once]="true">
         <div class="calendar-header">
           <button class="calendar-nav" (click)="previousMonth()"><i class="pi pi-angle-left"></i></button>
-          <span class="calendar-month">{{ currentMonth }}</span>
+          <span class="calendar-month">{{ currentMonth() }}</span>
           <button class="calendar-nav" (click)="nextMonth()"><i class="pi pi-angle-right"></i></button>
         </div>
         <div class="calendar-grid">
@@ -204,8 +204,8 @@
           <div class="calendar-day-label">Fr</div>
           <div class="calendar-day-label">Sa</div>
 
-          @for (day of calendarDays; track $index) {
-          <div class="calendar-day" [class.empty]="!day" [class.active]="day === selectedDay"
+          @for (day of calendarDays(); track $index) {
+          <div class="calendar-day" [class.empty]="!day" [class.active]="day === selectedDay()"
             [class.today]="isToday(day)" (click)="selectDay(day)">
             {{ day || '' }}
           </div>
@@ -214,7 +214,7 @@
       </div>
 
       <!-- Job Board -->
-      <div class="job-board-widget">
+      <div class="job-board-widget" pAnimateOnScroll enterClass="sqx-animate sqx-enter-fade" [once]="true">
         <h3 class="widget-title">Job-Board 🚀</h3>
         @for (job of jobs; track job.title) {
         <div class="job-card" [class.locked]="job.locked">
@@ -243,7 +243,7 @@
       </div>
 
       <!-- Top Students -->
-      <div class="students-widget">
+      <div class="students-widget" pAnimateOnScroll enterClass="sqx-animate sqx-enter-fade" [once]="true">
         <div class="widget-header">
           <h3 class="widget-title">Top Students</h3>
           <span class="view-all-text">View All</span>

@@ -4,11 +4,10 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AuthService } from '../../services/auth.service';
 import { getFriendlyErrorMessage } from '../../../shared/utils/error-messages.util';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
@@ -19,11 +18,10 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
+    ButtonModule,
+    InputTextModule,
+    PasswordModule,
+    ProgressSpinnerModule,
 ],
   templateUrl: './change-password.component.html',
   styleUrl: './change-password.component.scss',
@@ -36,9 +34,6 @@ export class ChangePasswordComponent {
   private snackbar = inject(SnackbarService);
 
   readonly submitting = signal(false);
-  readonly hideCurrentPassword = signal(true);
-  readonly hideNewPassword = signal(true);
-  readonly hideConfirmPassword = signal(true);
   form: FormGroup;
 
   constructor() {

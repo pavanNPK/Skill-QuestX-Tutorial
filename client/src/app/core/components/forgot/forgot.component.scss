@@ -167,40 +167,6 @@
   border-radius: 999px;
 }
 
-::ng-deep .login-button.p-button {
-  background: var(--sqx-color-primary);
-  border: 1px solid var(--sqx-color-primary);
-  color: #ffffff;
-}
-
-::ng-deep .login-button.p-button:enabled:hover,
-::ng-deep .login-button.p-button:enabled:focus,
-::ng-deep .login-button.p-button:enabled:active {
-  background: var(--sqx-color-primary-dark);
-  border: 1px solid var(--sqx-color-primary-dark);
-  color: #ffffff;
-}
-
-::ng-deep .login-button.p-button:focus,
-::ng-deep .login-button.p-button:active {
-  background: var(--sqx-color-primary);
-  border: none;
-  color: #ffffff;
-}
-
-::ng-deep .p-button.p-button-outlined {
-  color: var(--sqx-color-primary);
-  border-color: var(--sqx-color-primary);
-}
-
-::ng-deep .p-button.p-button-outlined:enabled:hover,
-::ng-deep .p-button.p-button-outlined:enabled:focus,
-::ng-deep .p-button.p-button-outlined:enabled:active {
-  color: var(--sqx-color-primary-dark);
-  border-color: var(--sqx-color-primary-dark);
-  background: rgba(91, 75, 196, 0.08);
-}
-
 // Password Strength Indicator
 .password-strength {
   margin-top: 8px;

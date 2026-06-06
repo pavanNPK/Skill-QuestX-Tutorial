@@ -8,7 +8,7 @@
       <div class="hero-content">
         <div class="hero-slides">
           @for (item of carouselItems; track item; let i = $index) {
-            <div class="hero-slide" [class.active]="i === activeIndex">
+            <div class="hero-slide" [class.active]="i === activeIndex()">
               <div class="hero-title-stack">
                 <h3 class="hero-title m-0">{{ item.title }}</h3>
                 <div class="hero-quote">
@@ -20,7 +20,7 @@
         </div>
         <div class="hero-dots">
           @for (item of carouselItems; track item; let i = $index) {
-            <button type="button" [class.active]="i === activeIndex"
+            <button type="button" [class.active]="i === activeIndex()"
             (click)="setActive(i)" aria-label="Show slide"></button>
           }
         </div>
@@ -37,7 +37,7 @@
       <p class="mt-2 mb-0">We’ll help you reset your password in a few steps.</p>
     </div>
 
-    @if (step === 'email') {
+    @if (step() === 'email') {
       <div class="animate-in">
         <form [formGroup]="emailForm" (ngSubmit)="submitEmail()" class="flex flex-column gap-3">
           <div class="flex flex-column gap-1">
@@ -65,7 +65,7 @@
       </div>
     }
 
-    @if (step === 'otp') {
+    @if (step() === 'otp') {
       <div class="animate-in">
         <form [formGroup]="otpForm" (ngSubmit)="submitOtp()" class="flex flex-column gap-3">
           <div class="flex flex-column gap-1">
@@ -81,7 +81,7 @@
                 Enter a valid 6-digit OTP.
               </small>
             }
-            @if (otpExpired) {
+            @if (otpExpired()) {
               <small class="p-error">OTP expired. Please resend.</small>
             }
           </div>
@@ -89,7 +89,7 @@
           <div class="flex flex-column gap-2 align-items-center">
             <div class="text-sm text-600">OTP expires in</div>
             <div class="otp-timer">
-              <p-knob [ngModel]="otpProgress" [ngModelOptions]="{ standalone: true }" [readonly]="true" [strokeWidth]="8"
+              <p-knob [ngModel]="otpProgress()" [ngModelOptions]="{ standalone: true }" [readonly]="true" [strokeWidth]="8"
               [size]="90" [showValue]="false"></p-knob>
               <div class="otp-timer-label text-sm font-medium">{{ otpTimeLabel }}</div>
             </div>
@@ -105,7 +105,7 @@
       </div>
     }
 
-    @if (step === 'reset') {
+    @if (step() === 'reset') {
       <div class="animate-in">
         <form [formGroup]="resetForm" (ngSubmit)="submitReset()" class="flex flex-column gap-3">
           <div class="flex flex-column gap-1">
@@ -127,10 +127,10 @@
             @if (resetForm.get('password')?.value) {
               <div class="password-strength">
                 <div class="strength-bar">
-                  <div class="strength-fill" [attr.data-strength]="passwordLabel.toLowerCase()"></div>
+                  <div class="strength-fill" [attr.data-strength]="passwordLabel().toLowerCase()"></div>
                 </div>
-                <small class="strength-text" [attr.data-strength]="passwordLabel.toLowerCase()">
-                  Password strength: {{ passwordLabel }}
+                <small class="strength-text" [attr.data-strength]="passwordLabel().toLowerCase()">
+                  Password strength: {{ passwordLabel() }}
                 </small>
               </div>
             }

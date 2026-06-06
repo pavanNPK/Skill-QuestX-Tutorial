@@ -1,11 +1,11 @@
 // use of this file is:
 // Shared service file. It provides reusable cross-feature behavior.
 import { Injectable, inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MessageService } from 'primeng/api';
 
 @Injectable({ providedIn: 'root' })
 export class SnackbarService {
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly messages = inject(MessageService);
 
   // use of this is:
   // Shows successful action feedback.
@@ -26,13 +26,13 @@ export class SnackbarService {
   }
 
   // use of this is:
-  // Centralizes Material snackbar styling, position, and duration.
+  // Centralizes PrimeNG toast severity, summary, and duration.
   private open(message: string, panelClass: 'success' | 'error' | 'info'): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 5000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: [`sqx-snackbar-${panelClass}`],
+    this.messages.add({
+      severity: panelClass,
+      summary: panelClass === 'success' ? 'Success' : panelClass === 'error' ? 'Error' : 'Info',
+      detail: message,
+      life: 5000,
     });
   }
 }

@@ -92,7 +92,7 @@
         </button>
 
         <div class="popular-course-grid">
-            @for (course of visiblePopularCourses; track course.id) {
+            @for (course of visiblePopularCourses(); track course.id) {
                 <div class="course-card">
                     <div class="card-top">
                         <span class="tag">Popular in week</span>

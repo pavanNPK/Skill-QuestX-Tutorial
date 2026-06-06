@@ -4,7 +4,7 @@
     <div class="batches-header">
         <span class="p-input-icon-left search-wrapper">
             <i class="pi pi-search"></i>
-            <input type="text" pInputText [(ngModel)]="searchQuery" placeholder="Search batches..."
+            <input type="text" pInputText [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search batches..."
                 class="search-input" />
         </span>
     </div>

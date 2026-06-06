@@ -1,6 +1,6 @@
 // use of this file is:
 // Feature page/container file. It connects route UI, feature state, services, and user actions.
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
 import { AccordionModule } from 'primeng/accordion';
@@ -21,14 +21,14 @@ import {
     styleUrl: './chapter-detail.scss'
 })
 export class ChapterDetail implements OnInit {
-    chapterTitle = 'Recorded Classes';
-    courseTitle = '';
-    courseDescription = '';
-    content: CourseContent | null = null;
-    modules: ContentModule[] = [];
-    selectedLesson: ContentLesson | null = null;
-    loading = true;
-    error = '';
+    readonly chapterTitle = signal('Recorded Classes');
+    readonly courseTitle = signal('');
+    readonly courseDescription = signal('');
+    readonly content = signal<CourseContent | null>(null);
+    readonly modules = signal<ContentModule[]>([]);
+    readonly selectedLesson = signal<ContentLesson | null>(null);
+    readonly loading = signal(true);
+    readonly error = signal('');
 
     constructor(private route: ActivatedRoute, private contentService: CourseContentService) { }
 
@@ -38,35 +38,35 @@ export class ChapterDetail implements OnInit {
             next: (courses) => {
                 const courseId = courses[0]?.id;
                 if (!courseId) {
-                    this.loading = false;
-                    this.error = 'No course content is available.';
+                    this.loading.set(false);
+                    this.error.set('No course content is available.');
                     return;
                 }
                 this.contentService.getContent(courseId).subscribe({
                     next: (content) => {
-                        this.content = content;
-                        this.courseTitle = content.title;
-                        this.courseDescription = content.description;
+                        this.content.set(content);
+                        this.courseTitle.set(content.title);
+                        this.courseDescription.set(content.description);
                         const selectedModule = content.modules.find((module) => module.id === chapterId);
-                        this.modules = selectedModule ? [selectedModule] : content.modules;
-                        this.chapterTitle = selectedModule ? selectedModule.title : 'Recorded Classes';
-                        this.loading = false;
+                        this.modules.set(selectedModule ? [selectedModule] : content.modules);
+                        this.chapterTitle.set(selectedModule ? selectedModule.title : 'Recorded Classes');
+                        this.loading.set(false);
                     },
                     error: () => {
-                        this.loading = false;
-                        this.error = 'Content is not published or you are not enrolled in this course.';
+                        this.loading.set(false);
+                        this.error.set('Content is not published or you are not enrolled in this course.');
                     },
                 });
             },
             error: () => {
-                this.loading = false;
-                this.error = 'Could not load course content.';
+                this.loading.set(false);
+                this.error.set('Could not load course content.');
             },
         });
     }
 
     openLesson(lesson: ContentLesson) {
-        this.selectedLesson = lesson;
+        this.selectedLesson.set(lesson);
         const target = lesson.blocks.find((block) => ['video', 'document', 'image', 'link'].includes(block.type) && block.url);
         if (target?.url) window.open(this.contentService.absoluteAssetUrl(target.url), '_blank', 'noopener');
     }
