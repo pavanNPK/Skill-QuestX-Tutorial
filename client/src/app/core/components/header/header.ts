@@ -7,9 +7,14 @@ import { filter, map } from 'rxjs/operators';
 import { TooltipModule } from 'primeng/tooltip';
 import { DrawerModule } from 'primeng/drawer';
 import { BadgeModule } from 'primeng/badge';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { PopoverModule } from 'primeng/popover';
 import { HeaderService, BreadcrumbItem } from '../../services/header.service';
 import { NotificationService, AppNotification as ApiNotification } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
+import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 
 export interface AppNotification {
   id: string;
@@ -23,7 +28,7 @@ export interface AppNotification {
 @Component({
   selector: 'sqx-header',
   standalone: true,
-  imports: [RouterLink, TooltipModule, DrawerModule, BadgeModule],
+  imports: [RouterLink, TooltipModule, DrawerModule, BadgeModule, IconFieldModule, InputIconModule, InputTextModule, PopoverModule, SafeUrlPipe],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
@@ -41,7 +46,7 @@ export class HeaderComponent implements OnInit {
   private router = inject(Router);
   private headerService = inject(HeaderService);
   private notificationService = inject(NotificationService);
-  private auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
   constructor() {}
 
@@ -238,5 +243,25 @@ export class HeaderComponent implements OnInit {
         this.unreadCount.update((c) => Math.max(0, c - 1));
       },
     });
+  }
+
+  userInitials(): string {
+    const u = this.auth.currentUser();
+    if (!u?.firstName && !u?.lastName) return (u?.name?.slice(0, 2) ?? 'U').toUpperCase();
+    const f = (u.firstName ?? '').trim().charAt(0);
+    const l = (u.lastName ?? '').trim().charAt(0);
+    return (f + l).toUpperCase() || (u.name?.slice(0, 2) ?? 'U').toUpperCase();
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile-settings']);
+  }
+
+  changePassword() {
+    this.router.navigate(['/change-password']);
+  }
+
+  userPreferences() {
+    this.router.navigate(['/profile-settings']);
   }
 }

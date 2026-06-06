@@ -47,15 +47,68 @@
         </div>
 
         <div class="header-right">
+            <p-iconfield class="header-search">
+                <p-inputicon class="pi pi-search" />
+                <input pInputText type="search" placeholder="Global search..." />
+            </p-iconfield>
+
             <button class="notification-btn" (click)="openNotifications()">
                 <i class="pi pi-bell"></i>
                 @if (unreadCount() > 0) {
                 <span class="badge">{{ unreadCount() }}</span>
                 }
             </button>
+
+            <button type="button" class="header-profile-btn" (click)="profileMenu.toggle($event)"
+                aria-label="Open profile menu">
+                <span class="header-avatar">
+                    <img [src]="auth.currentUser()?.profileImageUrl ? (auth.currentUser()?.profileImageUrl | safeUrl) : '/assets/images/avatar-1.jpg'"
+                        alt="User" />
+                </span>
+                <span class="header-profile-text">
+                    <strong>{{ auth.currentUser()?.name ?? 'User' }}</strong>
+                    <small>{{ auth.roleLabel() }}</small>
+                </span>
+                <i class="pi pi-chevron-down"></i>
+            </button>
         </div>
     </div>
 </header>
+
+<p-popover #profileMenu [dismissable]="true" styleClass="profile-popover header-profile-popover">
+    <div class="profile-menu">
+        <div class="profile-card-cover">
+            <img src="/assets/images/banner.jpg" alt="Profile cover" />
+        </div>
+
+        <div class="profile-card-body">
+            <div class="profile-card-avatar">
+                <img [src]="auth.currentUser()?.profileImageUrl ? (auth.currentUser()?.profileImageUrl | safeUrl) : '/assets/images/avatar-1.jpg'"
+                    alt="User" />
+            </div>
+
+            <div class="profile-card-heading">
+                <h4>{{ auth.currentUser()?.name ?? 'User' }}</h4>
+                <p>{{ auth.roleLabel() }}</p>
+            </div>
+
+            <div class="profile-actions">
+                <button class="profile-action primary" (click)="goToProfile(); profileMenu.hide()">
+                    <i class="pi pi-user"></i>
+                    <span>Profile Settings</span>
+                </button>
+                <button class="profile-action" (click)="changePassword(); profileMenu.hide()">
+                    <i class="pi pi-lock"></i>
+                    <span>Change Password</span>
+                </button>
+                <button class="profile-action" (click)="userPreferences(); profileMenu.hide()">
+                    <i class="pi pi-cog"></i>
+                    <span>User Preferences</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</p-popover>
 
 <!-- Notification Drawer -->
 <p-drawer [visible]="showDrawer()" (visibleChange)="showDrawer.set($event)" position="right" [showCloseIcon]="true" (onHide)="closeDrawer()">
