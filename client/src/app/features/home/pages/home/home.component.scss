@@ -1,8 +1,12 @@
 .content-area {
     margin-left: var(--sqx-sidebar-width);
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     transition: margin-left 0.2s ease;
 
     &.sidebar-collapsed {
@@ -12,8 +16,10 @@
 
 .main-content {
     flex: 1;
+    min-height: 0;
     background: var(--sqx-color-bg);
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 @media (max-width: 768px) {

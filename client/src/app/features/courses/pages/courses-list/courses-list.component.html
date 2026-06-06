@@ -133,15 +133,22 @@
                             </div>
 
                             @if (!course.unavailable) {
-                            <button class="get-course-btn">
-                                <span>Get Course</span>
-                                <i class="pi pi-chevron-right"></i>
-                            </button>
+                            <button
+                                pButton
+                                label="Get Course"
+                                icon="pi pi-chevron-right"
+                                iconPos="right"
+                                class="get-course-btn"
+                            ></button>
                             }
                             @if (course.unavailable) {
-                            <button class="unavailable-btn">
-                                <span>Unavailable</span>
-                            </button>
+                            <button
+                                pButton
+                                label="Unavailable"
+                                severity="secondary"
+                                class="unavailable-btn"
+                                disabled
+                            ></button>
                             }
                         </div>
                     </div>

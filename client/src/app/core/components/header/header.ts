@@ -29,6 +29,7 @@ export interface AppNotification {
 })
 export class HeaderComponent implements OnInit {
   readonly pageTitle = signal('');
+  readonly pageSubtitle = signal('');
   readonly breadcrumbs = signal<BreadcrumbItem[]>([]);
   private currentRoutePath = '';
 
@@ -48,7 +49,7 @@ export class HeaderComponent implements OnInit {
     // Check for overridden breadcrumbs first
     this.headerService.breadcrumbs$.subscribe(crumbs => {
       if (crumbs.length > 0) {
-        this.breadcrumbs.set(crumbs);
+        this.breadcrumbs.set(this.visibleBreadcrumbs(crumbs));
       } else {
         // Fallback to Router Logic using current URL (safeguard)
         this.updateFromRouter(this.router.url);
@@ -121,11 +122,18 @@ export class HeaderComponent implements OnInit {
     // Assuming headerService has these methods or they are placeholders for future implementation
     // For now, we'll just assign directly as the service reset should handle it.
     this.pageTitle.set(info.title);
-    this.breadcrumbs.set(info.breadcrumbs);
+    this.pageSubtitle.set(info.subtitle);
+    this.breadcrumbs.set(this.visibleBreadcrumbs(info.breadcrumbs));
   }
 
-  getPageInfo(url: string): { title: string, breadcrumbs: BreadcrumbItem[] } {
+  private visibleBreadcrumbs(items: BreadcrumbItem[]): BreadcrumbItem[] {
+    const withoutHome = items.filter((item) => (item.label ?? '').toLowerCase() !== 'home');
+    return withoutHome.length >= 2 ? items : [];
+  }
+
+  getPageInfo(url: string): { title: string, subtitle: string, breadcrumbs: BreadcrumbItem[] } {
     let title = 'Dashboard';
+    let subtitle = 'Track your learning progress and upcoming work';
     let breadcrumbs: BreadcrumbItem[] = [];
 
     // Default Home
@@ -134,46 +142,60 @@ export class HeaderComponent implements OnInit {
     // When adding new app routes: add a case here with title and breadcrumbs so the header shows the component name and breadcrumbs.
     if (url.includes('/dashboard')) {
       title = 'Dashboard';
+      subtitle = 'Track your learning progress and upcoming work';
       breadcrumbs = [];
     } else if (url.includes('/profile-settings')) {
       title = 'Profile Settings';
+      subtitle = 'Manage your account details and preferences';
       breadcrumbs = [{ label: 'Profile Settings', url: '/profile-settings' }];
     } else if (url.includes('/change-password')) {
       title = 'Change Password';
+      subtitle = 'Update your account password securely';
       breadcrumbs = [{ label: 'Change Password', url: '/change-password' }];
     } else if (url.includes('/courses')) {
-      title = 'My Course Syllabus';
+      title = 'Courses';
+      subtitle = 'Manage your syllabus and enrolled course content';
       breadcrumbs = [{ label: 'My Course Syllabus', url: '/courses' }];
     } else if (url.includes('/materials')) {
       title = 'Materials';
+      subtitle = 'Access course materials and learning content';
       breadcrumbs = [{ label: 'Materials', url: '/materials' }];
     } else if (url.includes('/classes/recorded')) {
       title = 'Recorded Classes';
+      subtitle = 'Watch recorded sessions and course chapters';
       breadcrumbs = [{ label: 'Classes' }, { label: 'Recorded Classes', url: '/classes/recorded' }];
     } else if (url.includes('/classes/live')) {
-      title = 'Live';
-      breadcrumbs = [{ label: 'Classes' }, { label: 'Live', url: '/classes/live' }];
+      title = 'Live Classes';
+      subtitle = 'Join live sessions and class activities';
+      breadcrumbs = [{ label: 'Classes' }, { label: 'Live Classes', url: '/classes/live' }];
     } else if (url.includes('/tasks')) {
       title = 'Tasks';
+      subtitle = 'Track assignments and learning tasks';
       breadcrumbs = [{ label: 'Tasks', url: '/tasks' }];
     } else if (url.includes('/batches/')) {
       // Batch detail page
       title = 'Batch Details';
+      subtitle = 'Review students, schedules, and batch information';
       breadcrumbs = [{ label: 'Batches', url: '/batches' }, { label: 'Batch Details' }];
     } else if (url.includes('/batches')) {
       title = 'Batches';
+      subtitle = 'Manage batches and enrolled students';
       breadcrumbs = [{ label: 'Batches', url: '/batches' }];
     } else if (url.includes('/exams/assessment')) {
       title = 'Online Assessment';
+      subtitle = 'Create, manage, and take online assessments';
       breadcrumbs = [{ label: 'Exams' }, { label: 'Online Assessment' }];
     } else if (url.includes('/exams/docs')) {
       title = 'Exam Documents';
+      subtitle = 'Access documents and resources for exams';
       breadcrumbs = [{ label: 'Exams' }, { label: 'Exam Documents' }];
     } else if (url.includes('/projects')) {
       title = 'Projects';
+      subtitle = 'Track project work, submissions, and progress';
       breadcrumbs = [{ label: 'Projects', url: '/projects' }];
     } else if (url.includes('/add-users')) {
       title = 'Users';
+      subtitle = 'Manage users, roles, and access';
       breadcrumbs = [{ label: 'Users', url: '/add-users' }];
     }
 
@@ -181,10 +203,10 @@ export class HeaderComponent implements OnInit {
     // The logic above already sets breadcrumbs to empty for dashboard.
     // If breadcrumbs are not empty, prepend home.
     if (breadcrumbs.length > 0) {
-      return { title, breadcrumbs: [home, ...breadcrumbs] };
+      return { title, subtitle, breadcrumbs: [home, ...breadcrumbs] };
     }
 
-    return { title, breadcrumbs: [] };
+    return { title, subtitle, breadcrumbs: [] };
   }
 
   // Notification Methods

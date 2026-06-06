@@ -28,7 +28,7 @@ export class PushRegistrationService {
         applicationServerKey: this.urlBase64ToUint8Array(key) as BufferSource,
       });
       await this.sendSubscriptionToBackend(sub.toJSON());
-      this.snackbar.success("Notifications enabled. You'll receive push notifications for tasks and updates.");
+      this.snackbar.success("You'll receive notifications for updates.");
     } catch (_) {
       // e.g. permission denied, SW register failed, no VAPID
     }

@@ -12,34 +12,7 @@
     margin-bottom: 2rem;
 
     .search-field {
-        max-width: 400px;
-
-        ::ng-deep .p-iconfield {
-            width: 100%;
-        }
-
-        ::ng-deep .p-inputtext {
-            width: 100%;
-        }
-
-        ::ng-deep .p-inputicon {
-            color: #9ca3af;
-            font-size: 16px;
-        }
-    }
-
-    // Add New Course Button
-    button {
-        background: var(--sqx-color-primary);
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-
-        &:hover {
-            background: #5b4dc7;
-        }
+        width: min(100%, 16rem);
     }
 }
 
@@ -375,35 +348,6 @@
                 }
             }
 
-            .get-course-btn {
-                background: var(--sqx-color-primary);
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 30px;
-                font-size: 13px;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                cursor: pointer;
-                transition: all 0.2s;
-
-                &:hover {
-                    background: #5b4dc7;
-                }
-            }
-
-            .unavailable-btn {
-                background: #E5E7EB;
-                color: #374151;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 30px;
-                font-size: 13px;
-                font-weight: 600;
-                cursor: default;
-            }
         }
     }
 }

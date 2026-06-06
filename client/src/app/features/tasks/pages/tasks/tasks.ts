@@ -14,7 +14,6 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 
@@ -79,10 +78,9 @@ interface TaskFeedback {
     AvatarGroupModule,
     TooltipModule,
     TagModule,
-    ConfirmDialogModule,
-    ToastModule
+    ConfirmDialogModule
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService],
   templateUrl: './tasks.html',
   styleUrl: './tasks.scss',
 })

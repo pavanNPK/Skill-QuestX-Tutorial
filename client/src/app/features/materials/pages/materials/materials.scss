@@ -45,7 +45,6 @@
     box-shadow: 0 4px 12px rgba(17, 24, 39, 0.04);
 }
 
-.back-btn,
 .pager-btn {
     border-radius: 8px;
 }
@@ -113,19 +112,6 @@
         color: #6B7280;
         font-size: 14px;
         font-weight: 600;
-    }
-}
-
-.index-cover .back-btn {
-    background: #FFFFFF !important;
-    border: 1px solid #D9D6F0 !important;
-    color: var(--sqx-color-primary) !important;
-    font-weight: 700;
-
-    &.primary {
-        background: var(--sqx-color-primary) !important;
-        border-color: var(--sqx-color-primary) !important;
-        color: #FFFFFF !important;
     }
 }
 
@@ -325,37 +311,6 @@
     font-weight: 800;
 }
 
-.manager-input,
-.manager-select,
-.manager-textarea {
-    width: 100%;
-    border: 1px solid #D1D5DB;
-    border-radius: 8px;
-    color: #111827;
-    font: inherit;
-    padding: 0.75rem 0.85rem;
-    margin-bottom: 1rem;
-    outline: none;
-
-    &:focus {
-        border-color: var(--sqx-color-primary);
-        box-shadow: 0 0 0 3px rgba(91, 75, 196, 0.12);
-    }
-
-    &.compact {
-        margin-bottom: 0.75rem;
-    }
-}
-
-.manager-textarea {
-    resize: vertical;
-
-    &.rich {
-        min-height: 132px;
-        line-height: 1.55;
-    }
-}
-
 .upload-strip {
     border-top: 1px solid #E5E7EB;
     border-bottom: 1px solid #E5E7EB;
@@ -372,47 +327,16 @@
     gap: 0.5rem;
 }
 
-.upload-btn,
-.bulk-import-btn,
-.text-btn {
-    border: 1px solid #D9D6F0;
-    border-radius: 8px;
-    background: #FFFFFF;
-    color: var(--sqx-color-primary);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.6rem 0.85rem;
-    font-weight: 800;
-    cursor: pointer;
-
-    input {
-        display: none;
-    }
-
-    &.danger {
-        border-color: #FECACA;
-        color: #DC2626;
-    }
-
-    &.compact {
-        min-height: 34px;
-        padding: 0.45rem 0.65rem;
-        font-size: 13px;
-    }
+.hidden-file-input {
+    display: none;
 }
 
-.bulk-import-btn {
-    margin: 0;
-    border-color: #10B981;
-    background: #10B981;
-    color: #FFFFFF;
+.editor-control {
+    margin-bottom: 1rem;
+}
 
-    &:hover {
-        border-color: #059669;
-        background: #059669;
-    }
+:host ::ng-deep .block-type-select {
+    min-width: 150px;
 }
 
 .asset-grid {
@@ -534,19 +458,6 @@
     &:hover {
         background: #F5F3FF;
         border-color: var(--sqx-color-primary);
-    }
-}
-
-.manager-select {
-    max-width: 180px;
-    min-height: 38px;
-    padding: 0.45rem 1.75rem 0.45rem 0.75rem;
-    font-size: 14px;
-    margin-bottom: 0;
-    appearance: auto;
-
-    &.inline {
-        width: 150px;
     }
 }
 

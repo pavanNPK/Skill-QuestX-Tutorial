@@ -1,7 +1,7 @@
 /* use of this stylesheet is: Define component/page styling while keeping layout and visual behavior scoped to this file. */
 :root {
-  // Primary Purple Theme (#5B4BC4 - app standard)
-  --sqx-color-primary: #5B4BC4;
+  // Primary Purple Theme (#5A4BC4 - app standard)
+  --sqx-color-primary: #5A4BC4;
   --sqx-color-primary-dark: #4a3da3;
   --sqx-color-primary-light: #8b7dd4;
 
@@ -9,11 +9,12 @@
   --sqx-header-height: 64px;
   --sqx-sidebar-width: 180px;
   --sqx-sidebar-collapsed-width: 76px;
-  --sqx-color-sidebar-bg: #5B4BC4;
-  --sqx-color-sidebar-bg-white: #ffffff;
-  --sqx-color-sidebar-text: #ffffff;
-  --sqx-color-sidebar-hover: rgba(255, 255, 255, 0.1);
-  --sqx-color-sidebar-active: rgba(255, 255, 255, 0.2);
+  --sqx-color-sidebar-bg: #F6F4FF;
+  --sqx-color-sidebar-hover: #EEEAFE;
+  --sqx-color-sidebar-active: #DDD6FF;
+  --sqx-color-sidebar-active-text: #5A4BC4;
+  --sqx-color-sidebar-text: #4B5563;
+  --sqx-color-sidebar-border: #E5E7EB;
 
   // Card Colors
   --sqx-color-card-purple: #E8E5FF;

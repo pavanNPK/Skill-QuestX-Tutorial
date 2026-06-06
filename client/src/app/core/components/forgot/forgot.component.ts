@@ -13,7 +13,6 @@ import { PasswordModule } from 'primeng/password';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { KnobModule } from 'primeng/knob';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -33,13 +32,11 @@ import { getFriendlyErrorMessage } from '../../../shared/utils/error-messages.ut
     PasswordModule,
     ProgressBarModule,
     KnobModule,
-    ToastModule,
     FloatLabelModule
 ],
   templateUrl: './forgot.component.html',
   styleUrl: './forgot.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [MessageService]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ForgotComponent implements OnDestroy {
   readonly step = signal<'email' | 'otp' | 'reset'>('email');

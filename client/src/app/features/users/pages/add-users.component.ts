@@ -11,7 +11,6 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
@@ -46,12 +45,10 @@ interface RoleOption {
     TableModule,
     SelectModule,
     MultiSelectModule,
-    ToastModule,
     TagModule,
     TooltipModule,
     ChipModule
 ],
-  providers: [MessageService],
   templateUrl: './add-users.component.html',
   styleUrl: './add-users.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

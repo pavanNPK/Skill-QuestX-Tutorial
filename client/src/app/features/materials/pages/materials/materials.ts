@@ -9,6 +9,9 @@ import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { filter } from 'rxjs';
 import { HeaderService } from '../../../../core/services/header.service';
@@ -52,7 +55,18 @@ interface MaterialsRouteState {
 @Component({
   selector: 'sqx-materials',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, ConfirmDialogModule, TableModule, BreadcrumbModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    DialogModule,
+    ConfirmDialogModule,
+    TableModule,
+    BreadcrumbModule,
+    InputTextModule,
+    SelectModule,
+    TextareaModule,
+  ],
   templateUrl: './materials.html',
   styleUrl: './materials.scss',
   providers: [ConfirmationService],

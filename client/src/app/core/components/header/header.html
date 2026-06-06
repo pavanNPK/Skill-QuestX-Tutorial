@@ -4,6 +4,10 @@
         <div class="header-left">
             <div class="title-section">
                 <h1 class="page-title">{{ pageTitle() }}</h1>
+                @if (!breadcrumbs().length && pageSubtitle()) {
+                <p class="page-subtitle">{{ pageSubtitle() }}</p>
+                }
+                @if (breadcrumbs().length) {
                 <nav class="breadcrumbs">
                     @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
                     <span class="breadcrumb-item">
@@ -38,6 +42,7 @@
                     </span>
                     }
                 </nav>
+                }
             </div>
         </div>
 

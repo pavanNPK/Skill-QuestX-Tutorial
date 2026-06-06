@@ -13,7 +13,6 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ChipModule } from 'primeng/chip';
 import { KnobModule } from 'primeng/knob';
@@ -32,12 +31,10 @@ import { TooltipModule } from 'primeng/tooltip';
     InputIconModule,
     InputTextModule,
     PasswordModule,
-    ToastModule,
     ChipModule,
     KnobModule,
     TooltipModule
 ],
-  providers: [MessageService],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -26,11 +26,38 @@ export class SnackbarService {
   }
 
   // use of this is:
+  // Shows warning feedback when the action can continue but needs attention.
+  warn(message: string): void {
+    this.open(message, 'warn');
+  }
+
+  // use of this is:
+  // Shows secondary neutral feedback for low-priority UI events.
+  secondary(message: string): void {
+    this.open(message, 'secondary');
+  }
+
+  // use of this is:
+  // Shows high-contrast feedback for important system notices.
+  contrast(message: string): void {
+    this.open(message, 'contrast');
+  }
+
+  // use of this is:
   // Centralizes PrimeNG toast severity, summary, and duration.
-  private open(message: string, panelClass: 'success' | 'error' | 'info'): void {
+  private open(message: string, panelClass: 'success' | 'error' | 'info' | 'warn' | 'secondary' | 'contrast'): void {
+    const summaryMap: Record<typeof panelClass, string> = {
+      success: 'Success',
+      error: 'Error',
+      info: 'Info',
+      warn: 'Warn',
+      secondary: 'Secondary',
+      contrast: 'Contrast',
+    };
+
     this.messages.add({
       severity: panelClass,
-      summary: panelClass === 'success' ? 'Success' : panelClass === 'error' ? 'Error' : 'Info',
+      summary: summaryMap[panelClass],
       detail: message,
       life: 5000,
     });

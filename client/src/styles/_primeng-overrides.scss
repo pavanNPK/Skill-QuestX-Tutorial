@@ -1,4 +1,4 @@
-$brand: #5B4BC4;
+$brand: #5A4BC4;
 $brand-dark: #4a3da3;
 $brand-soft: #EEEDF9;
 $surface: #ffffff;
@@ -8,7 +8,7 @@ $surface: #ffffff;
   --p-primary-contrast-color: #{$surface};
   --p-primary-hover-color: #{$brand-dark};
   --p-primary-active-color: #{$brand-dark};
-  --p-focus-ring-color: rgba(91, 75, 196, 0.18);
+  --p-focus-ring-color: rgba(90, 75, 196, 0.18);
   --p-button-primary-background: #{$brand};
   --p-button-primary-border-color: #{$brand};
   --p-button-primary-color: #{$surface};
@@ -22,8 +22,65 @@ $surface: #ffffff;
   --p-button-secondary-background: #{$brand-soft};
   --p-button-secondary-border-color: #{$brand-soft};
   --p-button-secondary-color: #{$brand};
+  --p-button-padding-y: 0.3rem;
+  --p-button-padding-x: 0.7rem;
+  --p-button-label-font-weight: 500;
   --p-form-field-focus-border-color: #{$brand};
-  --p-form-field-focus-ring-color: rgba(91, 75, 196, 0.18);
+  --p-form-field-focus-ring-color: rgba(90, 75, 196, 0.18);
+  --p-form-field-padding-y: 0.3rem;
+  --p-form-field-padding-x: 0.7rem;
+  --p-inputtext-padding-y: 0.3rem;
+  --p-inputtext-padding-x: 0.7rem;
+}
+
+.p-button {
+  padding: 0.3rem 0.7rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+
+  &.p-button-primary,
+  &:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(.p-button-text):not(.p-button-outlined) {
+    background: $brand-dark;
+    border-color: $brand-dark;
+  }
+
+  .p-button-icon {
+    font-size: 0.9rem !important;
+  }
+}
+
+.p-inputtext,
+.p-textarea,
+.p-select,
+.p-multiselect,
+.p-autocomplete-input,
+.p-datepicker-input,
+.p-inputnumber-input {
+  font-size: 0.9rem !important;
+}
+
+.p-inputtext,
+.p-textarea,
+.p-autocomplete-input,
+.p-datepicker-input,
+.p-inputnumber-input {
+  padding-block: 0.3rem !important;
+}
+
+.p-select-label,
+.p-multiselect-label {
+  padding-block: 0.3rem !important;
+  font-size: 0.9rem !important;
+}
+
+.p-iconfield {
+  .p-inputtext {
+    padding-block: 0.3rem !important;
+  }
+
+  .p-inputicon {
+    font-size: 0.9rem !important;
+  }
 }
 
 .p-tabs,

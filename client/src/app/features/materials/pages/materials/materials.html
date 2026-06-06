@@ -60,11 +60,11 @@
                 <p>{{ totalCourseSlides || selectedCourse.lessonCount }} slides organized for quick review.</p>
             </div>
             @if (visibleCourses.length > 1) {
-            <button pButton type="button" icon="pi pi-arrow-left" label="Courses" class="back-btn"
+            <button pButton type="button" icon="pi pi-arrow-left" label="Courses" class="p-button-outlined"
                 (click)="goBack()"></button>
             }
             @if (selectedContent.canManage) {
-            <button pButton type="button" icon="pi pi-pencil" label="Manage Slides" class="back-btn"
+            <button pButton type="button" icon="pi pi-pencil" label="Manage Slides" class="p-button-outlined"
                 (click)="startManage()"></button>
             }
         </div>
@@ -101,14 +101,13 @@
                 <p>Add, update, delete, upload, and publish slide content.</p>
             </div>
             <div class="manager-actions">
-                <label class="bulk-import-btn">
-                    <i class="pi pi-file-excel"></i>
-                    <span>Bulk Upload</span>
-                    <input type="file" accept=".xlsx" (change)="onBulkWorkbookSelected($event)" />
-                </label>
-                <button pButton type="button" icon="pi pi-save" label="Save Draft" class="back-btn"
+                <input #bulkWorkbookInput class="hidden-file-input" type="file" accept=".xlsx"
+                    (change)="onBulkWorkbookSelected($event)" />
+                <button pButton type="button" icon="pi pi-file-excel" label="Bulk Upload"
+                    (click)="bulkWorkbookInput.click()"></button>
+                <button pButton type="button" icon="pi pi-save" label="Save Draft"
                     [disabled]="saving" (click)="saveContentDraft()"></button>
-                <button pButton type="button" icon="pi pi-send" label="Publish" class="back-btn primary"
+                <button pButton type="button" icon="pi pi-send" label="Publish"
                     [disabled]="saving" (click)="publishContent()"></button>
             </div>
         </div>
@@ -168,54 +167,40 @@
                 @if (selectedManageLesson) {
                 <div class="editor-card">
                     <label class="field-label">Slide title</label>
-                    <input class="manager-input" type="text" [(ngModel)]="selectedManageLesson.title"
+                    <input pInputText class="w-full editor-control" type="text" [(ngModel)]="selectedManageLesson.title"
                         (blur)="saveContentDraft('Slide updated.')" />
 
                     <label class="field-label">Summary</label>
-                    <textarea class="manager-textarea" rows="3" [(ngModel)]="selectedManageLesson.summary"
+                    <textarea pTextarea class="w-full editor-control" rows="3" [(ngModel)]="selectedManageLesson.summary"
                         (blur)="saveContentDraft('Slide updated.')"></textarea>
 
                     <div class="upload-strip">
-                        <label class="upload-btn">
-                            <i class="pi pi-upload"></i>
-                            <span>Upload files</span>
-                            <input type="file" multiple (change)="onSlideFilesSelected($event)" />
-                        </label>
-                        <button type="button" class="text-btn" (click)="addTextBlock()">
-                            <i class="pi pi-align-left"></i>
-                            Add text
-                        </button>
-                        <button type="button" class="text-btn" (click)="addTableBlock()">
-                            <i class="pi pi-table"></i>
-                            Add table
-                        </button>
+                        <input #slideFilesInput class="hidden-file-input" type="file" multiple
+                            (change)="onSlideFilesSelected($event)" />
+                        <button pButton type="button" icon="pi pi-upload" label="Upload files" class="p-button-outlined"
+                            (click)="slideFilesInput.click()"></button>
+                        <button pButton type="button" icon="pi pi-align-left" label="Add text" class="p-button-outlined"
+                            (click)="addTextBlock()"></button>
+                        <button pButton type="button" icon="pi pi-table" label="Add table" class="p-button-outlined"
+                            (click)="addTableBlock()"></button>
                         <div class="add-block-control">
-                            <select class="manager-select inline" [(ngModel)]="newBlockType">
-                                @for (option of editableBlockTypes; track option.value) {
-                                <option [value]="option.value">{{ option.label }}</option>
-                                }
-                            </select>
-                            <button type="button" class="text-btn" (click)="addSelectedBlock()">
-                                <i class="pi pi-plus"></i>
-                                Add block
-                            </button>
+                            <p-select [options]="editableBlockTypes" [(ngModel)]="newBlockType" optionLabel="label"
+                                optionValue="value" styleClass="block-type-select"></p-select>
+                            <button pButton type="button" icon="pi pi-plus" label="Add block" class="p-button-outlined"
+                                (click)="addSelectedBlock()"></button>
                         </div>
-                        <button type="button" class="text-btn danger" (click)="confirmDeleteSlide($event, selectedManageLesson)">
-                            <i class="pi pi-trash"></i>
-                            Delete slide
-                        </button>
+                        <button pButton type="button" icon="pi pi-trash" label="Delete slide"
+                            class="p-button-outlined p-button-danger"
+                            (click)="confirmDeleteSlide($event, selectedManageLesson)"></button>
                     </div>
 
                     <div class="content-editor-list">
                         @for (block of contentBlocks(selectedManageLesson); track block.id) {
                         <section class="content-editor-block">
                             <div class="block-editor-toolbar">
-                                <select class="manager-select" [ngModel]="block.type"
-                                    (ngModelChange)="updateBlockType(block, $any($event))">
-                                    @for (option of editableBlockTypes; track option.value) {
-                                    <option [value]="option.value">{{ option.label }}</option>
-                                    }
-                                </select>
+                                <p-select [options]="editableBlockTypes" [ngModel]="block.type"
+                                    (ngModelChange)="updateBlockType(block, $any($event))" optionLabel="label"
+                                    optionValue="value" styleClass="block-type-select"></p-select>
                                 <div class="block-editor-actions">
                                     <button type="button" class="format-btn" (mousedown)="$event.preventDefault()"
                                         (click)="applyBoldToSelection()" aria-label="Bold selected text">
@@ -231,17 +216,17 @@
 
                             @if (block.type !== 'heading') {
                             <label class="field-label">Block title</label>
-                            <input class="manager-input compact" type="text" [(ngModel)]="block.title"
+                            <input pInputText class="w-full editor-control" type="text" [(ngModel)]="block.title"
                                 (blur)="saveContentDraft('Content updated.')" />
                             }
 
                             @if (block.type === 'heading') {
                             <label class="field-label">Heading</label>
-                            <input class="manager-input compact" type="text" [(ngModel)]="block.text"
+                            <input pInputText class="w-full editor-control" type="text" [(ngModel)]="block.text"
                                 (blur)="saveContentDraft('Content updated.')" />
                             } @else if (block.type === 'paragraph' || block.type === 'assignment_note') {
                             <label class="field-label">Rich text</label>
-                            <textarea class="manager-textarea rich" rows="6" [(ngModel)]="block.text"
+                            <textarea pTextarea class="w-full editor-control" rows="6" [(ngModel)]="block.text"
                                 (blur)="saveContentDraft('Content updated.')"></textarea>
                             } @else if (block.type === 'bullet_list' || block.type === 'nested_bullet_list') {
                             <label class="field-label">
@@ -251,20 +236,16 @@
                                 List items, one per line
                                 }
                             </label>
-                            <textarea class="manager-textarea rich" rows="6" [ngModel]="blockItemsText(block)"
+                            <textarea pTextarea class="w-full editor-control" rows="6" [ngModel]="blockItemsText(block)"
                                 (ngModelChange)="setBlockItemsText(block, $event)"
                                 (blur)="saveContentDraft('Content updated.')"></textarea>
                             } @else if (block.type === 'table') {
                             <div class="table-editor">
                                 <div class="table-editor-actions">
-                                    <button type="button" class="text-btn compact" (click)="addTableColumn(block)">
-                                        <i class="pi pi-plus"></i>
-                                        Column
-                                    </button>
-                                    <button type="button" class="text-btn compact" (click)="addTableRow(block)">
-                                        <i class="pi pi-plus"></i>
-                                        Row
-                                    </button>
+                                    <button pButton type="button" icon="pi pi-plus" label="Column" size="small"
+                                        class="p-button-outlined" (click)="addTableColumn(block)"></button>
+                                    <button pButton type="button" icon="pi pi-plus" label="Row" size="small"
+                                        class="p-button-outlined" (click)="addTableRow(block)"></button>
                                 </div>
                                 <div class="table-input-wrap">
                                     <table>
@@ -272,7 +253,7 @@
                                             <tr>
                                                 @for (column of tableColumns(block); track $index; let columnIndex = $index) {
                                                 <th>
-                                                    <input type="text" [(ngModel)]="block.columns![columnIndex]"
+                                                    <input pInputText type="text" [(ngModel)]="block.columns![columnIndex]"
                                                         (blur)="saveContentDraft('Content updated.')" />
                                                     <button type="button" class="table-delete"
                                                         (click)="confirmDeleteTableColumn($event, block, columnIndex)"
@@ -289,7 +270,7 @@
                                             <tr>
                                                 @for (cell of row; track $index; let cellIndex = $index) {
                                                 <td>
-                                                    <input type="text" [(ngModel)]="block.rows![rowIndex][cellIndex]"
+                                                    <input pInputText type="text" [(ngModel)]="block.rows![rowIndex][cellIndex]"
                                                         (blur)="saveContentDraft('Content updated.')" />
                                                 </td>
                                                 }
