@@ -36,6 +36,7 @@ export class HeaderComponent implements OnInit {
   readonly pageTitle = signal('');
   readonly pageSubtitle = signal('');
   readonly breadcrumbs = signal<BreadcrumbItem[]>([]);
+  readonly activeRoutePath = signal('');
   private currentRoutePath = '';
 
   // Notification Logic
@@ -72,6 +73,7 @@ export class HeaderComponent implements OnInit {
       )
       .subscribe((url) => {
         const nextRoutePath = this.routePath(url);
+        this.activeRoutePath.set(nextRoutePath);
         if (nextRoutePath !== this.currentRoutePath) {
           this.currentRoutePath = nextRoutePath;
           this.headerService.reset();
@@ -81,6 +83,7 @@ export class HeaderComponent implements OnInit {
 
     // Initial load
     this.currentRoutePath = this.routePath(this.router.url);
+    this.activeRoutePath.set(this.currentRoutePath);
     this.updateFromRouter(this.router.url);
     this.loadNotifications();
   }
@@ -267,5 +270,9 @@ export class HeaderComponent implements OnInit {
 
   userPreferences() {
     this.router.navigate(['/profile-settings']);
+  }
+
+  isRouteActive(path: string): boolean {
+    return this.activeRoutePath() === path;
   }
 }

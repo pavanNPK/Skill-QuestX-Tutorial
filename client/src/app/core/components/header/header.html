@@ -93,15 +93,15 @@
             </div>
 
             <div class="profile-actions">
-                <button class="profile-action primary" (click)="goToProfile(); profileMenu.hide()">
+                <button class="profile-action" [class.active]="isRouteActive('/profile-settings')" (click)="goToProfile(); profileMenu.hide()">
                     <i class="pi pi-user"></i>
                     <span>Profile Settings</span>
                 </button>
-                <button class="profile-action" routerLink="/change-password" (click)="profileMenu.hide()">
+                <button class="profile-action" [class.active]="isRouteActive('/change-password')" (click)="changePassword(); profileMenu.hide()">
                     <i class="pi pi-lock"></i>
                     <span>Change Password</span>
                 </button>
-                <button class="profile-action" (click)="userPreferences(); profileMenu.hide()">
+                <button class="profile-action" [class.active]="isRouteActive('/user-preferences')" (click)="userPreferences(); profileMenu.hide()">
                     <i class="pi pi-cog"></i>
                     <span>User Preferences</span>
                 </button>

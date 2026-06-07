@@ -352,6 +352,7 @@ $drawer-surface: #ffffff;
             background: var(--sqx-color-sidebar-hover);
         }
 
+        &.active,
         &.primary {
             background: rgba(90, 75, 196, 0.08);
             color: var(--sqx-color-primary);
