@@ -16,6 +16,9 @@ const strongPassword = { type: 'string', minLength: 8, maxLength: 128 };
 // use of this is:
 // Shared person-name validation for firstName and lastName fields.
 const name = { type: 'string', minLength: 1, maxLength: 128 };
+const optionalProfileText = { type: 'string', maxLength: 256 };
+const optionalLongProfileText = { type: 'string', maxLength: 512 };
+const profileImageDataUrl = { type: 'string', maxLength: 3_000_000 };
 const objectIdParam = {
   // use of this is:
   // Shared URL parameter schema for routes that receive /:id.
@@ -152,11 +155,17 @@ export const updateProfileSchema = {
   // Allows only editable profile fields; role/email/password cannot be mass-assigned here.
   body: {
     type: 'object',
-    required: ['firstName', 'lastName'],
     additionalProperties: false,
     properties: {
       firstName: name,
       lastName: name,
+      displayName: optionalProfileText,
+      phoneNumber: { type: 'string', maxLength: 32 },
+      dateOfBirth: { type: 'string', maxLength: 32 },
+      nationality: optionalProfileText,
+      address: optionalLongProfileText,
+      profileImageUrl: profileImageDataUrl,
+      coverImageUrl: profileImageDataUrl,
     },
   },
 };

@@ -18,9 +18,15 @@ export interface AuthResult {
     email: string;
     firstName: string;
     lastName: string;
+    displayName?: string | null;
     name: string;
     role: string;
+    phoneNumber?: string | null;
+    dateOfBirth?: string | null;
+    nationality?: string | null;
+    address?: string | null;
     profileImageUrl?: string | null;
+    coverImageUrl?: string | null;
     canManageUsers?: boolean;
   };
 }
@@ -264,7 +270,17 @@ export class AuthService {
 
   // use of this is:
   // Updates current user's editable profile fields and returns fresh auth user DTO.
-  async updateProfile(userId: string, dto: { firstName?: string; lastName?: string }): Promise<AuthResult['user']> {
+  async updateProfile(userId: string, dto: {
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+    phoneNumber?: string;
+    dateOfBirth?: string;
+    nationality?: string;
+    address?: string;
+    profileImageUrl?: string;
+    coverImageUrl?: string;
+  }): Promise<AuthResult['user']> {
     const user = await this.userService.updateProfile(userId, dto);
     if (!user) throw unauthorized('User not found.');
     return this.toAuthUser(user, user.role ?? 'student');
@@ -362,9 +378,15 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      name: `${user.firstName} ${user.lastName}`.trim(),
+      displayName: user.displayName ?? null,
+      name: user.displayName || `${user.firstName} ${user.lastName}`.trim(),
       role,
+      phoneNumber: user.phoneNumber ?? null,
+      dateOfBirth: user.dateOfBirth ?? null,
+      nationality: user.nationality ?? null,
+      address: user.address ?? null,
       profileImageUrl: user.profileImageUrl ?? null,
+      coverImageUrl: user.coverImageUrl ?? null,
     };
     if (role === ROLES.ADMIN && user.canManageUsers === true) payload.canManageUsers = true;
     return payload;

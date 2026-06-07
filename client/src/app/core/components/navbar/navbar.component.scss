@@ -485,10 +485,20 @@ $sidebar-branch-active: rgba(90, 75, 196, 0.3);
     position: relative;
     padding: 42px 12px 12px;
     border-radius: 12px;
+    border: 1px solid transparent;
     background: linear-gradient(180deg, #FFE08A 0%, #FFD15F 100%);
     color: var(--sqx-color-text);
     text-align: center;
     overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+    &.active,
+    &:hover {
+        border-color: $sidebar-active-bg;
+        box-shadow: 0 10px 24px rgba(90, 75, 196, 0.14);
+        transform: translateY(-1px);
+    }
 
     .upgrade-art {
         position: absolute;
@@ -523,13 +533,17 @@ $sidebar-branch-active: rgba(90, 75, 196, 0.3);
     button {
         width: 100%;
         min-height: 30px;
-        border: 0;
+        border: 1px solid $sidebar-active-bg;
         border-radius: 8px;
         background: #FFFFFF;
-        color: var(--sqx-color-text);
+        color: $sidebar-active-text;
         font-size: 11px;
         font-weight: 600;
         cursor: pointer;
+
+        &:hover {
+            background: $sidebar-hover-bg;
+        }
     }
 }
 
@@ -560,9 +574,22 @@ $sidebar-branch-active: rgba(90, 75, 196, 0.3);
     }
 
     &.upgrade-compact {
-        background: #FFE08A;
-        border-color: rgba(245, 158, 11, 0.28);
-        color: #92400E;
+        background: linear-gradient(
+            180deg,
+            #FFE08A 0%,
+            #FFD15F 100%);
+        border-color: $sidebar-active-bg;
+        color: $sidebar-active-text;
+
+        &.active,
+        &:hover {
+            background: linear-gradient(
+                180deg,
+                #FFE08A 0%,
+                #FFD15F 100%);
+            border-color: $sidebar-active-bg;
+            color: $sidebar-active-text;
+        }
     }
 
     &.logout-action {

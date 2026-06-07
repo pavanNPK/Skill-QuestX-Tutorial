@@ -221,12 +221,29 @@ export class UserService {
   }
 
   // use of this is:
-  // Updates editable profile name fields while ignoring empty values.
-  async updateProfile(userId: string, dto: { firstName?: string; lastName?: string }): Promise<UserDocument | null> {
+  // Updates editable profile fields while ignoring empty text values.
+  async updateProfile(userId: string, dto: {
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+    phoneNumber?: string;
+    dateOfBirth?: string;
+    nationality?: string;
+    address?: string;
+    profileImageUrl?: string;
+    coverImageUrl?: string;
+  }): Promise<UserDocument | null> {
     // Build update object manually to avoid mass assignment.
-    const updates: Record<string, string> = {};
+    const updates: Record<string, string | null> = {};
     if (dto.firstName != null && dto.firstName.trim()) updates.firstName = dto.firstName.trim();
     if (dto.lastName != null && dto.lastName.trim()) updates.lastName = dto.lastName.trim();
+    if (dto.displayName != null) updates.displayName = dto.displayName.trim() || null;
+    if (dto.phoneNumber != null) updates.phoneNumber = dto.phoneNumber.trim() || null;
+    if (dto.dateOfBirth != null) updates.dateOfBirth = dto.dateOfBirth.trim() || null;
+    if (dto.nationality != null) updates.nationality = dto.nationality.trim() || null;
+    if (dto.address != null) updates.address = dto.address.trim() || null;
+    if (dto.profileImageUrl != null) updates.profileImageUrl = dto.profileImageUrl.trim() || null;
+    if (dto.coverImageUrl != null) updates.coverImageUrl = dto.coverImageUrl.trim() || null;
     if (Object.keys(updates).length === 0) return this.findById(userId);
     return UserModel.findByIdAndUpdate(userId, { $set: updates }, { new: true }).exec();
   }

@@ -51,7 +51,16 @@ export class NavbarComponent {
   }
 
   isActive(route: string): boolean {
-    return this.router.url.startsWith(route);
+    return this.isRouteActive(route);
+  }
+
+  isRouteActive(route: string, exact = false): boolean {
+    const currentRoute = this.router.url.split('?')[0].split('#')[0];
+    return exact ? currentRoute === route : currentRoute === route || currentRoute.startsWith(`${route}/`);
+  }
+
+  openMembershipPlans() {
+    this.router.navigate(['/membership-plans']);
   }
 
   logout() {

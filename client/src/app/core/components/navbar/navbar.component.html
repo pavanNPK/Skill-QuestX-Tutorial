@@ -15,20 +15,20 @@
   <!-- Navigation Items -->
   <nav class="sidebar-nav">
     <!-- Dashboard -->
-    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+    <a routerLink="/dashboard" routerLinkActive="active" [class.active]="isRouteActive('/dashboard', true)" class="nav-item">
       <i class="pi pi-th-large"></i>
       <span>Dashboard</span>
     </a>
 
     <!-- Courses -->
-    <a routerLink="/courses" routerLinkActive="active" class="nav-item">
+    <a routerLink="/courses" routerLinkActive="active" [class.active]="isRouteActive('/courses')" class="nav-item">
       <i class="pi pi-book"></i>
       <span>Courses</span>
     </a>
 
     <!-- Materials (Instructor, Student only) -->
     @if (auth.showNavBeyondSaAdmin()) {
-    <a routerLink="/materials" routerLinkActive="active" class="nav-item">
+    <a routerLink="/materials" routerLinkActive="active" [class.active]="isRouteActive('/materials')" class="nav-item">
       <i class="pi pi-file"></i>
       <span>Materials</span>
     </a>
@@ -37,7 +37,7 @@
     <!-- Classes Dropdown (Instructor, Student only) -->
     @if (auth.showNavBeyondSaAdmin()) {
     <div class="nav-item dropdown" [class.open]="classesDropdownOpen()">
-      <div class="nav-item-header" (click)="toggleClassesDropdown()" [class.active]="isActive('/classes')">
+      <div class="nav-item-header" (click)="toggleClassesDropdown()" [class.active]="isRouteActive('/classes')">
         <div class="nav-item-content">
           <i class="pi pi-video"></i>
           <span>Classes</span>
@@ -47,11 +47,11 @@
         }
       </div>
       <div class="dropdown-menu">
-        <a routerLink="/classes/recorded" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
+        <a routerLink="/classes/recorded" routerLinkActive="active" [class.active]="isRouteActive('/classes/recorded')" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-play-circle"></i>
           <span>Recorded</span>
         </a>
-        <a routerLink="/classes/live" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
+        <a routerLink="/classes/live" routerLinkActive="active" [class.active]="isRouteActive('/classes/live')" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-video"></i>
           <span>Live</span>
         </a>
@@ -61,21 +61,21 @@
 
     <!-- Tasks (Instructor, Student only) -->
     @if (auth.showNavBeyondSaAdmin()) {
-    <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
+    <a routerLink="/tasks" routerLinkActive="active" [class.active]="isRouteActive('/tasks')" class="nav-item">
       <i class="pi pi-check-square"></i>
       <span>Tasks</span>
     </a>
     }
 
     <!-- Batches -->
-    <a routerLink="/batches" routerLinkActive="active" class="nav-item">
+    <a routerLink="/batches" routerLinkActive="active" [class.active]="isRouteActive('/batches')" class="nav-item">
       <i class="pi pi-users"></i>
       <span>Batches</span>
     </a>
 
     <!-- Users (SA, Admin only) -->
     @if (auth.canAccessUsersPage()) {
-    <a routerLink="/add-users" routerLinkActive="active" class="nav-item">
+    <a routerLink="/add-users" routerLinkActive="active" [class.active]="isRouteActive('/add-users')" class="nav-item">
       <i class="pi pi-user-plus"></i>
       <span>Users</span>
     </a>
@@ -84,7 +84,7 @@
     <!-- Exams Dropdown (Instructor, Student only) -->
     @if (auth.showNavBeyondSaAdmin()) {
     <div class="nav-item dropdown" [class.open]="examsDropdownOpen()">
-      <div class="nav-item-header" (click)="toggleExamsDropdown()" [class.active]="isActive('/exams')">
+      <div class="nav-item-header" (click)="toggleExamsDropdown()" [class.active]="isRouteActive('/exams')">
         <div class="nav-item-content">
           <i class="pi pi-file-edit"></i>
           <span>Exams</span>
@@ -94,11 +94,11 @@
         }
       </div>
       <div class="dropdown-menu">
-        <a routerLink="/exams/assessment" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
+        <a routerLink="/exams/assessment" routerLinkActive="active" [class.active]="isRouteActive('/exams/assessment')" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-list-check"></i>
           <span>Online</span>
         </a>
-        <a routerLink="/exams/docs" routerLinkActive="active" class="dropdown-item" (click)="closeDropdowns()">
+        <a routerLink="/exams/docs" routerLinkActive="active" [class.active]="isRouteActive('/exams/docs')" class="dropdown-item" (click)="closeDropdowns()">
           <i class="pi pi-file-pdf"></i>
           <span>Documents</span>
         </a>
@@ -108,7 +108,7 @@
 
     <!-- Projects (Instructor, Student only) -->
     @if (auth.showNavBeyondSaAdmin()) {
-    <a routerLink="/projects" routerLinkActive="active" class="nav-item">
+    <a routerLink="/projects" routerLinkActive="active" [class.active]="isRouteActive('/projects')" class="nav-item">
       <i class="pi pi-briefcase"></i>
       <span>Projects</span>
     </a>
@@ -117,16 +117,23 @@
 
   <div class="sidebar-footer">
     @if (!collapsed()) {
-    <div class="upgrade-card">
+    <div
+      class="upgrade-card"
+      [class.active]="isRouteActive('/membership-plans', true)"
+      role="button"
+      tabindex="0"
+      (click)="openMembershipPlans()"
+      (keydown.enter)="openMembershipPlans()"
+      (keydown.space)="openMembershipPlans()">
       <div class="upgrade-art">
         <i class="pi pi-sparkles"></i>
       </div>
       <h3>Upgrade to Pro</h3>
       <p>Unlock more courses.</p>
-      <button type="button">Upgrade</button>
+      <button type="button" (click)="openMembershipPlans(); $event.stopPropagation()">Upgrade</button>
     </div>
     } @else {
-    <button type="button" class="footer-action upgrade-compact" aria-label="Upgrade to Pro">
+    <button type="button" class="footer-action upgrade-compact" [class.active]="isRouteActive('/membership-plans', true)" aria-label="Upgrade to Pro" (click)="openMembershipPlans()">
       <i class="pi pi-sparkles"></i>
     </button>
     }

@@ -153,6 +153,10 @@ export class HeaderComponent implements OnInit {
       title = 'Profile Settings';
       subtitle = 'Manage your account details and preferences';
       breadcrumbs = [{ label: 'Profile Settings', url: '/profile-settings' }];
+    } else if (url.includes('/membership-plans')) {
+      title = 'Membership Plans';
+      subtitle = 'Choose your learning access and support level';
+      breadcrumbs = [{ label: 'Membership Plans', url: '/membership-plans' }];
     } else if (url.includes('/change-password')) {
       title = 'Change Password';
       subtitle = 'Update your account password securely';

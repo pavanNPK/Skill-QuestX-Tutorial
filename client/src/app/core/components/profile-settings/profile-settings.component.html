@@ -1,56 +1,173 @@
-<!-- use of this template is: Render the component view, bind signals/state, and expose user actions without API logic. -->
+<!-- use of this template is: Render profile details, editable account sections, and membership context in one settings screen. -->
 <div class="profile-settings-page">
-  <div class="profile-card card">
-    <h2 class="card-heading">Account</h2>
-    <div class="profile-row">
+  <p-confirmDialog />
+
+  <section class="profile-hero card">
+    <div class="profile-cover">
+      <img [src]="coverPreviewUrl() | safeUrl" alt="Profile cover" />
+      <label class="upload-action cover-upload" for="coverUpload">
+        <i class="pi pi-camera"></i>
+        <span>Change cover</span>
+      </label>
+      <input id="coverUpload" class="file-input" type="file" accept="image/*" (change)="onImageSelected($event, 'cover')" />
+    </div>
+    <div class="profile-summary">
       <div class="profile-avatar">
-        @if (auth.currentUser()?.profileImageUrl) {
-          <img [src]="auth.currentUser()?.profileImageUrl | safeUrl" alt="Profile" />
-        } @else {
-          <span class="avatar-initials">{{ userInitials() }}</span>
+        <img [src]="avatarPreviewUrl() | safeUrl" alt="Profile" />
+        <label class="upload-action avatar-upload" for="avatarUpload" aria-label="Change profile photo">
+          <i class="pi pi-camera"></i>
+        </label>
+        <input id="avatarUpload" class="file-input" type="file" accept="image/*" (change)="onImageSelected($event, 'avatar')" />
+      </div>
+      <div class="profile-title">
+        <h2>{{ fullName() }}</h2>
+        <p>{{ auth.currentUser()?.email ?? 'user@example.com' }}</p>
+        <span class="role-chip">{{ auth.roleLabel() }}</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="profile-grid">
+    <section class="detail-card card">
+      <div class="card-header">
+        <h3>Personal details</h3>
+        <button pButton type="button" class="p-button-text p-button-sm icon-action" icon="pi pi-pencil" aria-label="Edit personal details" (click)="startEdit('personal')"></button>
+      </div>
+
+      @if (editingSection() === 'personal') {
+        <form class="detail-form">
+          <label class="detail-field">
+            <span>First name</span>
+            <input pInputText [value]="personal().firstName" (input)="setPersonalField('firstName', textValue($event))" />
+          </label>
+          <label class="detail-field">
+            <span>Last name</span>
+            <input pInputText [value]="personal().lastName" (input)="setPersonalField('lastName', textValue($event))" />
+          </label>
+          <label class="detail-field">
+            <span>Date of birth</span>
+            <input pInputText type="date" [value]="personal().dateOfBirth" (input)="setPersonalField('dateOfBirth', textValue($event))" />
+          </label>
+          <label class="detail-field">
+            <span>Nationality</span>
+            <input pInputText [value]="personal().nationality" (input)="setPersonalField('nationality', textValue($event))" />
+          </label>
+          <label class="detail-field">
+            <span>Address</span>
+            <input pInputText [value]="personal().address" (input)="setPersonalField('address', textValue($event))" />
+          </label>
+          <label class="detail-field">
+            <span>Phone number</span>
+            <input pInputText type="number" [value]="personal().phoneNumber" (input)="setPersonalField('phoneNumber', textValue($event))" />
+          </label>
+          <div class="section-actions">
+            <button pButton type="button" label="Save" icon="pi pi-check" [disabled]="submitting() || !personal().firstName.trim() || !personal().lastName.trim()" (click)="saveSection('personal')"></button>
+            <button pButton type="button" label="Cancel" class="p-button-outlined" (click)="cancelEdit()"></button>
+          </div>
+        </form>
+      } @else {
+        <div class="detail-list">
+          <div><span>Full name</span><strong>{{ fullName() }}</strong></div>
+          <div><span>Date of birth</span><strong>{{ formatDate(personal().dateOfBirth) }}</strong></div>
+          <div><span>Nationality</span><strong>{{ personal().nationality }}</strong></div>
+          <div><span>Address</span><strong>{{ personal().address }}</strong></div>
+          <div><span>Phone number</span><strong>{{ personal().phoneNumber }}</strong></div>
+          <div><span>Email</span><strong>{{ auth.currentUser()?.email ?? '—' }}</strong></div>
+        </div>
+      }
+    </section>
+
+    <section class="detail-card card">
+      <div class="card-header">
+        <h3>Enrolled courses</h3>
+      </div>
+
+      <div class="course-list">
+        @for (course of enrolledCourses(); track course.name) {
+          <div class="course-row">
+            <div class="course-info">
+              <strong>{{ course.name }}</strong>
+              <span>{{ course.status }}</span>
+              <div class="course-progress" aria-label="Course progress">
+                <span [style.width.%]="course.progress"></span>
+              </div>
+            </div>
+            <div class="course-meta">
+              <span>{{ course.progress }}%</span>
+              <div class="course-actions">
+                <button pButton type="button" class="p-button-text p-button-sm" label="View" icon="pi pi-eye" (click)="viewCourse(course.name)"></button>
+                <button pButton type="button" class="p-button-text p-button-sm danger-action" label="Unenroll" icon="pi pi-times" (click)="unenrollCourse(course.name)"></button>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-state">No enrolled courses.</p>
         }
       </div>
-      <form [formGroup]="form" (ngSubmit)="save()" class="profile-details profile-form">
-        <div class="form-field">
-          <label class="field-label" for="firstName">First name</label>
-          <input pInputText class="w-full" formControlName="firstName" id="firstName" />
-          @if (form.get('firstName')?.touched && form.get('firstName')?.invalid) {
-            <small class="form-error">First name is required.</small>
-          }
-        </div>
-        <div class="form-field">
-          <label class="field-label" for="lastName">Last name</label>
-          <input pInputText class="w-full" formControlName="lastName" id="lastName" />
-          @if (form.get('lastName')?.touched && form.get('lastName')?.invalid) {
-            <small class="form-error">Last name is required.</small>
-          }
-        </div>
-        <div class="detail-row read-only">
-          <span class="label">Email (username)</span>
-          <span class="value">{{ auth.currentUser()?.email ?? '—' }}</span>
-        </div>
-        <div class="detail-row read-only">
-          <span class="label">Role</span>
-          <span class="value">{{ auth.roleLabel() }}</span>
-        </div>
-        <div class="profile-actions">
-          <button pButton type="submit" [disabled]="submitting() || form.invalid || form.pristine">
-            @if (submitting()) {
-              <p-progress-spinner strokeWidth="6" ariaLabel="Saving profile" />
-            }
-            <span pButtonLabel>Save changes</span>
-          </button>
-          <a pButton class="p-button-outlined" routerLink="/change-password">
-            <i pButtonIcon class="pi pi-lock"></i>
-            <span pButtonLabel>Change password</span>
-          </a>
-        </div>
-      </form>
-    </div>
-  </div>
+    </section>
 
-  <div class="preferences-card card">
-    <h2 class="card-heading">User Preferences</h2>
-    <p class="coming-soon">We'll add user preferences here in a future update.</p>
+    <section class="detail-card card">
+      <div class="card-header">
+        <h3>Account details</h3>
+        <button pButton type="button" class="p-button-text p-button-sm icon-action" icon="pi pi-pencil" aria-label="Edit account details" (click)="startEdit('account')"></button>
+      </div>
+
+      @if (editingSection() === 'account') {
+        <form class="detail-form">
+          <label class="detail-field">
+            <span>Display name</span>
+            <input pInputText [value]="account().displayName" (input)="setAccountField('displayName', textValue($event))" />
+          </label>
+          <div class="section-actions">
+            <button pButton type="button" label="Save" icon="pi pi-check" [disabled]="submitting() || !account().displayName.trim()" (click)="saveSection('account')"></button>
+            <button pButton type="button" label="Cancel" class="p-button-outlined" (click)="cancelEdit()"></button>
+          </div>
+        </form>
+      } @else {
+        <div class="detail-list">
+          <div><span>Display name</span><strong>{{ account().displayName }}</strong></div>
+          <div><span>Account created</span><strong>{{ account().accountCreated }}</strong></div>
+          <div><span>Last login</span><strong>{{ account().lastLogin }}</strong></div>
+          <div><span>Role</span><strong>{{ auth.roleLabel() }}</strong></div>
+          <div><span>Verification</span><strong class="status-ok">{{ account().verification }}</strong></div>
+          <div><span>Language</span><strong>{{ account().language }}</strong></div>
+          <div><span>Time zone</span><strong>{{ account().timezone }}</strong></div>
+        </div>
+      }
+    </section>
+
+    <section class="detail-card card">
+      <div class="card-header">
+        <h3>Preferences</h3>
+      </div>
+
+      <div class="detail-list">
+        <div><span>Email notifications</span><strong>{{ preferences().emailNotifications }}</strong></div>
+        <div><span>SMS alerts</span><strong>{{ preferences().smsAlerts }}</strong></div>
+        <div><span>Content preferences</span><strong>{{ preferences().contentPreferences }}</strong></div>
+        <div><span>Dashboard view</span><strong>{{ preferences().dashboardView }}</strong></div>
+        <div><span>Theme</span><strong>{{ preferences().theme }}</strong></div>
+        <div><span>Language for content</span><strong>{{ preferences().contentLanguage }}</strong></div>
+      </div>
+    </section>
+
+    <section class="detail-card card membership-card">
+      <div class="card-header">
+        <h3>Membership</h3>
+        <button pButton type="button" class="p-button-sm" label="Change plan" icon="pi pi-sparkles" (click)="openMembershipPlans()"></button>
+      </div>
+
+      <div class="membership-summary">
+        <span class="plan-badge">{{ membership().plan }}</span>
+        <h3>{{ membership().plan }} account</h3>
+        <p>Current access is active for the selected learning plan.</p>
+      </div>
+      <div class="detail-list">
+        <div><span>Access term</span><strong>{{ membership().accessTerm }}</strong></div>
+        <div><span>Renewal</span><strong>{{ membership().renewalPolicy }}</strong></div>
+        <div><span>Status</span><strong class="status-ok">{{ membership().membershipStatus }}</strong></div>
+        <div><span>Support level</span><strong>{{ membership().supportLevel }}</strong></div>
+      </div>
+    </section>
   </div>
 </div>

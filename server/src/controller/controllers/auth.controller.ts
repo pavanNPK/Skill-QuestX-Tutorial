@@ -87,6 +87,13 @@ export class AuthController {
     const user = await services.authService.updateProfile((request as AuthenticatedRequest).user.id, {
       firstName: body.firstName,
       lastName: body.lastName,
+      displayName: body.displayName,
+      phoneNumber: body.phoneNumber,
+      dateOfBirth: body.dateOfBirth,
+      nationality: body.nationality,
+      address: body.address,
+      profileImageUrl: body.profileImageUrl,
+      coverImageUrl: body.coverImageUrl,
     });
     // API response keeps the existing Angular contract: { user: ... }.
     return { user };
@@ -103,9 +110,15 @@ export class AuthController {
       email: u.email,
       firstName: u.firstName,
       lastName: u.lastName,
-      name: `${u.firstName} ${u.lastName}`.trim(),
+      displayName: u.displayName ?? null,
+      name: u.displayName || `${u.firstName} ${u.lastName}`.trim(),
       role: u.role ?? 'student',
       profileImageUrl: u.profileImageUrl ?? null,
+      coverImageUrl: u.coverImageUrl ?? null,
+      phoneNumber: u.phoneNumber ?? null,
+      dateOfBirth: u.dateOfBirth ?? null,
+      nationality: u.nationality ?? null,
+      address: u.address ?? null,
     };
     // canManageUsers is only meaningful for admin users, so omit it for all other roles.
     if (u.role === 'admin' && u.canManageUsers === true) user.canManageUsers = true;

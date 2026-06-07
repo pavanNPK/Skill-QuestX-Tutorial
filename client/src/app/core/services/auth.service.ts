@@ -76,13 +76,32 @@ export interface AuthUser {
   email: string;
   firstName: string;
   lastName: string;
+  displayName?: string | null;
   name: string;
   role: string;
   isActive?: boolean;
+  phoneNumber?: string | null;
+  dateOfBirth?: string | null;
+  nationality?: string | null;
+  address?: string | null;
   /** When set, show this image as avatar; otherwise show initials. */
   profileImageUrl?: string | null;
+  /** Optional cover image shown on the profile settings hero. */
+  coverImageUrl?: string | null;
   /** For role=admin: true when SA has granted head permission (can add users and set status). */
   canManageUsers?: boolean;
+}
+
+export interface UpdateProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  nationality?: string;
+  address?: string;
+  profileImageUrl?: string;
+  coverImageUrl?: string;
 }
 
 /** Instructor with course/batch counts (Admin & SA views). */
@@ -345,8 +364,8 @@ export class AuthService {
     });
   }
 
-  /** Authenticated user: update own profile (firstName, lastName only). Role and email/username are read-only. Refreshes stored user. */
-  updateProfile(payload: { firstName: string; lastName: string }): Observable<AuthUser> {
+  /** Authenticated user: update safe profile fields. Role and email/username are read-only. Refreshes stored user. */
+  updateProfile(payload: UpdateProfileRequest): Observable<AuthUser> {
     // use of this is:
     // Updates allowed profile fields and refreshes both localStorage and AuthStore.
     return this.http.patch<{ user: AuthUser }>(`${this.apiUrl}/auth/profile`, payload).pipe(

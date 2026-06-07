@@ -1,9 +1,9 @@
 // use of this file is:
 // Core component file. It renders app-wide UI used across routes.
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -16,8 +16,7 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
   selector: 'sqx-change-password',
   standalone: true,
   imports: [
-    ReactiveFormsModule,
-    RouterLink,
+    FormsModule,
     ButtonModule,
     InputTextModule,
     PasswordModule,
@@ -28,39 +27,61 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangePasswordComponent {
-  private fb = inject(FormBuilder);
   private router = inject(Router);
   private auth = inject(AuthService);
   private snackbar = inject(SnackbarService);
 
   readonly submitting = signal(false);
-  form: FormGroup;
-
-  constructor() {
-    this.form = this.fb.group(
-      {
-        currentPassword: ['', [Validators.required, Validators.minLength(6)]],
-        newPassword: ['', [Validators.required, Validators.minLength(8)]],
-        confirmPassword: ['', [Validators.required]],
-      },
-      { validators: this.passwordMatchValidator }
-    );
+  readonly currentPassword = signal('');
+  readonly newPassword = signal('');
+  readonly confirmPassword = signal('');
+  readonly touched = signal({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
+  readonly passwordMismatch = computed(() => {
+    const confirm = this.confirmPassword();
+    return confirm.length > 0 && this.newPassword() !== confirm;
+  });
+  readonly formInvalid = computed(() =>
+    !this.currentPassword().trim() ||
+    this.newPassword().length < 8 ||
+    !this.confirmPassword().trim() ||
+    this.newPassword() !== this.confirmPassword()
+  );
+  readonly passwordRules = [
+    { label: 'Minimum 8 characters', test: (value: string) => value.length >= 8 },
+    { label: 'One uppercase character', test: (value: string) => /[A-Z]/.test(value) },
+    { label: 'One lowercase character', test: (value: string) => /[a-z]/.test(value) },
+    { label: 'One number', test: (value: string) => /\d/.test(value) },
+    { label: 'One special character', test: (value: string) => /[^A-Za-z0-9]/.test(value) },
+  ];
+  ruleComplete(rule: { test: (value: string) => boolean }): boolean {
+    return rule.test(this.newPassword());
   }
 
-  passwordMatchValidator(g: FormGroup): { [key: string]: boolean } | null {
-    const newP = g.get('newPassword')?.value;
-    const confirm = g.get('confirmPassword')?.value;
-    if (newP && confirm && newP !== confirm) return { mismatch: true };
-    return null;
+  setField(field: 'currentPassword' | 'newPassword' | 'confirmPassword', value: string): void {
+    if (field === 'currentPassword') this.currentPassword.set(value);
+    if (field === 'newPassword') this.newPassword.set(value);
+    if (field === 'confirmPassword') this.confirmPassword.set(value);
+  }
+
+  markTouched(field: 'currentPassword' | 'newPassword' | 'confirmPassword'): void {
+    this.touched.update((state) => ({ ...state, [field]: true }));
+  }
+
+  cancel(): void {
+    this.router.navigate(['/profile-settings']);
   }
 
   submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    this.touched.set({ currentPassword: true, newPassword: true, confirmPassword: true });
+    if (this.formInvalid()) {
       return;
     }
-    const currentPassword = this.form.get('currentPassword')?.value;
-    const newPassword = this.form.get('newPassword')?.value;
+    const currentPassword = this.currentPassword();
+    const newPassword = this.newPassword();
     this.submitting.set(true);
     this.auth.changePassword(currentPassword, newPassword).subscribe({
       next: (res) => {

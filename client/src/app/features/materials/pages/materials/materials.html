@@ -1,93 +1,157 @@
 <!-- use of this template is: Render the component view, bind signals/state, and expose user actions without API logic. -->
 <div class="materials-container">
-    @if (!selectedCourse) {
-    <div class="view-section fade-in">
+    @if (!selectedModule && !manageMode) {
+    <div class="materials-dashboard fade-in">
         @if (loading) {
         <div class="empty-state">Loading materials...</div>
-        } @else if (error) {
+        } @else if (error && !selectedContent) {
         <div class="empty-state">{{ error }}</div>
-        }
-
-        @if (!loading && visibleCourses.length > 0) {
-        <div class="materials-count">Showing {{ visibleCourses.length }} course material set{{ visibleCourses.length === 1 ? '' : 's' }}</div>
-        }
-
-        <div class="courses-list">
-            @for (course of visibleCourses; track course.id) {
-            <div class="course-item">
-                <div class="course-icon">
-                    <i class="pi pi-book"></i>
+        } @else if (selectedContent) {
+        <section class="materials-main">
+            <div class="materials-summary-card">
+                <div class="summary-toolbar">
+                    <div class="summary-title">
+                        <span class="index-eyebrow">Material Review</span>
+                        <h2>Course indexes</h2>
+                        <p>Upload a source file, review extracted indexes, then publish only verified content.</p>
+                    </div>
+                    @if (selectedContent.canManage) {
+                    <div class="summary-actions">
+                        <input #sourceInput class="hidden-file-input" type="file" accept=".ppt,.pptx,.xlsx"
+                            (change)="onMaterialSourceSelected($event)" />
+                        <button pButton type="button" icon="pi pi-upload" label="Upload File"
+                            (click)="sourceInput.click()"></button>
+                    </div>
+                    }
                 </div>
-                <div class="course-info">
-                    <h3 class="course-name">{{ courseDisplayTitle(course) }}</h3>
-                    <p class="instructor">By {{ course.author || 'SkillQuestX' }}</p>
-                    <div class="progress-wrapper">
-                        <div class="progress-bar">
-                            <div class="fill" [style.width.%]="course.moduleCount ? 100 : 0"></div>
-                        </div>
-                        <span class="progress-text">{{ course.moduleCount }} Indexes • {{ course.lessonCount }} Slides</span>
+
+                <div class="summary-stats">
+                    <div class="summary-stat">
+                        <i class="pi pi-list"></i>
+                        <strong>{{ indexModules.length }} indexes</strong>
+                        <span>Ready to review</span>
+                    </div>
+                    <div class="summary-stat">
+                        <i class="pi pi-clone"></i>
+                        <strong>{{ totalCourseSlides }}</strong>
+                        <span>Total slides</span>
+                    </div>
+                    <div class="summary-stat">
+                        <i class="pi pi-eye"></i>
+                        <strong>{{ contentReviewLabel }}</strong>
+                        <span>{{ contentReviewMeta }}</span>
+                    </div>
+                    <div class="summary-stat">
+                        <i class="pi pi-send"></i>
+                        <strong>{{ publishedVersionLabel }}</strong>
+                        <span>{{ publishedVersionMeta }}</span>
                     </div>
                 </div>
-                <button pButton label="View Material" icon="pi pi-arrow-right" class="action-btn"
-                    (click)="selectCourse(course)"></button>
             </div>
-            } @empty {
-            @if (!loading && !error) {
-            <div class="empty-state">No material records were returned by the API.</div>
-            }
-            }
-        </div>
-    </div>
-    }
 
-    @if (selectedCourse && !selectedModule && !manageMode) {
-    <div class="index-layout fade-in">
-        @if (loading) {
-        <div class="empty-state">Loading course material...</div>
-        } @else if (!selectedContent || selectedContent.modules.length === 0) {
-        <div class="empty-state">No materials have been published for this course.</div>
-        }
+            @if (managerMessage) {
+            <div class="manager-message">{{ managerMessage }}</div>
+            }
 
-        @if (selectedContent) {
-        <div class="index-cover">
-            <div class="index-cover-mark">
-                <span>{{ selectedContent.modules.length }}</span>
-                <small>Indexes</small>
+            <div class="materials-table-card">
+                <p-table [value]="pagedIndexModules" styleClass="materials-review-table" [tableStyle]="{ 'min-width': '720px' }">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>#</th>
+                            <th>Module name</th>
+                            <th>Slides</th>
+                            <th>Status</th>
+                            <th>Last edited</th>
+                            <th class="actions-column">Actions</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-module let-rowIndex="rowIndex">
+                        <tr>
+                            <td>{{ modulePage + rowIndex + 1 }}</td>
+                            <td>
+                                <div class="module-name-cell">
+                                    <span><i class="pi pi-book"></i></span>
+                                    <strong>{{ moduleTitle(module, modulePage + rowIndex) }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ module.lessons.length }}</td>
+                            <td>
+                                <span class="status-chip" [ngClass]="moduleStatusClass(module)">
+                                    {{ moduleStatus(module) }}
+                                </span>
+                            </td>
+                            <td>{{ formatMaterialDate(selectedContent.updatedAt) }}</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button pButton type="button" icon="pi pi-eye" class="p-button-text"
+                                        [disabled]="module.lessons.length === 0" (click)="openIndex(module)"
+                                        aria-label="View module"></button>
+                                    @if (selectedContent.canManage) {
+                                    <button pButton type="button" icon="pi pi-pencil" class="p-button-text"
+                                        (click)="openManageModule(module)" aria-label="Edit module"></button>
+                                    <button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-danger"
+                                        (click)="confirmDeleteIndex($event, module)" aria-label="Delete module"></button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state compact">No indexes are available. Import an XLSX file or add slides in review mode.</div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+                <p-paginator styleClass="materials-paginator" [first]="modulePage" [rows]="moduleRows"
+                    [totalRecords]="indexModules.length" [rowsPerPageOptions]="[5, 10, 15, 20, 25, 30]"
+                    [showCurrentPageReport]="true" currentPageReportTemplate="{first} - {last} of {totalRecords}"
+                    (onPageChange)="onModulePageChange($event)">
+                    <ng-template pTemplate="left">
+                        <span class="paginator-label">Items per page:</span>
+                    </ng-template>
+                </p-paginator>
             </div>
-            <div class="index-cover-copy">
-                <span class="index-eyebrow">Course Material</span>
-                <h2>{{ courseDisplayTitle(selectedCourse) }}</h2>
-                <p>{{ totalCourseSlides || selectedCourse.lessonCount }} slides organized for quick review.</p>
-            </div>
-            @if (visibleCourses.length > 1) {
-            <button pButton type="button" icon="pi pi-arrow-left" label="Courses" class="p-button-outlined"
-                (click)="goBack()"></button>
-            }
-            @if (selectedContent.canManage) {
-            <button pButton type="button" icon="pi pi-pencil" label="Manage Slides" class="p-button-outlined"
-                (click)="startManage()"></button>
-            }
-        </div>
+        </section>
 
-        <div class="index-table">
-            @for (module of indexModules; track module.id; let i = $index) {
-            <button type="button" class="index-row" [class.disabled]="module.lessons.length === 0"
-                (click)="module.lessons.length ? openIndex(module) : null">
-                <span class="index-step">
-                    <span class="index-number">{{ i + 1 }}</span>
-                </span>
-                <span class="index-title">{{ moduleTitle(module, i) }}</span>
-                <span class="index-meta">
-                    @if (module.lessons.length) {
-                    {{ module.lessons.length }} slides
-                    } @else {
-                    Coming next
-                    }
-                </span>
-                <i class="pi pi-chevron-right"></i>
-            </button>
-            }
-        </div>
+        <aside class="materials-side">
+            <section class="side-card">
+                <h3>Review workflow</h3>
+                <div class="workflow-step">
+                    <span>1</span>
+                    <div>
+                        <strong>Import source file</strong>
+                        <p>Use PPTX or XLSX to generate draft indexes and slides.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <span>2</span>
+                    <div>
+                        <strong>Cross-check content</strong>
+                        <p>Review titles, text, tables, slide order, and missing assets.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <span>3</span>
+                    <div>
+                        <strong>Publish to students</strong>
+                        <p>Only approved content should be visible in the student view.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="side-card tips-card">
+                <h3><i class="pi pi-lightbulb"></i> Extraction tips</h3>
+                <ul>
+                    <li>Use real editable PPTX or XLSX text instead of screenshots.</li>
+                    <li>Keep one topic per slide with a clear title.</li>
+                    <li>Split long paragraphs into short bullets.</li>
+                    <li>For XLSX, keep one row per slide and simple table columns.</li>
+                </ul>
+            </section>
+        </aside>
         }
     </div>
     }

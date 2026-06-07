@@ -1,0 +1,43 @@
+<!-- use of this template is: Show available membership plans and let users choose a plan. -->
+<div class="membership-page">
+  <section class="pricing-shell">
+    <div class="pricing-heading">
+      <span>Membership</span>
+      <h2>Choose your learning plan</h2>
+      <p>Pick the access level that matches how much support and course access you need.</p>
+    </div>
+
+    <div class="plans-grid">
+      @for (plan of plans; track plan.name) {
+        <article class="plan-card" [class.featured]="plan.name === selectedPlan()" [class]="plan.tone">
+          <div class="plan-top">
+            <div>
+              <span class="plan-badge">{{ plan.badge }}</span>
+              <h3>{{ plan.name }}</h3>
+              <p>{{ plan.description }}</p>
+            </div>
+            <strong>{{ plan.price }}</strong>
+          </div>
+
+          <ul>
+            @for (feature of plan.features; track feature) {
+              <li><i class="pi pi-check"></i>{{ feature }}</li>
+            }
+          </ul>
+
+          <button
+            pButton
+            type="button"
+            class="plan-button"
+            [class.current]="plan.name === selectedPlan()"
+            [label]="plan.name === selectedPlan() ? 'Current plan' : 'Choose plan'"
+            [class.p-button-outlined]="plan.name !== selectedPlan()"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            (click)="choosePlan(plan.name)">
+          </button>
+        </article>
+      }
+    </div>
+  </section>
+</div>

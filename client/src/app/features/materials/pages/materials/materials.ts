@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
+import { PaginatorModule } from 'primeng/paginator';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -62,6 +63,7 @@ interface MaterialsRouteState {
     DialogModule,
     ConfirmDialogModule,
     TableModule,
+    PaginatorModule,
     BreadcrumbModule,
     InputTextModule,
     SelectModule,
@@ -84,6 +86,8 @@ export class Materials extends BaseComponent implements OnInit {
   manageMode = false;
   saving = false;
   managerMessage = '';
+  modulePage = 0;
+  moduleRows = 5;
   selectedManageModuleId = '';
   selectedManageLessonId = '';
   previewBlock: ContentBlock | null = null;
@@ -124,6 +128,32 @@ export class Materials extends BaseComponent implements OnInit {
 
   get totalCourseSlides(): number {
     return this.indexModules.reduce((total, module) => total + module.lessons.length, 0);
+  }
+
+  get pagedIndexModules(): ContentModule[] {
+    return this.indexModules.slice(this.modulePage, this.modulePage + this.moduleRows);
+  }
+
+  get contentReviewLabel(): string {
+    if (!this.selectedContent) return 'Not loaded';
+    if (!this.indexModules.length) return 'Waiting';
+    if (this.selectedContent.status === 'published') return 'Published';
+    return 'Draft';
+  }
+
+  get contentReviewMeta(): string {
+    if (!this.selectedContent) return 'No material loaded';
+    if (!this.indexModules.length) return 'Upload source file';
+    if (this.selectedContent.status === 'published') return 'Reviewed content';
+    return 'Updated today';
+  }
+
+  get publishedVersionLabel(): string {
+    return this.selectedContent?.publishedAt ? 'Available' : 'Not ready';
+  }
+
+  get publishedVersionMeta(): string {
+    return this.selectedContent?.publishedAt ? 'Published version' : 'Publish after review';
   }
 
   get selectedManageModule(): ContentModule | null {
@@ -206,7 +236,10 @@ export class Materials extends BaseComponent implements OnInit {
         this.enrolledCourses = normalizedCourses;
         this.loading = false;
         this.error = normalizedCourses.length ? '' : this.emptyStateMessage();
-        this.restoreFromRoute(normalizedCourses);
+        const restoredFromRoute = this.restoreFromRoute(normalizedCourses);
+        if (!restoredFromRoute && normalizedCourses.length) {
+          this.selectCourse(normalizedCourses[0], { fromRoute: true });
+        }
         this.cdr.detectChanges();
       })
       .catch(() => {
@@ -269,6 +302,7 @@ export class Materials extends BaseComponent implements OnInit {
         this.selectedModule = null;
         this.manageMode = false;
         this.currentLessonIndex = 0;
+        this.modulePage = 0;
         this.applyRouteState(routeState);
         this.loading = false;
         this.updateGlobalHeader();
@@ -326,6 +360,86 @@ export class Materials extends BaseComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  openManageModule(module: ContentModule) {
+    // use of this is:
+    // Opens the full slide manager directly on the selected index row from the review table.
+    if (!this.selectedContent?.canManage) return;
+    this.manageMode = true;
+    this.selectedModule = null;
+    this.managerMessage = '';
+    this.selectedManageModuleId = module.id;
+    this.selectedManageLessonId = module.lessons[0]?.id ?? '';
+    this.updateMaterialsUrl({ courseId: this.selectedCourse?.id, mode: 'manage' });
+    this.updateGlobalHeader();
+    this.cdr.detectChanges();
+  }
+
+  onModulePageChange(event: { first?: number; rows?: number }) {
+    // use of this is:
+    // Keeps PrimeNG paginator state in sync with the module table slice.
+    this.modulePage = event.first ?? 0;
+    this.moduleRows = event.rows ?? this.moduleRows;
+  }
+
+  moduleStatus(module: ContentModule): string {
+    // use of this is:
+    // Shows managers whether an extracted index is ready for publish or still needs review.
+    if (this.selectedContent?.status === 'published') return 'Published';
+    return module.lessons.length ? 'In Review' : 'Draft';
+  }
+
+  moduleStatusClass(module: ContentModule): string {
+    // use of this is:
+    // Maps the readable status into a stable CSS modifier for status chips.
+    return this.moduleStatus(module).toLowerCase().replace(/\s+/g, '-');
+  }
+
+  formatMaterialDate(value?: string | null): string {
+    // use of this is:
+    // Presents backend timestamps in a compact reviewer-friendly format.
+    if (!value) return 'Not edited yet';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(value));
+  }
+
+  onPptxSelected(event: Event) {
+    // use of this is:
+    // Accepts PPT/PPTX selection for the new flow; backend extraction still needs an endpoint before parsing can run.
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    const isPresentation = /\.(ppt|pptx)$/i.test(file.name);
+    if (!isPresentation) {
+      this.messageService.add({ severity: 'warn', summary: 'Invalid file', detail: 'Please choose a PPT or PPTX file.' });
+      return;
+    }
+    this.managerMessage = 'PPTX extraction is ready in the UI. Connect the backend parser endpoint to import this file into indexes.';
+    this.messageService.add({
+      severity: 'info',
+      summary: 'PPTX selected',
+      detail: 'PPTX parser API is not available yet. XLSX import is currently connected.',
+    });
+  }
+
+  onMaterialSourceSelected(event: Event) {
+    // use of this is:
+    // Keeps the review screen simple with one upload button while still routing each file type to the right importer.
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (file.name.toLowerCase().endsWith('.xlsx')) {
+      this.onBulkWorkbookSelected(event);
+      return;
+    }
+    this.onPptxSelected(event);
+  }
+
   stopManage() {
     this.manageMode = false;
     this.managerMessage = '';
@@ -336,16 +450,16 @@ export class Materials extends BaseComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  private restoreFromRoute(courses: AvailableCourseContent[]) {
-    if (this.selectedCourse) return;
+  private restoreFromRoute(courses: AvailableCourseContent[]): boolean {
+    if (this.selectedCourse) return true;
     const params = this.route.snapshot.queryParamMap;
     const courseId = params.get('course');
-    if (!courseId) return;
+    if (!courseId) return false;
 
     const course = courses.find((item) => item.id === courseId);
     if (!course) {
       this.updateMaterialsUrl({}, true);
-      return;
+      return false;
     }
 
     this.selectCourse(course, {
@@ -354,6 +468,7 @@ export class Materials extends BaseComponent implements OnInit {
       indexId: params.get('index'),
       slideId: params.get('slide'),
     });
+    return true;
   }
 
   private applyRouteState(routeState?: MaterialsRouteState) {

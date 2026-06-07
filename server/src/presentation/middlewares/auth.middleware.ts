@@ -46,8 +46,14 @@ const authPlugin: FastifyPluginAsync = async (app) => {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      displayName: user.displayName ?? null,
       role: user.role ?? 'student',
       profileImageUrl: user.profileImageUrl ?? null,
+      coverImageUrl: user.coverImageUrl ?? null,
+      phoneNumber: user.phoneNumber ?? null,
+      dateOfBirth: user.dateOfBirth ?? null,
+      nationality: user.nationality ?? null,
+      address: user.address ?? null,
       canManageUsers: user.role === 'admin' && user.canManageUsers === true ? true : undefined,
     };
   });
