@@ -11,6 +11,7 @@ import { authRoutes } from '../presentation/routes/auth.routes';
 import { courseContentRoutes } from '../presentation/routes/course-content.routes';
 import { courseRoutes } from '../presentation/routes/course.routes';
 import { examRoutes } from '../presentation/routes/exam.routes';
+import { materialDraftRoutes } from '../presentation/routes/material-draft.routes';
 import { notificationRoutes } from '../presentation/routes/notification.routes';
 import { securityRoutes } from '../presentation/routes/security.routes';
 import { taskRoutes } from '../presentation/routes/task.routes';
@@ -87,6 +88,8 @@ export async function buildApp(): Promise<FastifyInstance> {
     await api.register(courseRoutes, { prefix: '/courses' });
     // /api/exams handles exam management, import, retrieval, and submissions.
     await api.register(examRoutes, { prefix: '/exams' });
+    // /api/material-drafts handles the new standalone upload/review/submit material flow.
+    await api.register(materialDraftRoutes, { prefix: '/material-drafts' });
     // /api/tasks handles task creation and student submissions.
     await api.register(taskRoutes, { prefix: '/tasks' });
     // /api/notifications handles notification list/read and push subscription endpoints.

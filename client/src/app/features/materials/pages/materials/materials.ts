@@ -250,22 +250,17 @@ export class Materials extends BaseComponent implements OnInit {
   }
 
   updateGlobalHeader() {
+    if (this.isMaterialsLandingRoute()) {
+      this.headerService.updateTitle('Materials');
+      this.headerService.updateBreadcrumbs([]);
+      return;
+    }
+
     if (!this.selectedCourse) {
       this.headerService.updateTitle('Materials');
       this.headerService.updateBreadcrumbs([
         { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
         { label: 'Materials' }
-      ]);
-      return;
-    }
-
-    if (this.selectedModule) {
-      this.headerService.updateTitle('Materials');
-      this.headerService.updateBreadcrumbs([
-        { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
-        { label: 'Materials', command: () => this.goBack() },
-        { label: this.courseDisplayTitle(this.selectedCourse), command: () => this.backToIndex() },
-        { label: this.breadcrumbLabel(this.selectedModule.title) }
       ]);
       return;
     }
@@ -281,12 +276,28 @@ export class Materials extends BaseComponent implements OnInit {
       return;
     }
 
+    if (this.selectedModule) {
+      this.headerService.updateTitle('Materials');
+      this.headerService.updateBreadcrumbs([
+        { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
+        { label: 'Materials', command: () => this.goBack() },
+        { label: this.courseDisplayTitle(this.selectedCourse), command: () => this.backToIndex() },
+        { label: this.breadcrumbLabel(this.selectedModule.title) }
+      ]);
+      return;
+    }
+
     this.headerService.updateTitle('Materials');
     this.headerService.updateBreadcrumbs([
       { icon: 'pi pi-home', url: '/dashboard', label: 'Home' },
       { label: 'Materials', command: () => this.goBack() },
       { label: this.courseDisplayTitle(this.selectedCourse), command: () => this.backToIndex() }
     ]);
+  }
+
+  private isMaterialsLandingRoute(): boolean {
+    const path = this.router.url.split('?')[0];
+    return path === '/materials' && this.route.snapshot.queryParamMap.keys.length === 0;
   }
 
   selectCourse(course: AvailableCourseContent, routeState?: MaterialsRouteState) {
@@ -314,6 +325,10 @@ export class Materials extends BaseComponent implements OnInit {
         this.error = 'Content is not published or you are not enrolled in this course.';
         this.cdr.detectChanges();
       });
+  }
+
+  goToMaterialUpload() {
+    this.router.navigate(['/materials/upload']);
   }
 
   goBack() {

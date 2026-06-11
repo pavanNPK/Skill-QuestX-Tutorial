@@ -225,6 +225,8 @@ $sidebar-branch-active: rgba(90, 75, 196, 0.3);
             gap: 8px;
             align-items: center;
             border-right: 1px solid $sidebar-border;
+            z-index: 1;
+            background-color: var(--sqx-color-sidebar-bg, #F6F4FF);
         }
 
         .footer-action {

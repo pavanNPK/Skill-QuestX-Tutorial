@@ -1,0 +1,103 @@
+.upload-page {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+h1 {
+  margin: 0;
+  color: #151936;
+  font-size: 1.75rem;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+p {
+  margin: 0.35rem 0 0;
+  color: #626783;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: auto minmax(48px, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid #e4e1f4;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+}
+
+.stepper > div {
+  height: 2px;
+  background: #dedaf2;
+}
+
+.stepper button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 0;
+  background: transparent;
+  color: #626783;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.stepper button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.stepper span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid #d6d2f0;
+  color: #4d3ac8;
+  background: #fff;
+}
+
+.stepper .active {
+  color: #151936;
+}
+
+.stepper .active span {
+  background: #4d3ac8;
+  color: #fff;
+  border-color: #4d3ac8;
+}
+
+.page-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0 0;
+}
+
+@media (max-width: 640px) {
+  .page-head,
+  .page-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stepper {
+    grid-template-columns: 1fr;
+  }
+
+  .stepper > div {
+    display: none;
+  }
+}

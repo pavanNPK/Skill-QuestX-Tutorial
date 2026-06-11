@@ -5,6 +5,7 @@ import { CourseService } from './course.service';
 import { CourseContentService } from './course-content.service';
 import { ExamService } from './exam.service';
 import { MailService } from './mail.service';
+import { MaterialDraftService } from './material-draft.service';
 import { NotificationService } from './notification.service';
 import { PushService } from './push.service';
 import { TaskService } from './task.service';
@@ -18,6 +19,7 @@ const userService = new UserService();
 const courseService = new CourseService();
 const batchService = new BatchService(courseService);
 const courseContentService = new CourseContentService(courseService, batchService);
+const materialDraftService = new MaterialDraftService();
 const examService = new ExamService();
 const mailService = new MailService();
 const pushService = new PushService();
@@ -35,6 +37,7 @@ export const services = {
   courseContentService,
   examService,
   mailService,
+  materialDraftService,
   notificationService,
   pushService,
   taskService,

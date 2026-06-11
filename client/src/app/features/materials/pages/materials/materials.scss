@@ -461,6 +461,27 @@
     }
 }
 
+.material-manager .manager-header,
+.material-manager .module-panel {
+    display: none;
+}
+
+.material-manager {
+    padding-top: 0;
+}
+
+.material-manager .manager-grid {
+    grid-template-columns: 320px minmax(0, 1fr);
+}
+
+.material-manager .slide-panel {
+    max-height: calc(100vh - 132px);
+}
+
+.material-manager .manager-editor .editor-card {
+    min-height: calc(100vh - 132px);
+}
+
 .manager-actions {
     display: flex;
     flex-wrap: wrap;
@@ -1112,7 +1133,7 @@
 .reader-toolbar {
     justify-content: space-between;
     position: sticky;
-    top: 0;
+    top: calc(var(--sqx-header-height, 72px) + 0.75rem);
     z-index: 3;
 
     .reader-title {
@@ -1173,10 +1194,11 @@
 .slide-page {
     background:
         linear-gradient(90deg, #5B4BC4 0 72px, transparent 72px),
-        radial-gradient(circle at 94% 8%, rgba(245, 158, 11, 0.16), transparent 190px),
+        linear-gradient(180deg, #F4F6FB 0 96px, #FFFFFF 96px),
+        radial-gradient(circle at 94% 88%, rgba(91, 75, 196, 0.08), transparent 220px),
         #FFFFFF;
     border: 1px solid #D9D6F0;
-    border-radius: 8px;
+    border-radius: 10px;
     min-height: 680px;
     padding: 0;
     box-shadow: 0 18px 42px rgba(17, 24, 39, 0.12);
@@ -1184,9 +1206,8 @@
 }
 
 .slide-page-header {
-    border-bottom: 1px solid #EDE9FE;
-    // padding: 2rem 2rem 1.5rem 7rem;
-    padding: 1rem 2rem 0rem 7rem;
+    border-bottom: 1px solid #E9E7F5;
+    padding: 1.25rem 2rem 0.9rem 7rem;
     margin-bottom: 0;
     // min-height: 132px;
     min-height: 90px;
@@ -1205,8 +1226,8 @@
 
     h2 {
         margin: 0;
-        color: #111827;
-        font-size: 34px;
+        color: #4B3BC7;
+        font-size: 30px;
         line-height: 1.12;
         font-weight: 800;
         overflow-wrap: anywhere;
@@ -1233,7 +1254,7 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 1.25rem;
     align-items: start;
-    padding: 1.75rem 2.25rem 2.25rem 7rem;
+    padding: 1.5rem 2.25rem 2.25rem 7rem;
 
     &.has-files {
         grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
@@ -1249,12 +1270,12 @@
 
 .content-block {
     color: #1F2937;
-    font-size: 16px;
-    line-height: 1.65;
+    font-size: 15px;
+    line-height: 1.5;
 
     h3 {
         margin: 0 0 0.75rem;
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
         color: var(--sqx-color-primary-dark);
     }

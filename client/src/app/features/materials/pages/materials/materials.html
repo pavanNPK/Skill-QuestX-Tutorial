@@ -17,10 +17,8 @@
                     </div>
                     @if (selectedContent.canManage) {
                     <div class="summary-actions">
-                        <input #sourceInput class="hidden-file-input" type="file" accept=".ppt,.pptx,.xlsx"
-                            (change)="onMaterialSourceSelected($event)" />
                         <button pButton type="button" icon="pi pi-upload" label="Upload File"
-                            (click)="sourceInput.click()"></button>
+                            (click)="goToMaterialUpload()"></button>
                     </div>
                     }
                 </div>
