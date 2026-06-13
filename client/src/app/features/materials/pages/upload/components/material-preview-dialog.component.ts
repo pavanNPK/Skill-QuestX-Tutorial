@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { TextToSpeechService } from '../../../../../core/services/text-to-speech.service';
 import { MaterialFile, MaterialSlide } from '../../../domain/material-draft.model';
 import { MaterialSlidePreviewComponent } from './material-slide-preview.component';
 
@@ -25,6 +26,10 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
             <span>{{ activeIndex + 1 }} / {{ deckSlides.length }} slides</span>
           </div>
           <div class="preview-tools">
+            <button type="button" class="read-btn" (click)="readDeck()" aria-label="Read all slides aloud">
+              <i class="pi pi-volume-up"></i>
+              Read
+            </button>
             <button type="button" class="tool-btn" (click)="changeZoom(-0.1)" aria-label="Zoom out">
               <i class="pi pi-minus"></i>
             </button>
@@ -32,7 +37,7 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
             <button type="button" class="tool-btn" (click)="changeZoom(0.1)" aria-label="Zoom in">
               <i class="pi pi-plus"></i>
             </button>
-            <button type="button" class="close-btn" (click)="visibleChange.emit(false)" aria-label="Close preview">
+            <button type="button" class="close-btn" (click)="close()" aria-label="Close preview">
               <i class="pi pi-times"></i>
             </button>
           </div>
@@ -132,6 +137,7 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
 
     .close-btn,
     .nav-btn,
+    .read-btn,
     .tool-btn,
     .zoom-chip {
       border: 1px solid rgba(255,255,255,.18);
@@ -160,6 +166,15 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
       width: 30px;
       height: 30px;
       padding: 0;
+    }
+
+    .read-btn {
+      height: 30px;
+      display: inline-flex;
+      grid-auto-flow: column;
+      gap: .4rem;
+      padding: 0 .72rem;
+      font-weight: 800;
     }
 
     .zoom-chip {
@@ -290,7 +305,9 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
     }
   `],
 })
-export class MaterialPreviewDialogComponent implements OnChanges {
+export class MaterialPreviewDialogComponent implements OnChanges, OnDestroy {
+  private readonly tts = inject(TextToSpeechService);
+
   @Input() visible = false;
   @Input() files: MaterialFile[] = [];
   @Input() slide: MaterialSlide | null = null;
@@ -300,6 +317,7 @@ export class MaterialPreviewDialogComponent implements OnChanges {
   zoom = 0.78;
 
   ngOnChanges(changes: SimpleChanges): void {
+    if ('visible' in changes && !this.visible) this.tts.stop();
     if ('slide' in changes && this.slide) {
       const index = this.deckSlides.findIndex((item) => item.id === this.slide?.id);
       this.activeIndex = index >= 0 ? index : 0;
@@ -325,5 +343,30 @@ export class MaterialPreviewDialogComponent implements OnChanges {
 
   changeZoom(delta: number): void {
     this.zoom = Math.min(1.6, Math.max(0.62, Number((this.zoom + delta).toFixed(2))));
+  }
+
+  readDeck(): void {
+    this.tts.speak(this.deckSlides.map((slide) => this.slideText(slide)).filter(Boolean).join('\n\n'));
+  }
+
+  close(): void {
+    this.tts.stop();
+    this.visibleChange.emit(false);
+  }
+
+  ngOnDestroy(): void {
+    this.tts.stop();
+  }
+
+  private slideText(slide: MaterialSlide): string {
+    const parts = [`Slide ${slide.order}. ${slide.title}`];
+    slide.blocks.forEach((block) => {
+      const value = block.value;
+      if (typeof value === 'string') parts.push(value);
+      else if (Array.isArray(value)) parts.push(value.flat().join('. '));
+      else if (value && typeof value === 'object') parts.push(Object.values(value).join('. '));
+    });
+    if (slide.notes) parts.push(slide.notes);
+    return parts.join('. ').replace(/\s+/g, ' ').trim();
   }
 }

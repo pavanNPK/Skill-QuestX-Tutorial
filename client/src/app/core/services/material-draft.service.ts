@@ -35,8 +35,8 @@ export class MaterialDraftService {
     return this.http.patch<MaterialDraft>(`${this.apiUrl}/${id}`, draft);
   }
 
-  submit(id: string): Observable<MaterialDraft> {
-    return this.http.post<MaterialDraft>(`${this.apiUrl}/${id}/submit`, {});
+  submit(id: string, draft?: MaterialDraft): Observable<MaterialDraft> {
+    return this.http.post<MaterialDraft>(`${this.apiUrl}/${id}/submit`, draft ?? {});
   }
 
   importFile(file: File): Observable<MaterialFile> {

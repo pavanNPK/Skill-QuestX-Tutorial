@@ -95,9 +95,11 @@ export class MaterialDraftService {
     return { id, deleted: true };
   }
 
-  async submit(id: string, user: AuthUser) {
+  async submit(id: string, body: unknown, user: AuthUser) {
     const draft = await this.requireDraft(id, user);
-    const normalized = this.normalizeDraft(draft);
+    const persistedDraft = this.normalizeDraft(draft);
+    const submittedDraft = this.hasDraftPayload(body) ? this.normalizeDraft(body) : null;
+    const normalized = persistedDraft.files.length ? persistedDraft : submittedDraft ?? persistedDraft;
     this.validateSubmittable(normalized.files);
     draft.title = normalized.title;
     draft.sourceType = normalized.sourceType;
@@ -259,6 +261,12 @@ export class MaterialDraftService {
         if (!this.hasValue(block.value)) throw badRequest('Every content block must have content before submitting.');
       });
     });
+  }
+
+  private hasDraftPayload(input: unknown): boolean {
+    if (!input || typeof input !== 'object') return false;
+    const source = input as Record<string, unknown>;
+    return Object.keys(source).length > 0 && (Array.isArray(source.files) || typeof source.title === 'string' || typeof source.sourceType === 'string');
   }
 
   private hasValue(value: unknown): boolean {

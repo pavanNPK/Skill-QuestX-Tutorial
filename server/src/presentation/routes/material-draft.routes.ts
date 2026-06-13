@@ -44,7 +44,7 @@ export const materialDraftRoutes: FastifyPluginAsync = async (app) => {
 
   app.post('/:id/submit', {
     preHandler: [app.authenticate],
-    schema: { params: idParamsSchema },
+    schema: { params: idParamsSchema, body: looseObjectBodySchema },
     handler: materialDraftController.submit,
   });
 

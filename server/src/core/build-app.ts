@@ -35,8 +35,9 @@ export async function buildApp(): Promise<FastifyInstance> {
     trustProxy: env.nodeEnv === 'production',
     ajv: {
       customOptions: {
-        // Unknown DTO fields are stripped before handlers receive the body.
-        removeAdditional: 'all',
+        // Unknown DTO fields are stripped only on strict schemas. Flexible editor/import
+        // routes opt into additionalProperties so their dynamic bodies are preserved.
+        removeAdditional: true,
         // Coercion is disabled so clients must send the exact expected JSON types.
         coerceTypes: false,
         allErrors: false,

@@ -44,7 +44,7 @@ export class MaterialDraftController {
 
   async submit(request: FastifyRequest) {
     const params = request.params as { id: string };
-    return services.materialDraftService.submit(params.id, (request as AuthenticatedRequest).user);
+    return services.materialDraftService.submit(params.id, request.body, (request as AuthenticatedRequest).user);
   }
 
   async importFile(request: FastifyRequest) {

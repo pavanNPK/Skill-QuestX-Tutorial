@@ -81,6 +81,9 @@
                             <td>{{ formatMaterialDate(selectedContent.updatedAt) }}</td>
                             <td>
                                 <div class="table-actions">
+                                    <button pButton type="button" icon="pi pi-volume-up" class="p-button-text"
+                                        [disabled]="module.lessons.length === 0" (click)="listenToModule(module)"
+                                        aria-label="Read module"></button>
                                     <button pButton type="button" icon="pi pi-eye" class="p-button-text"
                                         [disabled]="module.lessons.length === 0" (click)="openIndex(module)"
                                         aria-label="View module"></button>
@@ -401,14 +404,13 @@
             <div class="slide-page-header">
                 <div>
                     <h2>{{ currentLesson.title }}</h2>
+                    <span class="slide-count-inline">{{ currentSlideNumber }} of {{ totalSlides }}</span>
                 </div>
                 <div class="slide-page-meta">
+                    <button pButton type="button" icon="pi pi-volume-up" label="Read" class="pager-btn"
+                        (click)="listenToCurrentSlide()"></button>
                     <button pButton type="button" icon="pi pi-chevron-left" label="Prev" class="pager-btn"
                         [disabled]="currentLessonIndex === 0" (click)="previousSlide()"></button>
-                    <div class="slide-course-group">
-                        <span class="slide-course-chip">{{ courseDisplayTitle(selectedCourse) }}</span>
-                        <span class="slide-count-inline">Slide {{ currentSlideNumber }} of {{ totalSlides }}</span>
-                    </div>
                     <button pButton type="button" icon="pi pi-chevron-right" iconPos="right" label="Next" class="pager-btn"
                         [disabled]="currentLessonIndex >= totalSlides - 1" (click)="nextSlide()"></button>
                 </div>

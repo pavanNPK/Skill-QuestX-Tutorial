@@ -17,6 +17,7 @@ import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { filter } from 'rxjs';
 import { HeaderService } from '../../../../core/services/header.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TextToSpeechService } from '../../../../core/services/text-to-speech.service';
 import {
   AvailableCourseContent,
   ContentBlock,
@@ -104,6 +105,7 @@ export class Materials extends BaseComponent implements OnInit {
     { label: 'Table', value: 'table' },
   ];
   private readonly materialsStore = inject(MaterialsStore);
+  private readonly tts = inject(TextToSpeechService);
 
   get visibleCourses(): AvailableCourseContent[] {
     return Array.isArray(this.enrolledCourses) ? this.enrolledCourses : [];
@@ -221,6 +223,7 @@ export class Materials extends BaseComponent implements OnInit {
   }
 
   override ngOnDestroy() {
+    this.tts.stop();
     this.unlockBodyScroll();
     this.headerService.reset();
     super.ngOnDestroy();
@@ -328,7 +331,7 @@ export class Materials extends BaseComponent implements OnInit {
   }
 
   goToMaterialUpload() {
-    this.router.navigate(['/materials/upload']);
+    this.router.navigate(['/materials/upload'], { queryParams: this.selectedCourse ? { course: this.selectedCourse.id } : undefined });
   }
 
   goBack() {
@@ -979,6 +982,26 @@ export class Materials extends BaseComponent implements OnInit {
     return segments.length ? segments : [{ text, bold: false }];
   }
 
+  listenToCurrentSlide() {
+    if (!this.currentLesson) return;
+    this.tts.speak([
+      this.currentLesson.title,
+      this.currentLesson.summary,
+      ...this.contentBlocks(this.currentLesson).map((block) => this.blockSpeechText(block)),
+    ].filter(Boolean).join('\n\n'));
+  }
+
+  listenToModule(module: ContentModule) {
+    this.tts.speak(module.lessons
+      .map((lesson, index) => [
+        `Slide ${index + 1}. ${lesson.title}`,
+        lesson.summary,
+        ...this.contentBlocks(lesson).map((block) => this.blockSpeechText(block)),
+      ].filter(Boolean).join('\n\n'))
+      .filter(Boolean)
+      .join('\n\n'));
+  }
+
   setBlockItemsText(block: ContentBlock, value: string) {
     block.items = block.type === 'nested_bullet_list'
       ? this.parseNestedItems(value)
@@ -1225,6 +1248,16 @@ export class Materials extends BaseComponent implements OnInit {
       }
     }
     return result;
+  }
+
+  private blockSpeechText(block: ContentBlock): string {
+    const parts: string[] = [];
+    if (block.title) parts.push(block.title);
+    if (block.text) parts.push(block.text.replace(/\*\*/g, ''));
+    if (block.items?.length) parts.push(this.flattenedBullets(block.items).map((item) => item.text).join('. '));
+    if (block.columns?.length) parts.push(block.columns.join('. '));
+    if (block.rows?.length) parts.push(block.rows.flat().join('. '));
+    return parts.join('. ').replace(/\s+/g, ' ').trim();
   }
 
   hasOpenableAsset(block: ContentBlock): boolean {

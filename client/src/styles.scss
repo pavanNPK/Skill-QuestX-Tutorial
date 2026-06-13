@@ -67,6 +67,12 @@ input[pInputText] {
   width: 100%;
 }
 
+.p-select-overlay,
+.p-paginator-rpp-options,
+.p-dropdown-panel {
+  z-index: 12000 !important;
+}
+
 .field-label {
   color: var(--p-text-color, var(--sqx-color-text));
   font-size: 13px;
