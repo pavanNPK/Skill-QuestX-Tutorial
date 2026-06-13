@@ -1,0 +1,195 @@
+<!-- use of this template is: Render user notification preferences and integration controls. -->
+<section class="preferences-page">
+  <div class="preferences-layout">
+    <section class="channels-panel">
+      <div class="section-heading">
+        <div class="w-100">
+          <div class="hero-status">
+            <i class="pi pi-shield"></i>
+            <span>Choose how Skill QuestX should reach you for learning updates, account alerts, and reminders.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="channel-list">
+        @for (channel of channels(); track channel.id) {
+          <article class="channel-card" [class.integrated]="channel.integrated" [attr.data-tone]="channel.tone">
+            <div class="channel-icon">
+              <i [class]="channel.icon"></i>
+            </div>
+
+            <div class="channel-main">
+              <div class="channel-title-row">
+                <div>
+                  <h3>{{ channel.title }}</h3>
+                  <p>{{ channel.description }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="switch"
+                  [class.on]="channel.enabled"
+                  [disabled]="!channel.integrated"
+                  (click)="toggleEnabled(channel.id)"
+                  [attr.aria-label]="'Toggle ' + channel.title"
+                >
+                  <span></span>
+                </button>
+              </div>
+
+              @if (channel.integrated) {
+                <div class="connected-row">
+                  <div class="verified-pill">
+                    <i class="pi pi-check-circle"></i>
+                    <span>{{ channel.verifiedValue }}</span>
+                  </div>
+                  <div class="channel-actions">
+                    <button type="button" class="subtle-btn" (click)="toggleEnabled(channel.id)">
+                      {{ channel.enabled ? 'Disable notifications' : 'Enable notifications' }}
+                    </button>
+                    @if (channel.requiresOtp) {
+                      <button type="button" class="danger-btn" (click)="deleteIntegration(channel.id)">
+                        Delete integration
+                      </button>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="integration-form">
+                  <label>
+                    <span>{{ channel.targetLabel }}</span>
+                    <input
+                      pInputText
+                      [ngModel]="channel.draftValue"
+                      (ngModelChange)="updateDraft(channel.id, $event)"
+                      [placeholder]="channel.placeholder"
+                    />
+                  </label>
+
+                  @if (channel.verifying) {
+                    <label class="otp-field">
+                      <span>Verification OTP</span>
+                      <input
+                        pInputText
+                        inputmode="numeric"
+                        [ngModel]="channel.otp"
+                        (ngModelChange)="updateOtp(channel.id, $event)"
+                        placeholder="Enter OTP"
+                      />
+                    </label>
+                  }
+
+                  <div class="form-actions">
+                    @if (!channel.verifying) {
+                      <button
+                        pButton
+                        type="button"
+                        label="Send OTP"
+                        icon="pi pi-send"
+                        [disabled]="!canRequestOtp(channel)"
+                        (click)="startIntegration(channel.id)"
+                      ></button>
+                    } @else {
+                      <button
+                        pButton
+                        type="button"
+                        label="Verify & Enable"
+                        icon="pi pi-check"
+                        [disabled]="!canVerify(channel)"
+                        (click)="verifyIntegration(channel.id)"
+                      ></button>
+                      <button pButton type="button" label="Cancel" class="p-button-outlined" (click)="cancelIntegration(channel.id)"></button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <aside class="controls-panel">
+      <article class="control-card">
+        <div class="control-icon moon">
+          <i class="pi pi-moon"></i>
+        </div>
+        <div>
+          <h3>Do Not Disturb</h3>
+          <p>Pause non-critical alerts during quiet hours. Critical security messages can still be delivered.</p>
+        </div>
+        <button type="button" class="switch" [class.on]="doNotDisturb()" (click)="doNotDisturb.update(value => !value)" aria-label="Toggle Do Not Disturb">
+          <span></span>
+        </button>
+      </article>
+
+      <article class="control-card schedule-card" [class.expanded]="scheduled()">
+        <div class="control-summary">
+          <div class="control-icon calendar">
+            <i class="pi pi-calendar-clock"></i>
+          </div>
+          <div>
+            <h3>Schedule Notifications</h3>
+            <p>Choose preferred delivery windows for summaries, reminders, and digest-style updates.</p>
+          </div>
+          <button type="button" class="switch" [class.on]="scheduled()" (click)="scheduled.update(value => !value)" aria-label="Toggle scheduled notifications">
+            <span></span>
+          </button>
+        </div>
+
+        @if (scheduled()) {
+          <div class="schedule-options">
+            <div class="time-grid">
+              <label>
+                <span>From</span>
+                <input pInputText type="time" [ngModel]="scheduleStart()" (ngModelChange)="setScheduleTime('start', $event)" />
+              </label>
+              <label>
+                <span>To</span>
+                <input pInputText type="time" [ngModel]="scheduleEnd()" (ngModelChange)="setScheduleTime('end', $event)" />
+              </label>
+            </div>
+
+            <div class="option-group">
+              <span class="option-label">Days</span>
+              <div class="day-grid">
+                @for (day of days; track day) {
+                  <button type="button" class="day-chip" [class.active]="selectedDays().includes(day)" (click)="toggleDay(day)">
+                    {{ day }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="option-group">
+              <span class="option-label">Frequency</span>
+              <div class="frequency-grid">
+                @for (item of frequencies; track item.value) {
+                  <button type="button" class="frequency-chip" [class.active]="scheduleFrequency() === item.value" (click)="selectFrequency(item.value)">
+                    <i [class]="item.icon"></i>
+                    <span>{{ item.label }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </article>
+
+      <article class="delivery-preview">
+        <h3>Delivery priority</h3>
+        <div class="priority-step">
+          <i class="pi pi-bell"></i>
+          <span>In-app first for active sessions</span>
+        </div>
+        <div class="priority-step">
+          <i class="pi pi-whatsapp"></i>
+          <span>WhatsApp or SMS for urgent reminders</span>
+        </div>
+        <div class="priority-step">
+          <i class="pi pi-envelope"></i>
+          <span>Email for reports and summaries</span>
+        </div>
+      </article>
+    </aside>
+  </div>
+</section>

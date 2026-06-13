@@ -174,8 +174,11 @@ export class MaterialUploadStepComponent {
     input.value = '';
   }
 
-  addManualMaterial(file: MaterialFile): void {
-    this.emitFiles([...this.files, { ...file, order: this.files.length + 1 }]);
+  addManualMaterial(files: MaterialFile[]): void {
+    this.emitFiles([
+      ...this.files,
+      ...files.map((file, index) => ({ ...file, order: this.files.length + index + 1 })),
+    ]);
   }
 
   removeFile(fileId: string): void {

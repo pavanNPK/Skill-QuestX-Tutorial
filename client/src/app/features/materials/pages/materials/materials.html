@@ -97,7 +97,7 @@
                     <ng-template pTemplate="emptymessage">
                         <tr>
                             <td colspan="6">
-                                <div class="empty-state compact">No indexes are available. Import an XLSX file or add slides in review mode.</div>
+                                <div class="empty-state compact">No indexes are available. Import an XLSX or PPTx file's or add slides in review mode.</div>
                             </td>
                         </tr>
                     </ng-template>
@@ -105,6 +105,7 @@
 
                 <p-paginator styleClass="materials-paginator" [first]="modulePage" [rows]="moduleRows"
                     [totalRecords]="indexModules.length" [rowsPerPageOptions]="[5, 10, 15, 20, 25, 30]"
+                    dropdownAppendTo="body"
                     [showCurrentPageReport]="true" currentPageReportTemplate="{first} - {last} of {totalRecords}"
                     (onPageChange)="onModulePageChange($event)">
                     <ng-template pTemplate="left">
@@ -121,7 +122,7 @@
                     <span>1</span>
                     <div>
                         <strong>Import source file</strong>
-                        <p>Use PPTX or XLSX to generate draft indexes and slides.</p>
+                        <p>Use PPTx or XLSX to generate draft indexes and slides.</p>
                     </div>
                 </div>
                 <div class="workflow-step">
@@ -247,7 +248,7 @@
                             (click)="addTableBlock()"></button>
                         <div class="add-block-control">
                             <p-select [options]="editableBlockTypes" [(ngModel)]="newBlockType" optionLabel="label"
-                                optionValue="value" styleClass="block-type-select"></p-select>
+                                optionValue="value" appendTo="body" styleClass="block-type-select"></p-select>
                             <button pButton type="button" icon="pi pi-plus" label="Add block" class="p-button-outlined"
                                 (click)="addSelectedBlock()"></button>
                         </div>
@@ -262,7 +263,7 @@
                             <div class="block-editor-toolbar">
                                 <p-select [options]="editableBlockTypes" [ngModel]="block.type"
                                     (ngModelChange)="updateBlockType(block, $any($event))" optionLabel="label"
-                                    optionValue="value" styleClass="block-type-select"></p-select>
+                                    optionValue="value" appendTo="body" styleClass="block-type-select"></p-select>
                                 <div class="block-editor-actions">
                                     <button type="button" class="format-btn" (mousedown)="$event.preventDefault()"
                                         (click)="applyBoldToSelection()" aria-label="Bold selected text">
@@ -395,32 +396,22 @@
 
     @if (selectedCourse && selectedModule) {
     <div class="slide-reader fade-in">
-        <div class="reader-toolbar">
-            <div class="reader-title">
-                <button type="button" class="reader-back-icon" aria-label="Back to index" (click)="backToIndex()">
-                    <i class="pi pi-chevron-left"></i>
-                </button>
-                <div>
-                    <h2>{{ selectedModule.title }}</h2>
-                    <span>Slide {{ currentSlideNumber }} of {{ totalSlides }}</span>
-                </div>
-            </div>
-            <div class="reader-actions">
-                <button pButton type="button" icon="pi pi-chevron-left" label="Prev" class="pager-btn"
-                    [disabled]="currentLessonIndex === 0" (click)="previousSlide()"></button>
-                <button pButton type="button" icon="pi pi-chevron-right" iconPos="right" label="Next" class="pager-btn"
-                    [disabled]="currentLessonIndex >= totalSlides - 1" (click)="nextSlide()"></button>
-            </div>
-        </div>
-
         @if (currentLesson) {
         <article class="slide-page">
             <div class="slide-page-header">
                 <div>
-                    <p>Slide {{ currentSlideNumber }} / {{ totalSlides }}</p>
                     <h2>{{ currentLesson.title }}</h2>
                 </div>
-                <span class="slide-course-chip">{{ courseDisplayTitle(selectedCourse) }}</span>
+                <div class="slide-page-meta">
+                    <button pButton type="button" icon="pi pi-chevron-left" label="Prev" class="pager-btn"
+                        [disabled]="currentLessonIndex === 0" (click)="previousSlide()"></button>
+                    <div class="slide-course-group">
+                        <span class="slide-course-chip">{{ courseDisplayTitle(selectedCourse) }}</span>
+                        <span class="slide-count-inline">Slide {{ currentSlideNumber }} of {{ totalSlides }}</span>
+                    </div>
+                    <button pButton type="button" icon="pi pi-chevron-right" iconPos="right" label="Next" class="pager-btn"
+                        [disabled]="currentLessonIndex >= totalSlides - 1" (click)="nextSlide()"></button>
+                </div>
             </div>
 
             <div class="slide-reader-grid" [class.has-files]="fileBlocks(currentLesson).length">

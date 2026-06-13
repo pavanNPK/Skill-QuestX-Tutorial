@@ -160,10 +160,12 @@ export class MaterialDraftService {
   }
 
   private normalizeDraft(input: any): { title: string; sourceType: MaterialSourceType; status: MaterialDraftStatus; files: MaterialFile[] } {
-    const title = this.cleanString(input?.title) || 'Untitled Material';
-    const files: MaterialFile[] = this.dedupeFiles(Array.isArray(input?.files) ? input.files.map((file: any, index: number) => this.normalizeFile(file, index)) : []);
-    const sourceType: MaterialSourceType = input?.sourceType === 'MANUAL' || files.every((file) => file.fileType === 'MANUAL') ? 'MANUAL' : 'FILE_UPLOAD';
-    const status: MaterialDraftStatus = input?.status === 'PUBLISHED' || input?.status === 'SUBMITTED' ? input.status : 'DRAFT';
+    const source = typeof input?.toObject === 'function' ? input.toObject() : input;
+    const title = this.cleanString(source?.title) || 'Untitled Material';
+    const rawFiles = Array.isArray(source?.files) ? source.files : [];
+    const files: MaterialFile[] = this.dedupeFiles(rawFiles.map((file: any, index: number) => this.normalizeFile(file, index)));
+    const sourceType: MaterialSourceType = source?.sourceType === 'MANUAL' || (files.length > 0 && files.every((file) => file.fileType === 'MANUAL')) ? 'MANUAL' : 'FILE_UPLOAD';
+    const status: MaterialDraftStatus = source?.status === 'PUBLISHED' || source?.status === 'SUBMITTED' ? source.status : 'DRAFT';
     return { title, sourceType, status, files };
   }
 

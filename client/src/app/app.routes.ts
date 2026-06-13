@@ -17,6 +17,7 @@ import { HomeComponent } from './features/home/pages/home/home.component';
 import { ChangePasswordComponent } from './core/components/change-password/change-password.component';
 import { ProfileSettingsComponent } from './core/components/profile-settings/profile-settings.component';
 import { MembershipPlansComponent } from './core/components/membership-plans/membership-plans.component';
+import { UserPreferencesComponent } from './core/components/user-preferences/user-preferences.component';
 
 export const routes: Routes = [
   // use of this section is:
@@ -82,7 +83,8 @@ export const routes: Routes = [
       },
       { path: 'change-password', component: ChangePasswordComponent, canActivate: [authGuard] },
       { path: 'membership-plans', component: MembershipPlansComponent, canActivate: [authGuard] },
-      { path: 'profile-settings', component: ProfileSettingsComponent, canActivate: [authGuard] }
+      { path: 'profile-settings', component: ProfileSettingsComponent, canActivate: [authGuard] },
+      { path: 'user-preferences', component: UserPreferencesComponent, canActivate: [authGuard] }
     ]
   },
 

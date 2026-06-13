@@ -61,6 +61,7 @@ import { MaterialFile, MaterialItemStatus, MaterialSlide } from '../../../domain
                   [ngModel]="slide.status"
                   optionLabel="label"
                   optionValue="value"
+                  appendTo="body"
                   (ngModelChange)="setStatus(slide, $event)"
                 />
               </td>
@@ -79,11 +80,6 @@ import { MaterialFile, MaterialItemStatus, MaterialSlide } from '../../../domain
             </tr>
           </ng-template>
         </p-table>
-
-        <footer class="submit-box">
-          <p>Once submitted, this material will be available in the materials list. You can still edit the material after submission.</p>
-          <button pButton type="button" icon="pi pi-send" label="Submit Material" [disabled]="!canSubmit" (click)="submit.emit()"></button>
-        </footer>
       </section>
     </div>
   `,
@@ -91,9 +87,9 @@ import { MaterialFile, MaterialItemStatus, MaterialSlide } from '../../../domain
     .review-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 1rem; align-items: start; }
     .review-left, .review-right { border: 1px solid #e4e1f4; border-radius: 8px; background: #fff; }
     .review-left { padding: .75rem; display: grid; gap: .55rem; }
-    .panel-heading, .review-toolbar, .submit-box { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .panel-heading, .review-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
     .panel-heading h3, .review-toolbar h3 { margin: 0; color: #151936; }
-    .panel-heading span, .review-toolbar p, .source-item small, .submit-box p { margin: 0; color: #626783; }
+    .panel-heading span, .review-toolbar p, .source-item small { margin: 0; color: #626783; }
     .source-item { display: grid; grid-template-columns: 34px 1fr; gap: .25rem .65rem; text-align: left; border: 1px solid #ebe8f8; background: #fff; border-radius: 8px; padding: .75rem; cursor: pointer; color: #343957; }
     .source-item.active { border-color: #4d3ac8; background: #f7f5ff; box-shadow: inset 0 0 0 1px #4d3ac8; }
     .source-item span { grid-row: span 2; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px; background: #eef0f8; color: #4b526d; font-weight: 800; }
@@ -105,9 +101,8 @@ import { MaterialFile, MaterialItemStatus, MaterialSlide } from '../../../domain
     :host ::ng-deep .review-table td small { display: block; color: #626783; margin-top: .2rem; }
     .actions-column { width: 310px; }
     .row-actions { display: flex; gap: .45rem; flex-wrap: wrap; }
-    .submit-box { padding: 1rem; border-top: 1px solid #eeeaf9; }
     @media (max-width: 980px) { .review-layout { grid-template-columns: 1fr; } }
-    @media (max-width: 640px) { .panel-heading, .review-toolbar, .submit-box { align-items: flex-start; flex-direction: column; } }
+    @media (max-width: 640px) { .panel-heading, .review-toolbar { align-items: flex-start; flex-direction: column; } }
   `],
 })
 export class MaterialReviewStepComponent {

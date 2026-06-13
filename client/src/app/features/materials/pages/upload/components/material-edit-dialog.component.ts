@@ -37,7 +37,7 @@ import {
             <div class="slide-badge">{{ draft.order | number: '2.0-0' }}</div>
             <h3>{{ draft.title || 'Untitled slide' }}</h3>
             <p>{{ draft.blocks.length }} content block{{ draft.blocks.length === 1 ? '' : 's' }}</p>
-            <p-select [options]="statusOptions" [(ngModel)]="draft.status" optionLabel="label" optionValue="value" />
+            <p-select [options]="statusOptions" [(ngModel)]="draft.status" optionLabel="label" optionValue="value" appendTo="body" />
           </aside>
 
           <section class="edit-main">
@@ -55,7 +55,7 @@ import {
             <div class="block-add-row">
               <button pButton type="button" icon="pi pi-align-left" label="Add text" class="p-button-outlined" (click)="newBlockType = 'PARAGRAPH'; addBlock()"></button>
               <button pButton type="button" icon="pi pi-table" label="Add table" class="p-button-outlined" (click)="newBlockType = 'TABLE'; addBlock()"></button>
-              <p-select [options]="blockTypes" [(ngModel)]="newBlockType" optionLabel="label" optionValue="value" />
+              <p-select [options]="blockTypes" [(ngModel)]="newBlockType" optionLabel="label" optionValue="value" appendTo="body" />
               <button pButton type="button" icon="pi pi-plus" label="Add block" class="p-button-outlined" (click)="addBlock()"></button>
               <label class="image-upload">
                 <i class="pi pi-image"></i>
@@ -80,6 +80,7 @@ import {
                       [(ngModel)]="block.type"
                       optionLabel="label"
                       optionValue="value"
+                      appendTo="body"
                       (ngModelChange)="normalizeBlock(block)"
                     />
                     <button type="button" class="format-btn" (mousedown)="$event.preventDefault()" (click)="applyBoldToSelection()">Bold</button>
@@ -151,7 +152,6 @@ import {
     .edit-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
     label, .full-field { display: grid; gap: .4rem; color: #343957; font-weight: 700; }
     .full-field { margin-top: 1rem; }
-    input, textarea, p-select { width: 100%; }
     .block-add-row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
     .image-upload { display: inline-flex; align-items: center; gap: .45rem; min-height: 40px; border: 1px solid #d6d2f0; border-radius: 6px; padding: 0 .9rem; cursor: pointer; color: #4d3ac8; }
     .image-upload input { display: none; }

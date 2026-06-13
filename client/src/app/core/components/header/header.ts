@@ -156,6 +156,10 @@ export class HeaderComponent implements OnInit {
       title = 'Profile Settings';
       subtitle = 'Manage your account details and preferences';
       breadcrumbs = [{ label: 'Profile Settings', url: '/profile-settings' }];
+    } else if (url.includes('/user-preferences')) {
+      title = 'User Preferences';
+      subtitle = 'Manage notification channels and delivery controls';
+      breadcrumbs = [{ label: 'User Preferences', url: '/user-preferences' }];
     } else if (url.includes('/membership-plans')) {
       title = 'Membership Plans';
       subtitle = 'Choose your learning access and support level';
@@ -269,7 +273,7 @@ export class HeaderComponent implements OnInit {
   }
 
   userPreferences() {
-    this.router.navigate(['/profile-settings']);
+    this.router.navigate(['/user-preferences']);
   }
 
   isRouteActive(path: string): boolean {
