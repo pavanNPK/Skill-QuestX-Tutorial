@@ -2,7 +2,7 @@
 // Core service file. It provides app-wide API/state helpers shared by multiple features.
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, finalize, of, shareReplay } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -93,24 +93,45 @@ export class CourseContentService {
   private http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
   private readonly debugLogs = !environment.production && globalThis.localStorage?.getItem('debugCourseContentApi') === 'true';
+  private availableCache?: AvailableCourseContent[];
+  private availableCacheAt = 0;
+  private availableRequest$?: Observable<AvailableCourseContent[]>;
+  private readonly availableCacheMs = 15000;
+  private readonly contentRequests = new Map<string, Observable<CourseContent>>();
 
-  getAvailableCourses(): Observable<AvailableCourseContent[]> {
+  getAvailableCourses(force = false): Observable<AvailableCourseContent[]> {
     // use of this is:
     // Loads lightweight course material cards; MaterialsStore caches this result.
+    const now = Date.now();
+    if (!force && this.availableCache && now - this.availableCacheAt < this.availableCacheMs) {
+      return of(this.availableCache);
+    }
+    if (!force && this.availableRequest$) return this.availableRequest$;
+
     const url = `${this.apiUrl}/courses/content/available`;
     this.logRequest('GET', url);
-    return this.http.get<AvailableCourseContent[]>(url).pipe(
-      tap((courses) => this.logSuccess('GET', url, { courses: courses.length })),
+    this.availableRequest$ = this.http.get<AvailableCourseContent[]>(url).pipe(
+      tap((courses) => {
+        this.availableCache = courses;
+        this.availableCacheAt = Date.now();
+        this.logSuccess('GET', url, { courses: courses.length });
+      }),
       catchError((error) => this.logError<AvailableCourseContent[]>('GET', url, error)),
+      shareReplay({ bufferSize: 1, refCount: true }),
+      finalize(() => { this.availableRequest$ = undefined; }),
     );
+    return this.availableRequest$;
   }
 
   getContent(courseId: string): Observable<CourseContent> {
     // use of this is:
     // Loads full draft/published content for one course.
+    const existingRequest = this.contentRequests.get(courseId);
+    if (existingRequest) return existingRequest;
+
     const url = `${this.apiUrl}/courses/${courseId}/content`;
     this.logRequest('GET', url);
-    return this.http.get<CourseContent>(url).pipe(
+    const request$ = this.http.get<CourseContent>(url).pipe(
       tap((content) => this.logSuccess('GET', url, {
         courseId: content.courseId,
         status: content.status,
@@ -118,7 +139,11 @@ export class CourseContentService {
         modules: content.modules.length,
       })),
       catchError((error) => this.logError<CourseContent>('GET', url, error)),
+      shareReplay({ bufferSize: 1, refCount: true }),
+      finalize(() => { this.contentRequests.delete(courseId); }),
     );
+    this.contentRequests.set(courseId, request$);
+    return request$;
   }
 
   importContent(courseId: string, payload: unknown): Observable<CourseContent> {
@@ -127,7 +152,10 @@ export class CourseContentService {
     const url = `${this.apiUrl}/courses/${courseId}/content/import`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, payload).pipe(
-      tap((content) => this.logSuccess('POST', url, { courseId: content.courseId, status: content.status })),
+      tap((content) => {
+        this.clearAvailableCache();
+        this.logSuccess('POST', url, { courseId: content.courseId, status: content.status });
+      }),
       catchError((error) => this.logError<CourseContent>('POST', url, error)),
     );
   }
@@ -140,7 +168,10 @@ export class CourseContentService {
     const url = `${this.apiUrl}/courses/${courseId}/content/import-workbook`;
     this.logRequest('POST', url, { fileName: file.name, fileType: file.type, fileSize: file.size });
     return this.http.post<CourseContent>(url, formData).pipe(
-      tap((content) => this.logSuccess('POST', url, { courseId: content.courseId, modules: content.modules.length })),
+      tap((content) => {
+        this.clearAvailableCache();
+        this.logSuccess('POST', url, { courseId: content.courseId, modules: content.modules.length });
+      }),
       catchError((error) => this.logError<CourseContent>('POST', url, error)),
     );
   }
@@ -151,7 +182,10 @@ export class CourseContentService {
     const url = `${this.apiUrl}/courses/${courseId}/content`;
     this.logRequest('PATCH', url);
     return this.http.patch<CourseContent>(url, payload).pipe(
-      tap((content) => this.logSuccess('PATCH', url, { courseId: content.courseId, status: content.status })),
+      tap((content) => {
+        this.clearAvailableCache();
+        this.logSuccess('PATCH', url, { courseId: content.courseId, status: content.status });
+      }),
       catchError((error) => this.logError<CourseContent>('PATCH', url, error)),
     );
   }
@@ -162,7 +196,10 @@ export class CourseContentService {
     const url = `${this.apiUrl}/courses/${courseId}/content/publish`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, {}).pipe(
-      tap((content) => this.logSuccess('POST', url, { courseId: content.courseId, status: content.status })),
+      tap((content) => {
+        this.clearAvailableCache();
+        this.logSuccess('POST', url, { courseId: content.courseId, status: content.status });
+      }),
       catchError((error) => this.logError<CourseContent>('POST', url, error)),
     );
   }
@@ -173,7 +210,10 @@ export class CourseContentService {
     const url = `${this.apiUrl}/courses/${courseId}/content/unpublish`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, {}).pipe(
-      tap((content) => this.logSuccess('POST', url, { courseId: content.courseId, status: content.status })),
+      tap((content) => {
+        this.clearAvailableCache();
+        this.logSuccess('POST', url, { courseId: content.courseId, status: content.status });
+      }),
       catchError((error) => this.logError<CourseContent>('POST', url, error)),
     );
   }
@@ -197,6 +237,11 @@ export class CourseContentService {
     if (!url) return '';
     if (/^https?:\/\//.test(url)) return url;
     return `${this.apiUrl.replace(/\/api$/, '')}${url}`;
+  }
+
+  private clearAvailableCache(): void {
+    this.availableCache = undefined;
+    this.availableCacheAt = 0;
   }
 
   private logRequest(method: string, url: string, details?: unknown): void {

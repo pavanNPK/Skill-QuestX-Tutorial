@@ -63,15 +63,21 @@ export const MaterialsStore = signalStore(
     // Single loading flag for templates that should show a loader during list or detail API calls.
     loading: computed(() => store.loadingCourses() || store.loadingContent()),
   })),
-  withMethods((store, contentService = inject(CourseContentService)) => ({
+  withMethods((store, contentService = inject(CourseContentService)) => {
+    let availableCoursesRequest: Promise<AvailableCourseContent[]> | null = null;
+    const contentRequests = new Map<string, Promise<CourseContent>>();
+
+    return ({
     // use of this is:
     // Loads available material courses once and reuses them on future visits unless force is true.
     async loadAvailableCourses(force = false): Promise<AvailableCourseContent[]> {
       if (store.loadedCourses() && !force) return store.courses();
+      if (availableCoursesRequest && !force) return availableCoursesRequest;
 
       patchState(store, { loadingCourses: true, error: '' });
-      try {
-        const courses = await firstValueFrom(contentService.getAvailableCourses());
+      availableCoursesRequest = (async () => {
+        try {
+        const courses = await firstValueFrom(contentService.getAvailableCourses(force));
         const safeCourses = Array.isArray(courses) ? courses : [];
         patchState(store, {
           courses: safeCourses,
@@ -86,6 +92,14 @@ export const MaterialsStore = signalStore(
           error: 'Could not load materials.',
         });
         throw error;
+        } finally {
+          availableCoursesRequest = null;
+        }
+      })();
+      try {
+        return await availableCoursesRequest;
+      } catch (error) {
+        throw error;
       }
     },
 
@@ -96,9 +110,12 @@ export const MaterialsStore = signalStore(
 
       const cached = store.contentByCourseId()[courseId];
       if (cached && !force) return cached;
+      const existingRequest = contentRequests.get(courseId);
+      if (existingRequest && !force) return existingRequest;
 
       patchState(store, { loadingContent: true });
-      try {
+      const request = (async () => {
+        try {
         const content = await firstValueFrom(contentService.getContent(courseId));
         patchState(store, {
           contentByCourseId: {
@@ -113,6 +130,15 @@ export const MaterialsStore = signalStore(
           loadingContent: false,
           error: 'Content is not published or you are not enrolled in this course.',
         });
+        throw error;
+        } finally {
+          contentRequests.delete(courseId);
+        }
+      })();
+      contentRequests.set(courseId, request);
+      try {
+        return await request;
+      } catch (error) {
         throw error;
       }
     },
@@ -144,5 +170,6 @@ export const MaterialsStore = signalStore(
     resetCache(): void {
       patchState(store, initialState);
     },
-  })),
+    });
+  }),
 );

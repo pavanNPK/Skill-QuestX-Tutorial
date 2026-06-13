@@ -32,9 +32,11 @@ export class NotificationController {
   async list(request: FastifyRequest) {
     // Auth middleware attaches the user id after validating the JWT.
     const userId = (request as AuthenticatedRequest).user.id;
-    // Fetch list and count separately because the UI needs both notification rows and badge count.
-    const list = await services.notificationService.findByUserId(userId);
-    const unreadCount = await services.notificationService.countUnreadByUserId(userId);
+    // Fetch list and count in parallel because the UI needs both notification rows and badge count.
+    const [list, unreadCount] = await Promise.all([
+      services.notificationService.findByUserId(userId, 20),
+      services.notificationService.countUnreadByUserId(userId),
+    ]);
     // Map Mongo documents to stable JSON so clients do not depend on Mongoose internals.
     return {
       notifications: list.map((n: any) => ({

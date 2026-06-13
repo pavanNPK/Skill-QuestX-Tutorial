@@ -11,7 +11,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { provideRouter } from '@angular/router';
-import { lastValueFrom } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
 import { routes } from './app.routes';
@@ -28,10 +27,12 @@ function initAuth(auth: AuthService, pushReg: PushRegistrationService): () => Pr
   return () => {
     // No token means anonymous startup, so skip the /me API call.
     if (!auth.getToken()) return Promise.resolve();
-    // getMe refreshes local session state; push registration is best-effort after auth succeeds.
-    return lastValueFrom(auth.getMe())
-      .then(() => { pushReg.register(); })
-      .catch(() => {});
+    // Refresh session in the background so a slow /me request never blocks first paint.
+    auth.getMe().subscribe({
+      next: () => { void pushReg.register(); },
+      error: () => {},
+    });
+    return Promise.resolve();
   };
 }
 

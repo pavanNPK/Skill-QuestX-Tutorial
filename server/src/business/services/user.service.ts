@@ -19,6 +19,23 @@ export interface CreateUserDto {
   skills?: string[];
 }
 
+export interface AuthLookupUser {
+  _id: Types.ObjectId;
+  email: string;
+  firstName: string;
+  lastName: string;
+  displayName?: string | null;
+  role?: string;
+  isActive?: boolean;
+  profileImageUrl?: string | null;
+  coverImageUrl?: string | null;
+  phoneNumber?: string | null;
+  dateOfBirth?: string | null;
+  nationality?: string | null;
+  address?: string | null;
+  canManageUsers?: boolean;
+}
+
 export class UserService {
   // use of this is:
   // Safe field projection prevents passwordHash, OTP, and invite tokens from being returned in list APIs.
@@ -34,6 +51,14 @@ export class UserService {
   // Finds one user by Mongo id for authenticated user loading and relation lookups.
   async findById(id: string): Promise<UserDocument | null> {
     return UserModel.findById(id).exec();
+  }
+
+  async findAuthById(id: string): Promise<AuthLookupUser | null> {
+    if (!Types.ObjectId.isValid(id)) return null;
+    return UserModel.findById(id)
+      .select('email firstName lastName displayName role isActive profileImageUrl coverImageUrl phoneNumber dateOfBirth nationality address canManageUsers')
+      .lean()
+      .exec() as Promise<AuthLookupUser | null>;
   }
 
   // use of this is:

@@ -3,7 +3,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, finalize, map, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthStore } from '../auth/auth.store';
 
@@ -152,6 +152,7 @@ export class AuthService {
   private readonly apiUrl = environment.apiUrl;
   private readonly tokenKey = 'auth_token';
   private readonly userKey = 'auth_user';
+  private meRequest$?: Observable<AuthUser>;
 
   readonly currentUser = signal<AuthUser | null>(this.getStoredUser());
 
@@ -382,14 +383,19 @@ export class AuthService {
   getMe(): Observable<AuthUser> {
     // use of this is:
     // Validates token on app startup and refreshes the current user from backend.
-    return this.http.get<{ user: AuthUser }>(`${this.apiUrl}/auth/me`).pipe(
+    if (this.meRequest$) return this.meRequest$;
+
+    this.meRequest$ = this.http.get<{ user: AuthUser }>(`${this.apiUrl}/auth/me`).pipe(
       tap((res) => {
         this.currentUser.set(res.user);
         localStorage.setItem(this.userKey, JSON.stringify(res.user));
         this.authStore.setUser(res.user);
       }),
-      map((res) => res.user)
+      map((res) => res.user),
+      shareReplay({ bufferSize: 1, refCount: true }),
+      finalize(() => { this.meRequest$ = undefined; }),
     );
+    return this.meRequest$;
   }
 
   /** Upload resume file and get URL. Public endpoint (for registration). */

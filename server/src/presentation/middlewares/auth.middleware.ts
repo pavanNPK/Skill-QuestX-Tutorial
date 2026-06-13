@@ -32,7 +32,7 @@ const authPlugin: FastifyPluginAsync = async (app) => {
     // jwt.verify checks signature and expiry using the configured JWT secret.
     const payload = jwt.verify(token, env.jwtSecret) as JwtPayload;
     // Load user from MongoDB so disabled/deleted accounts cannot keep using old tokens.
-    const user = await services.userService.findById(payload.sub);
+    const user = await services.userService.findAuthById(payload.sub);
 
     if (!user) throw unauthorized('Unauthorized');
     if (user.isActive === false) {

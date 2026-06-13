@@ -59,6 +59,7 @@ export class NotificationService {
   // Returns latest notifications for the user's notification drawer.
   async findByUserId(userId: string, limit = 50): Promise<NotificationDocument[]> {
     const list = await NotificationModel.find({ userId: new Types.ObjectId(userId) })
+      .select('title message type link metadata read createdAt')
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean()

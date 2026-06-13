@@ -17,12 +17,12 @@ export class PushRegistrationService {
     // use of this is:
     // Registers service worker, requests permission, subscribes browser, and saves subscription.
     if (!this.supported()) return;
+    // Do not prompt or run push setup during every refresh. Preferences can ask for permission explicitly.
+    if (Notification.permission !== 'granted') return;
     try {
       const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       const key = await this.getVapidPublicKey();
       if (!key) return;
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') return;
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: this.urlBase64ToUint8Array(key) as BufferSource,
