@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class TextToSpeechService {
+  readonly speaking = signal(false);
+
   private readonly synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
   private voices: SpeechSynthesisVoice[] = [];
   private utterance?: SpeechSynthesisUtterance;
@@ -32,6 +34,8 @@ export class TextToSpeechService {
 
     const token = ++this.playbackToken;
     this.queue = this.splitIntoSpeechChunks(content);
+    if (!this.queue.length) return;
+    this.speaking.set(true);
     this.speakNext(token);
   }
 
@@ -47,15 +51,20 @@ export class TextToSpeechService {
     this.playbackToken++;
     this.queue = [];
     this.utterance = undefined;
+    this.speaking.set(false);
     this.synth?.cancel();
   }
 
   private speakNext(token: number): void {
-    if (!this.synth || token !== this.playbackToken) return;
+    if (!this.synth || token !== this.playbackToken) {
+      this.speaking.set(false);
+      return;
+    }
 
     const text = this.queue.shift();
     if (!text) {
       this.utterance = undefined;
+      this.speaking.set(false);
       return;
     }
 

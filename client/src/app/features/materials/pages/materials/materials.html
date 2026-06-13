@@ -81,9 +81,14 @@
                             <td>{{ formatMaterialDate(selectedContent.updatedAt) }}</td>
                             <td>
                                 <div class="table-actions">
+                                    @if (tts.speaking() && activeReadModuleId === module.id) {
+                                    <button pButton type="button" icon="pi pi-stop-circle" class="p-button-text p-button-danger"
+                                        (click)="stopReading()" aria-label="Stop reading module"></button>
+                                    } @else {
                                     <button pButton type="button" icon="pi pi-volume-up" class="p-button-text"
                                         [disabled]="module.lessons.length === 0" (click)="listenToModule(module)"
                                         aria-label="Read module"></button>
+                                    }
                                     <button pButton type="button" icon="pi pi-eye" class="p-button-text"
                                         [disabled]="module.lessons.length === 0" (click)="openIndex(module)"
                                         aria-label="View module"></button>
@@ -409,6 +414,10 @@
                 <div class="slide-page-meta">
                     <button pButton type="button" icon="pi pi-volume-up" label="Read" class="pager-btn"
                         (click)="listenToCurrentSlide()"></button>
+                    @if (tts.speaking()) {
+                    <button pButton type="button" icon="pi pi-stop-circle" label="Stop" class="pager-btn stop-read-btn"
+                        (click)="stopReading()"></button>
+                    }
                     <button pButton type="button" icon="pi pi-chevron-left" label="Prev" class="pager-btn"
                         [disabled]="currentLessonIndex === 0" (click)="previousSlide()"></button>
                     <button pButton type="button" icon="pi pi-chevron-right" iconPos="right" label="Next" class="pager-btn"
@@ -554,6 +563,11 @@
                 </aside>
                 }
             </div>
+
+            <footer class="slide-page-footer">
+                <span>You can directly email us at info&#64;skillquestx.com</span>
+                <span>&copy; 2026 SkillQuestX. All rights reserved.</span>
+            </footer>
         </article>
         } @else {
         <div class="empty-state">Content for this index will be added soon.</div>

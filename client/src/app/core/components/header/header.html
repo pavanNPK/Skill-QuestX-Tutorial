@@ -78,7 +78,8 @@
 <p-popover #profileMenu [dismissable]="true" styleClass="profile-popover header-profile-popover">
     <div class="profile-menu">
         <div class="profile-card-cover">
-            <img src="/assets/images/banner.jpg" alt="Profile cover" />
+            <img [src]="auth.currentUser()?.coverImageUrl ? (auth.currentUser()?.coverImageUrl | safeUrl) : '/assets/images/banner.jpg'"
+                alt="Profile cover" />
         </div>
 
         <div class="profile-card-body">

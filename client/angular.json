@@ -124,6 +124,14 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "prebundle": {
+              "exclude": [
+                "primeng",
+                "@primeng/themes"
+              ]
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "skill-questx-tutorial:build:production"

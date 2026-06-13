@@ -1192,20 +1192,41 @@
 }
 
 .slide-page {
-    background: #FFFFFF;
+    background:
+        linear-gradient(180deg, #5B4BC4 0 100%) left top / 72px 100% no-repeat,
+        linear-gradient(115deg, rgba(91, 75, 196, 0.06), transparent 30%) 72px 90px / calc(100% - 72px) calc(100% - 90px) no-repeat,
+        radial-gradient(circle at 92% 12%, rgba(59, 130, 246, 0.09), transparent 230px) 72px 90px / calc(100% - 72px) calc(100% - 90px) no-repeat,
+        radial-gradient(circle at 15% 86%, rgba(91, 75, 196, 0.08), transparent 260px) 72px 90px / calc(100% - 72px) calc(100% - 90px) no-repeat,
+        repeating-linear-gradient(135deg, rgba(91, 75, 196, 0.055) 0 1px, transparent 1px 18px) 72px 90px / calc(100% - 72px) calc(100% - 90px) no-repeat,
+        repeating-linear-gradient(90deg, rgba(59, 130, 246, 0.035) 0 1px, transparent 1px 26px) 72px 90px / calc(100% - 72px) calc(100% - 90px) no-repeat,
+        #FFFFFF;
     border: 1px solid #D9D6F0;
     border-radius: 10px;
     min-height: 680px;
     padding: 0;
     box-shadow: 0 18px 42px rgba(17, 24, 39, 0.12);
     overflow: hidden;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+
+    &::after {
+        content: '';
+        position: absolute;
+        pointer-events: none;
+        z-index: 0;
+        right: clamp(2rem, 8vw, 8rem);
+        bottom: 82px;
+        width: min(36vw, 460px);
+        aspect-ratio: 4 / 1;
+        background: url('/core/logo.svg') center / contain no-repeat;
+        opacity: 0.035;
+    }
 }
 
 .slide-page-header {
-    background:
-        linear-gradient(90deg, #5B4BC4 0 72px, transparent 72px),
-        linear-gradient(180deg, #F4F6FB 0 100%),
-        #FFFFFF;
+    background: linear-gradient(90deg, transparent 0 72px, #F4F6FB 72px 100%);
     background-clip: padding-box;
     border-bottom: 1px solid #E9E7F5;
     padding: 1.25rem 2rem 0.9rem 7rem;
@@ -1215,6 +1236,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    position: relative;
+    z-index: 1;
 
     > div:first-child {
         min-width: 0;
@@ -1235,6 +1258,16 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+
+    .stop-read-btn {
+        background: #EF4444;
+        border-color: #EF4444;
+
+        &:enabled:hover {
+            background: #DC2626;
+            border-color: #DC2626;
+        }
+    }
 }
 
 .slide-count-inline {
@@ -1251,10 +1284,30 @@
     gap: 1.25rem;
     align-items: start;
     padding: 1.5rem 2.25rem 2.25rem 7rem;
+    position: relative;
+    z-index: 1;
+    min-height: 0;
 
     &.has-files {
         grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
     }
+}
+
+.slide-page-footer {
+    border-top: 1px solid #E9E7F5;
+    background: linear-gradient(90deg, transparent 0 72px, rgba(255, 255, 255, 0.78) 72px 100%);
+    color: #6B7280;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.25rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 2rem 0.8rem 7rem;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
 }
 
 .slide-blocks {
@@ -1665,6 +1718,16 @@
 
     .slide-page {
         min-height: 560px;
+
+        &::before {
+            inset: 120px 0 50px 0;
+        }
+
+        &::after {
+            right: 1rem;
+            bottom: 68px;
+            width: min(58vw, 300px);
+        }
     }
 
     .slide-page-header {
@@ -1691,6 +1754,11 @@
     .slide-reader-grid {
         grid-template-columns: 1fr;
         padding: 1.25rem;
+    }
+
+    .slide-page-footer {
+        padding: 0.75rem 1.25rem;
+        justify-content: flex-start;
     }
 
     .slide-files-panel {

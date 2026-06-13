@@ -95,6 +95,7 @@ export class Materials extends BaseComponent implements OnInit {
   previewZoom = 1;
   private previousBodyOverflow = '';
   activeFileIndex = 0;
+  activeReadModuleId = '';
   newBlockType: ContentBlockType = 'paragraph';
   readonly editableBlockTypes: BlockTypeOption[] = [
     { label: 'Heading', value: 'heading' },
@@ -105,7 +106,7 @@ export class Materials extends BaseComponent implements OnInit {
     { label: 'Table', value: 'table' },
   ];
   private readonly materialsStore = inject(MaterialsStore);
-  private readonly tts = inject(TextToSpeechService);
+  readonly tts = inject(TextToSpeechService);
 
   get visibleCourses(): AvailableCourseContent[] {
     return Array.isArray(this.enrolledCourses) ? this.enrolledCourses : [];
@@ -132,6 +133,16 @@ export class Materials extends BaseComponent implements OnInit {
     return this.indexModules.reduce((total, module) => total + module.lessons.length, 0);
   }
 
+  get publishedSlideCount(): number {
+    if (!this.selectedContent || this.selectedContent.status !== 'published') return 0;
+    return this.totalCourseSlides;
+  }
+
+  get availablePublishedVersionCount(): number {
+    if (!this.selectedContent?.publishedAt && this.selectedContent?.status !== 'published') return 0;
+    return this.totalCourseSlides;
+  }
+
   get pagedIndexModules(): ContentModule[] {
     return this.indexModules.slice(this.modulePage, this.modulePage + this.moduleRows);
   }
@@ -139,7 +150,7 @@ export class Materials extends BaseComponent implements OnInit {
   get contentReviewLabel(): string {
     if (!this.selectedContent) return 'Not loaded';
     if (!this.indexModules.length) return 'Waiting';
-    if (this.selectedContent.status === 'published') return 'Published';
+    if (this.selectedContent.status === 'published') return `${this.publishedSlideCount} published`;
     return 'Draft';
   }
 
@@ -151,7 +162,7 @@ export class Materials extends BaseComponent implements OnInit {
   }
 
   get publishedVersionLabel(): string {
-    return this.selectedContent?.publishedAt ? 'Available' : 'Not ready';
+    return this.availablePublishedVersionCount ? `${this.availablePublishedVersionCount} available` : 'Not ready';
   }
 
   get publishedVersionMeta(): string {
@@ -984,6 +995,7 @@ export class Materials extends BaseComponent implements OnInit {
 
   listenToCurrentSlide() {
     if (!this.currentLesson) return;
+    this.activeReadModuleId = '';
     this.tts.speak([
       this.currentLesson.title,
       this.currentLesson.summary,
@@ -992,6 +1004,7 @@ export class Materials extends BaseComponent implements OnInit {
   }
 
   listenToModule(module: ContentModule) {
+    this.activeReadModuleId = module.id;
     this.tts.speak(module.lessons
       .map((lesson, index) => [
         `Slide ${index + 1}. ${lesson.title}`,
@@ -1000,6 +1013,11 @@ export class Materials extends BaseComponent implements OnInit {
       ].filter(Boolean).join('\n\n'))
       .filter(Boolean)
       .join('\n\n'));
+  }
+
+  stopReading() {
+    this.activeReadModuleId = '';
+    this.tts.stop();
   }
 
   setBlockItemsText(block: ContentBlock, value: string) {
