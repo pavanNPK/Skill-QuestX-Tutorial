@@ -5,6 +5,7 @@ import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
 
 import { env } from '../../core/config/env';
 import { services } from '../../business/services';
+import { appCache } from '../../core/cache/app-cache';
 import { forbidden, unauthorized } from '../../core/utils/http-error';
 
 interface JwtPayload {
@@ -31,8 +32,9 @@ const authPlugin: FastifyPluginAsync = async (app) => {
 
     // jwt.verify checks signature and expiry using the configured JWT secret.
     const payload = jwt.verify(token, env.jwtSecret) as JwtPayload;
-    // Load user from MongoDB so disabled/deleted accounts cannot keep using old tokens.
-    const user = await services.userService.findAuthById(payload.sub);
+    // Load user from a short cache so repeated protected API calls do not all hit MongoDB.
+    // TTL stays low so profile/status changes propagate quickly after mutation invalidation.
+    const user = await appCache.getOrSet(`auth:user:${payload.sub}`, 15000, () => services.userService.findAuthById(payload.sub));
 
     if (!user) throw unauthorized('Unauthorized');
     if (user.isActive === false) {

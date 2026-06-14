@@ -72,6 +72,24 @@ export async function buildApp(): Promise<FastifyInstance> {
   });
 
   // use of this is:
+  // Track slow APIs at the HTTP boundary. The product target is under 2s, with 4s as the hard warning line.
+  app.addHook('onRequest', async (request) => {
+    (request as any).requestStartedAt = Date.now();
+  });
+
+  app.addHook('onResponse', async (request, reply) => {
+    const startedAt = Number((request as any).requestStartedAt) || Date.now();
+    const elapsedMs = Date.now() - startedAt;
+    if (elapsedMs >= 4000) {
+      request.log.warn({ method: request.method, url: request.url, statusCode: reply.statusCode, elapsedMs }, 'API exceeded 4s target');
+      return;
+    }
+    if (elapsedMs >= 2000) {
+      request.log.info({ method: request.method, url: request.url, statusCode: reply.statusCode, elapsedMs }, 'API exceeded 2s target');
+    }
+  });
+
+  // use of this is:
   // Register cross-cutting plugins before routes so routes can use their decorators and protections.
   // Security plugins register before routes so every route inherits the same boundary rules.
   await app.register(securityPluginRegistration);

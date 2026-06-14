@@ -7,6 +7,7 @@ import { services } from '../../business/services';
 import { badRequest } from '../../core/utils/http-error';
 import type { AuthenticatedRequest } from '../../core/types/fastify-auth';
 import { fileToBuffer, requireMultipartFile, saveMultipartFile } from '../../core/utils/upload';
+import { appCache } from '../../core/cache/app-cache';
 
 const uploadsDir = join(process.cwd(), 'uploads', 'content');
 if (!existsSync(uploadsDir)) mkdirSync(uploadsDir, { recursive: true });
@@ -15,7 +16,12 @@ export class CourseContentController {
   /** Returns the course-content cards the authenticated user is allowed to see. */
   async getAvailableCourses(request: FastifyRequest) {
     // request.user is available because the route preHandler ran app.authenticate first.
-    return services.courseContentService.getAvailableCourses((request as AuthenticatedRequest).user);
+    const user = (request as AuthenticatedRequest).user;
+    return appCache.getOrSet(
+      `course-content:available:${user.id}:${user.role}`,
+      15000,
+      () => services.courseContentService.getAvailableCourses(user),
+    );
   }
 
   /** Loads either draft or published content depending on the authenticated user's role. */
@@ -23,7 +29,12 @@ export class CourseContentController {
     // Fastify stores route params on request.params; schema validation already checked shape.
     const params = request.params as { courseId: string };
     // The service decides whether this user gets draft content or published content.
-    return services.courseContentService.getContent(params.courseId, (request as AuthenticatedRequest).user);
+    const user = (request as AuthenticatedRequest).user;
+    return appCache.getOrSet(
+      `course-content:content:${params.courseId}:${user.id}:${user.role}`,
+      10000,
+      () => services.courseContentService.getContent(params.courseId, user),
+    );
   }
 
   /** Saves editor/imported JSON as the course draft; publish status is handled in the service. */
@@ -32,7 +43,9 @@ export class CourseContentController {
     const params = request.params as { courseId: string };
     // request.body is the client JSON payload; DTO schema rejects invalid/non-object bodies before this.
     // request.user is the sanitized JWT user created by auth middleware.
-    return services.courseContentService.saveDraft(params.courseId, request.body, (request as AuthenticatedRequest).user);
+    const result = await services.courseContentService.saveDraft(params.courseId, request.body, (request as AuthenticatedRequest).user);
+    await this.invalidateContentCache(params.courseId);
+    return result;
   }
 
   /** Reads an uploaded workbook into memory because the parser needs the full XLSX buffer. */
@@ -42,7 +55,9 @@ export class CourseContentController {
     const part = await requireMultipartFile(await request.file(), 'No workbook uploaded');
     // Convert XLSX upload into a buffer so CourseContentService can parse workbook XML.
     const file = await fileToBuffer(part, 10 * 1024 * 1024, /\.xlsx$/i);
-    return services.courseContentService.importWorkbookDraft(params.courseId, file, (request as AuthenticatedRequest).user);
+    const result = await services.courseContentService.importWorkbookDraft(params.courseId, file, (request as AuthenticatedRequest).user);
+    await this.invalidateContentCache(params.courseId);
+    return result;
   }
 
   /** Streams a content asset to disk and then stores its metadata in MongoDB. */
@@ -55,21 +70,34 @@ export class CourseContentController {
     const file = await saveMultipartFile(part, courseDir, 'content', 100 * 1024 * 1024);
     if (!file.filename) throw badRequest('No file uploaded');
     // Service persists metadata and verifies manage permission.
-    return services.courseContentService.saveAsset(params.courseId, file, (request as AuthenticatedRequest).user);
+    const result = await services.courseContentService.saveAsset(params.courseId, file, (request as AuthenticatedRequest).user);
+    await this.invalidateContentCache(params.courseId);
+    return result;
   }
 
   /** Copies the current draft snapshot into the published snapshot. */
   async publish(request: FastifyRequest) {
     const params = request.params as { courseId: string };
     // Service checks manager permissions and updates publish fields.
-    return services.courseContentService.publish(params.courseId, (request as AuthenticatedRequest).user);
+    const result = await services.courseContentService.publish(params.courseId, (request as AuthenticatedRequest).user);
+    await this.invalidateContentCache(params.courseId);
+    return result;
   }
 
   /** Marks published content unavailable while keeping the draft editable. */
   async unpublish(request: FastifyRequest) {
     const params = request.params as { courseId: string };
     // Service keeps draft data but changes status to unpublished.
-    return services.courseContentService.unpublish(params.courseId, (request as AuthenticatedRequest).user);
+    const result = await services.courseContentService.unpublish(params.courseId, (request as AuthenticatedRequest).user);
+    await this.invalidateContentCache(params.courseId);
+    return result;
+  }
+
+  private async invalidateContentCache(courseId: string): Promise<void> {
+    await Promise.all([
+      appCache.deleteByPrefix('course-content:available:'),
+      appCache.deleteByPrefix(`course-content:content:${courseId}:`),
+    ]);
   }
 }
 

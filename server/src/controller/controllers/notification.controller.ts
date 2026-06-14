@@ -3,6 +3,21 @@ import type { FastifyRequest } from 'fastify';
 
 import { services } from '../../business/services';
 import type { AuthenticatedRequest } from '../../core/types/fastify-auth';
+import { appCache } from '../../core/cache/app-cache';
+
+interface NotificationListResponse {
+  notifications: Array<{
+    id: string;
+    title: string;
+    message: string;
+    type: string;
+    link: string | null;
+    metadata: Record<string, unknown> | null;
+    read: boolean;
+    createdAt: Date | undefined;
+  }>;
+  unreadCount: number;
+}
 
 export class NotificationController {
   // use of this is:
@@ -32,13 +47,16 @@ export class NotificationController {
   async list(request: FastifyRequest) {
     // Auth middleware attaches the user id after validating the JWT.
     const userId = (request as AuthenticatedRequest).user.id;
+    const cacheKey = `notifications:list:${userId}`;
+    const cached = await appCache.get<NotificationListResponse>(cacheKey);
+    if (cached) return cached;
     // Fetch list and count in parallel because the UI needs both notification rows and badge count.
     const [list, unreadCount] = await Promise.all([
       services.notificationService.findByUserId(userId, 20),
       services.notificationService.countUnreadByUserId(userId),
     ]);
     // Map Mongo documents to stable JSON so clients do not depend on Mongoose internals.
-    return {
+    const response: NotificationListResponse = {
       notifications: list.map((n: any) => ({
         id: n._id.toString(),
         title: n.title,
@@ -51,13 +69,17 @@ export class NotificationController {
       })),
       unreadCount,
     };
+    return appCache.set(cacheKey, response, 10000);
   }
 
   // use of this is:
   // Marks every notification for the logged-in user as read.
   async markAllAsRead(request: FastifyRequest) {
     // Service scopes the update by user id, so another user's notifications cannot be changed.
-    return { marked: await services.notificationService.markAllAsRead((request as AuthenticatedRequest).user.id) };
+    const userId = (request as AuthenticatedRequest).user.id;
+    const result = { marked: await services.notificationService.markAllAsRead(userId) };
+    await appCache.delete(`notifications:list:${userId}`);
+    return result;
   }
 
   // use of this is:
@@ -65,7 +87,10 @@ export class NotificationController {
   async markAsRead(request: FastifyRequest) {
     // params.id comes from /:id/read and is validated by idParamsSchema.
     const params = request.params as { id: string };
-    return { updated: await services.notificationService.markAsRead(params.id, (request as AuthenticatedRequest).user.id) };
+    const userId = (request as AuthenticatedRequest).user.id;
+    const result = { updated: await services.notificationService.markAsRead(params.id, userId) };
+    await appCache.delete(`notifications:list:${userId}`);
+    return result;
   }
 }
 

@@ -5,8 +5,11 @@ import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PasswordModule } from 'primeng/password';
 import { AuthService } from '../../services/auth.service';
 import { getFriendlyErrorMessage } from '../../../shared/utils/error-messages.util';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
@@ -18,8 +21,11 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
     ReactiveFormsModule,
     RouterLink,
     ButtonModule,
+    FloatLabelModule,
+    IconFieldModule,
+    InputIconModule,
     InputTextModule,
-    ProgressSpinnerModule,
+    PasswordModule,
 ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',

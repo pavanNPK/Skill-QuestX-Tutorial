@@ -38,11 +38,20 @@
 
     <div class="flex flex-column gap-3">
       <div class="flex flex-column gap-1">
-        <label class="field-label" for="login-email">Email Id</label>
-        <span class="input-shell">
-          <i class="pi pi-envelope"></i>
-          <input id="login-email" pInputText type="email" formControlName="email" autocomplete="email" />
-        </span>
+        <p-floatlabel variant="on" class="w-full">
+          <p-iconfield class="w-full">
+            <p-inputicon class="pi pi-envelope"></p-inputicon>
+            <input
+              id="login-email"
+              pInputText
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              class="w-full"
+            />
+          </p-iconfield>
+          <label for="login-email">Email Id</label>
+        </p-floatlabel>
         @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
           <small class="form-error">
             Enter a valid email address.
@@ -51,25 +60,21 @@
       </div>
 
       <div class="flex flex-column gap-1">
-        <label class="field-label" for="login-password">Password</label>
-        <span class="input-shell">
-          <i class="pi pi-lock"></i>
-          <input
-            id="login-password"
-            pInputText
-            [type]="hidePassword() ? 'password' : 'text'"
-            formControlName="password"
-            autocomplete="current-password"
-          />
-          <button
-            class="input-icon-button"
-            type="button"
-            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
-            (click)="hidePassword.set(!hidePassword())"
-          >
-            <i [class]="hidePassword() ? 'pi pi-eye' : 'pi pi-eye-slash'"></i>
-          </button>
-        </span>
+        <p-floatlabel variant="on" class="w-full">
+          <p-iconfield class="w-full">
+            <p-inputicon class="pi pi-lock"></p-inputicon>
+            <p-password
+              inputId="login-password"
+              [toggleMask]="true"
+              [feedback]="false"
+              formControlName="password"
+              autocomplete="current-password"
+              inputStyleClass="w-full"
+              class="w-full"
+            ></p-password>
+          </p-iconfield>
+          <label for="login-password">Password</label>
+        </p-floatlabel>
         @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
           <small class="form-error">
             Password must be at least 6 characters.
@@ -88,13 +93,10 @@
     <button
       pButton
       type="submit"
+      label="Login"
       class="login-button w-full"
+      [loading]="submitting()"
       [disabled]="loginForm.invalid || submitting()"
-    >
-      @if (submitting()) {
-        <p-progress-spinner strokeWidth="6" ariaLabel="Logging in" />
-      }
-      <span>Login</span>
-    </button>
+    ></button>
   </form>
 </section>

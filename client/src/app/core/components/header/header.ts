@@ -1,6 +1,6 @@
 // use of this file is:
 // Core component file. It renders app-wide UI used across routes.
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, inject } from '@angular/core';
 
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
@@ -12,25 +12,17 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PopoverModule } from 'primeng/popover';
 import { HeaderService, BreadcrumbItem } from '../../services/header.service';
-import { NotificationService, AppNotification as ApiNotification } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
-
-export interface AppNotification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-  link?: string | null;
-}
+import { NotificationsStore, type NotificationItem } from '../../../features/notifications/state';
 
 @Component({
   selector: 'sqx-header',
   standalone: true,
   imports: [RouterLink, TooltipModule, DrawerModule, BadgeModule, IconFieldModule, InputIconModule, InputTextModule, PopoverModule, SafeUrlPipe],
   templateUrl: './header.html',
-  styleUrl: './header.scss'
+  styleUrl: './header.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit {
   readonly pageTitle = signal('');
@@ -41,13 +33,13 @@ export class HeaderComponent implements OnInit {
 
   // Notification Logic
   readonly showDrawer = signal(false);
-  readonly notifications = signal<AppNotification[]>([]);
-  readonly unreadCount = signal(0);
 
   private router = inject(Router);
   private headerService = inject(HeaderService);
-  private notificationService = inject(NotificationService);
+  private notificationsStore = inject(NotificationsStore);
   readonly auth = inject(AuthService);
+  readonly notifications = this.notificationsStore.visibleNotifications;
+  readonly unreadCount = this.notificationsStore.unreadCount;
 
   constructor() {}
 
@@ -85,43 +77,11 @@ export class HeaderComponent implements OnInit {
     this.currentRoutePath = this.routePath(this.router.url);
     this.activeRoutePath.set(this.currentRoutePath);
     this.updateFromRouter(this.router.url);
-    this.loadNotifications();
+    void this.notificationsStore.load();
   }
 
   private routePath(url: string): string {
     return url.split('?')[0].split('#')[0];
-  }
-
-  private formatTimeAgo(createdAt: string): string {
-    const date = new Date(createdAt);
-    const now = new Date();
-    const sec = Math.floor((now.getTime() - date.getTime()) / 1000);
-    if (sec < 60) return 'Just now';
-    const min = Math.floor(sec / 60);
-    if (min < 60) return `${min} minute${min !== 1 ? 's' : ''} ago`;
-    const hr = Math.floor(min / 60);
-    if (hr < 24) return `${hr} hour${hr !== 1 ? 's' : ''} ago`;
-    const day = Math.floor(hr / 24);
-    if (day < 7) return `${day} day${day !== 1 ? 's' : ''} ago`;
-    return date.toLocaleDateString();
-  }
-
-  loadNotifications(): void {
-    if (!this.auth.isAuthenticated()) return;
-    this.notificationService.getNotifications().subscribe({
-      next: (res) => {
-        this.notifications.set(res.notifications.map((n: ApiNotification) => ({
-          id: n.id,
-          title: n.title,
-          message: n.message || '',
-          time: this.formatTimeAgo(n.createdAt),
-          read: n.read,
-          link: n.link ?? null,
-        })));
-        this.unreadCount.set(res.unreadCount);
-      },
-      error: () => {},
-    });
   }
 
   updateFromRouter(url: string) {
@@ -227,7 +187,7 @@ export class HeaderComponent implements OnInit {
 
   // Notification Methods
   openNotifications() {
-    this.loadNotifications();
+    void this.notificationsStore.load();
     this.showDrawer.set(true);
   }
 
@@ -236,24 +196,11 @@ export class HeaderComponent implements OnInit {
   }
 
   markAllAsRead() {
-    this.notificationService.markAllAsRead().subscribe({
-      next: () => {
-        this.notifications.update((items) => items.map((n) => ({ ...n, read: true })));
-        this.unreadCount.set(0);
-      },
-    });
+    void this.notificationsStore.markAllAsRead();
   }
 
-  markAsRead(notification: AppNotification) {
-    if (notification.read) return;
-    this.notificationService.markAsRead(notification.id).subscribe({
-      next: () => {
-        this.notifications.update((items) => items.map((n) =>
-          n.id === notification.id ? { ...n, read: true } : n,
-        ));
-        this.unreadCount.update((c) => Math.max(0, c - 1));
-      },
-    });
+  markAsRead(notification: NotificationItem) {
+    void this.notificationsStore.markAsRead(notification.id);
   }
 
   userInitials(): string {

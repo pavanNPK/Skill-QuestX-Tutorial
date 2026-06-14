@@ -1,6 +1,7 @@
 /** Service file: contains business rules and database coordination; controllers call these methods after route validation. */
 import { Types } from 'mongoose';
 import { NotificationModel, type NotificationDocument, type NotificationType } from '../../data/models/notification.model';
+import { appCache } from '../../core/cache/app-cache';
 import type { PushService } from './push.service';
 
 export interface CreateNotificationDto {
@@ -36,6 +37,7 @@ export class NotificationService {
       link: dto.link ?? undefined,
       type: dto.type,
     }).catch(() => {});
+    await appCache.delete(`notifications:list:${dto.userId}`);
     return doc;
   }
 
@@ -52,6 +54,7 @@ export class NotificationService {
       link: options.link ?? null,
       metadata: options.metadata ?? null,
     })));
+    await Promise.all(userIds.map((userId) => appCache.delete(`notifications:list:${userId}`)));
     this.pushService.sendToUsers(userIds, { title, body: options.message, link: options.link, type }).catch(() => {});
   }
 

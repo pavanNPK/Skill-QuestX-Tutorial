@@ -8,7 +8,7 @@ import {
 } from '@angular/common/http';
 import { Observable, shareReplay } from 'rxjs';
 
-const DEDUPE_WINDOW_MS = 2500;
+const DEDUPE_WINDOW_MS = 4000;
 
 interface CacheEntry {
   observable: Observable<HttpEvent<unknown>>;
@@ -19,8 +19,11 @@ const requestCache = new Map<string, CacheEntry>();
 
 function requestKey(req: HttpRequest<unknown>): string | null {
   // use of this is:
-  // Build a cache key only for write requests that users may accidentally double-click.
+  // Build a cache key for GET fan-out and write requests that users may accidentally double-click.
   const method = req.method.toUpperCase();
+  if (method === 'GET') {
+    return `${method}:${req.urlWithParams}`;
+  }
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
     return null;
   }

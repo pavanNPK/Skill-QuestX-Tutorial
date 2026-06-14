@@ -3,6 +3,7 @@ import type { FastifyRequest } from 'fastify';
 
 import { services } from '../../business/services';
 import type { AuthenticatedRequest } from '../../core/types/fastify-auth';
+import { appCache } from '../../core/cache/app-cache';
 
 export class AuthController {
   // use of this is:
@@ -68,7 +69,9 @@ export class AuthController {
   async createUser(request: FastifyRequest) {
     // request.user comes from auth.middleware.ts after JWT verification.
     // AuthService uses it to decide whether this creator can create the requested role.
-    return services.authService.createUser(request.body as any, (request as AuthenticatedRequest).user);
+    const result = await services.authService.createUser(request.body as any, (request as AuthenticatedRequest).user);
+    await this.invalidateUserAdminCaches();
+    return result;
   }
 
   // use of this is:
@@ -76,7 +79,10 @@ export class AuthController {
   async changePassword(request: FastifyRequest) {
     // currentPassword is needed for re-authentication; newPassword is saved only after hashing.
     const body = request.body as any;
-    return services.authService.changePassword((request as AuthenticatedRequest).user.id, body.currentPassword, body.newPassword);
+    const userId = (request as AuthenticatedRequest).user.id;
+    const result = await services.authService.changePassword(userId, body.currentPassword, body.newPassword);
+    await appCache.delete(`auth:user:${userId}`);
+    return result;
   }
 
   // use of this is:
@@ -84,7 +90,8 @@ export class AuthController {
   async updateProfile(request: FastifyRequest) {
     // We pick allowed fields explicitly so clients cannot mass-assign protected fields like role/isActive.
     const body = request.body as any;
-    const user = await services.authService.updateProfile((request as AuthenticatedRequest).user.id, {
+    const userId = (request as AuthenticatedRequest).user.id;
+    const user = await services.authService.updateProfile(userId, {
       firstName: body.firstName,
       lastName: body.lastName,
       displayName: body.displayName,
@@ -95,6 +102,7 @@ export class AuthController {
       profileImageUrl: body.profileImageUrl,
       coverImageUrl: body.coverImageUrl,
     });
+    await appCache.delete(`auth:user:${userId}`);
     // API response keeps the existing Angular contract: { user: ... }.
     return { user };
   }
@@ -129,7 +137,7 @@ export class AuthController {
   // Lists courses that admins can assign while creating/updating users.
   async listCourses() {
     // No request object is needed because role access was already checked in the route.
-    return services.authService.listCourses();
+    return appCache.getOrSet('auth:courses:list', 15000, () => services.authService.listCourses());
   }
 
   // use of this is:
@@ -137,14 +145,22 @@ export class AuthController {
   async createCourse(request: FastifyRequest) {
     // Trim avoids saving whitespace-only course names; fallback keeps the old UI behavior.
     const body = request.body as any;
-    return services.authService.createCourse(body.name?.trim() || 'New Course', (request as AuthenticatedRequest).user);
+    const result = await services.authService.createCourse(body.name?.trim() || 'New Course', (request as AuthenticatedRequest).user);
+    await Promise.all([
+      appCache.delete('auth:courses:list'),
+      appCache.delete('courses:list:public'),
+      appCache.deleteByPrefix('course-content:available:'),
+      this.invalidateUserAdminCaches(),
+    ]);
+    return result;
   }
 
   // use of this is:
   // Lists users visible to the logged-in admin/super-admin.
   async listUsers(request: FastifyRequest) {
     // Service applies role-specific filtering, so the controller does not leak all users by mistake.
-    return services.authService.listUsers((request as AuthenticatedRequest).user);
+    const user = (request as AuthenticatedRequest).user;
+    return appCache.getOrSet(`auth:users:list:${user.id}:${user.role}`, 10000, () => services.authService.listUsers(user));
   }
 
   // use of this is:
@@ -154,7 +170,12 @@ export class AuthController {
     const params = request.params as { id: string };
     // Only exact true activates; every other valid boolean value deactivates.
     const body = request.body as any;
-    return services.authService.setUserStatus(params.id, body.active === true, (request as AuthenticatedRequest).user);
+    const result = await services.authService.setUserStatus(params.id, body.active === true, (request as AuthenticatedRequest).user);
+    await Promise.all([
+      appCache.delete(`auth:user:${params.id}`),
+      this.invalidateUserAdminCaches(),
+    ]);
+    return result;
   }
 
   // use of this is:
@@ -163,7 +184,19 @@ export class AuthController {
     // params.id chooses the target admin; body.head is the requested permission state.
     const params = request.params as { id: string };
     const body = request.body as any;
-    return services.authService.setHeadPermission(params.id, body.head === true, (request as AuthenticatedRequest).user);
+    const result = await services.authService.setHeadPermission(params.id, body.head === true, (request as AuthenticatedRequest).user);
+    await Promise.all([
+      appCache.delete(`auth:user:${params.id}`),
+      this.invalidateUserAdminCaches(),
+    ]);
+    return result;
+  }
+
+  private async invalidateUserAdminCaches(): Promise<void> {
+    await Promise.all([
+      appCache.deleteByPrefix('auth:users:list:'),
+      appCache.deleteByPrefix('course-content:available:'),
+    ]);
   }
 }
 
