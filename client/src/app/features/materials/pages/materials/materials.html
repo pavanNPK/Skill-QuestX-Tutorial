@@ -176,8 +176,8 @@
                     (change)="onBulkWorkbookSelected($event)" />
                 <button pButton type="button" icon="pi pi-file-excel" label="Bulk Upload"
                     (click)="bulkWorkbookInput.click()"></button>
-                <button pButton type="button" icon="pi pi-save" label="Save Draft"
-                    [disabled]="saving" (click)="saveContentDraft()"></button>
+                <button pButton type="button" icon="pi pi-save" [label]="saving ? 'Saving...' : 'Save Changes'"
+                    (click)="saveContentChanges('Changes saved.', true, 'Saved')"></button>
                 <button pButton type="button" icon="pi pi-send" label="Publish"
                     [disabled]="saving" (click)="publishContent()"></button>
             </div>
@@ -201,7 +201,7 @@
                     <span>{{ i + 1 }}</span>
                     @if (selectedManageModule?.id === module.id) {
                     <input type="text" class="manager-title-input" [(ngModel)]="module.title"
-                        (click)="$event.stopPropagation()" (blur)="saveContentDraft('Index updated.')" />
+                        (click)="$event.stopPropagation()" (blur)="saveContentChanges('Index updated.')" />
                     } @else {
                     <strong>{{ moduleTitle(module, i) }}</strong>
                     }
@@ -239,11 +239,11 @@
                 <div class="editor-card">
                     <label class="field-label">Slide title</label>
                     <input pInputText class="w-full editor-control" type="text" [(ngModel)]="selectedManageLesson.title"
-                        (blur)="saveContentDraft('Slide updated.')" />
+                        (blur)="saveSlideChanges()" />
 
                     <label class="field-label">Summary</label>
                     <textarea pTextarea class="w-full editor-control" rows="3" [(ngModel)]="selectedManageLesson.summary"
-                        (blur)="saveContentDraft('Slide updated.')"></textarea>
+                        (blur)="saveSlideChanges()"></textarea>
 
                     <div class="upload-strip">
                         <input #slideFilesInput class="hidden-file-input" type="file" multiple
@@ -288,17 +288,17 @@
                             @if (block.type !== 'heading') {
                             <label class="field-label">Block title</label>
                             <input pInputText class="w-full editor-control" type="text" [(ngModel)]="block.title"
-                                (blur)="saveContentDraft('Content updated.')" />
+                                (blur)="saveContentChanges('Content updated.')" />
                             }
 
                             @if (block.type === 'heading') {
                             <label class="field-label">Heading</label>
                             <input pInputText class="w-full editor-control" type="text" [(ngModel)]="block.text"
-                                (blur)="saveContentDraft('Content updated.')" />
+                                (blur)="saveContentChanges('Content updated.')" />
                             } @else if (block.type === 'paragraph' || block.type === 'assignment_note') {
                             <label class="field-label">Rich text</label>
                             <textarea pTextarea class="w-full editor-control" rows="6" [(ngModel)]="block.text"
-                                (blur)="saveContentDraft('Content updated.')"></textarea>
+                                (blur)="saveContentChanges('Content updated.')"></textarea>
                             } @else if (block.type === 'bullet_list' || block.type === 'nested_bullet_list') {
                             <label class="field-label">
                                 @if (block.type === 'nested_bullet_list') {
@@ -309,7 +309,7 @@
                             </label>
                             <textarea pTextarea class="w-full editor-control" rows="6" [ngModel]="blockItemsText(block)"
                                 (ngModelChange)="setBlockItemsText(block, $event)"
-                                (blur)="saveContentDraft('Content updated.')"></textarea>
+                                (blur)="saveContentChanges('Content updated.')"></textarea>
                             } @else if (block.type === 'table') {
                             <div class="table-editor">
                                 <div class="table-editor-actions">
@@ -325,7 +325,7 @@
                                                 @for (column of tableColumns(block); track $index; let columnIndex = $index) {
                                                 <th>
                                                     <input pInputText type="text" [(ngModel)]="block.columns![columnIndex]"
-                                                        (blur)="saveContentDraft('Content updated.')" />
+                                                        (blur)="saveContentChanges('Content updated.')" />
                                                     <button type="button" class="table-delete"
                                                         (click)="confirmDeleteTableColumn($event, block, columnIndex)"
                                                         [disabled]="tableColumns(block).length <= 1">
@@ -342,7 +342,7 @@
                                                 @for (cell of row; track $index; let cellIndex = $index) {
                                                 <td>
                                                     <input pInputText type="text" [(ngModel)]="block.rows![rowIndex][cellIndex]"
-                                                        (blur)="saveContentDraft('Content updated.')" />
+                                                        (blur)="saveContentChanges('Content updated.')" />
                                                 </td>
                                                 }
                                                 <td class="row-action-cell">
@@ -392,6 +392,11 @@
                             <input type="file" multiple (change)="onSlideFilesSelected($event)" />
                         </label>
                         }
+                    </div>
+
+                    <div class="editor-save-row mt-3">
+                        <button pButton type="button" icon="pi pi-save" [label]="saving ? 'Saving...' : 'Save Changes'"
+                            (click)="saveSlideChanges()"></button>
                     </div>
                 </div>
                 } @else {

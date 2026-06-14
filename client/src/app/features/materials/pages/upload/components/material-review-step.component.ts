@@ -33,9 +33,20 @@ import { MaterialFile, MaterialItemStatus, MaterialSlide } from '../../../domain
             <h3>{{ selectedFile?.fileName || 'Slides/content' }}</h3>
             <p>Mark each item Published before submitting.</p>
           </div>
-          <div class="submit-status" [class.ready]="canSubmit">
-            <i [class]="canSubmit ? 'pi pi-check-circle' : 'pi pi-info-circle'"></i>
-            {{ validationMessage }}
+          <div class="review-header-actions">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-check-circle"
+              label="Publish all"
+              class="p-button-outlined publish-all-btn"
+              [disabled]="!files.length || canSubmit"
+              (click)="publishAll.emit()"
+            ></button>
+            <div class="submit-status" [class.ready]="canSubmit">
+              <i [class]="canSubmit ? 'pi pi-check-circle' : 'pi pi-info-circle'"></i>
+              {{ validationMessage }}
+            </div>
           </div>
         </div>
 
@@ -96,13 +107,15 @@ import { MaterialFile, MaterialItemStatus, MaterialSlide } from '../../../domain
     .source-item.active span { background: #4d3ac8; color: #fff; }
     .source-item strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .review-toolbar { padding: 1rem; border-bottom: 1px solid #eeeaf9; }
+    .review-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: .65rem; flex-wrap: wrap; }
+    :host ::ng-deep .publish-all-btn.p-button { color: #1e7d46; border-color: #9ce4ba; background: #f4fff8; }
     .submit-status { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem .7rem; border-radius: 6px; background: #fff8e8; color: #8a5a00; font-weight: 700; }
     .submit-status.ready { background: #edf9f1; color: #1e7d46; }
     :host ::ng-deep .review-table td small { display: block; color: #626783; margin-top: .2rem; }
     .actions-column { width: 310px; }
     .row-actions { display: flex; gap: .45rem; flex-wrap: wrap; }
     @media (max-width: 980px) { .review-layout { grid-template-columns: 1fr; } }
-    @media (max-width: 640px) { .panel-heading, .review-toolbar { align-items: flex-start; flex-direction: column; } }
+    @media (max-width: 640px) { .panel-heading, .review-toolbar { align-items: flex-start; flex-direction: column; } .review-header-actions { justify-content: flex-start; } }
   `],
 })
 export class MaterialReviewStepComponent {
@@ -115,6 +128,7 @@ export class MaterialReviewStepComponent {
   @Output() preview = new EventEmitter<MaterialSlide>();
   @Output() edit = new EventEmitter<MaterialSlide>();
   @Output() delete = new EventEmitter<MaterialSlide>();
+  @Output() publishAll = new EventEmitter<void>();
   @Output() submit = new EventEmitter<void>();
 
   readonly statusOptions: { label: string; value: MaterialItemStatus }[] = [

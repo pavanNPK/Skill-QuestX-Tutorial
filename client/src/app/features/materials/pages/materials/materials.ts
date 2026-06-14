@@ -573,7 +573,7 @@ export class Materials extends BaseComponent implements OnInit {
     this.selectedContent.modules = [...this.indexModules, module];
     this.selectedManageModuleId = module.id;
     this.selectedManageLessonId = '';
-    this.saveContentDraft('Index added.');
+    this.saveContentChanges('Index added.', true, 'Index added');
   }
 
   deleteIndex(module: ContentModule) {
@@ -583,7 +583,7 @@ export class Materials extends BaseComponent implements OnInit {
       this.selectedManageModuleId = this.indexModules[0]?.id ?? '';
       this.selectedManageLessonId = this.selectedManageModule?.lessons[0]?.id ?? '';
     }
-    this.saveContentDraft('Index deleted.');
+    this.saveContentChanges('The material file has been removed.', true, 'File removed');
   }
 
   confirmDeleteIndex(event: Event, module: ContentModule) {
@@ -614,7 +614,11 @@ export class Materials extends BaseComponent implements OnInit {
     input.value = '';
     if (!file || !this.selectedCourse) return;
     if (!file.name.toLowerCase().endsWith('.xlsx')) {
-      this.managerMessage = 'Upload an Excel .xlsx workbook.';
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid file',
+        detail: 'Upload an Excel .xlsx workbook.',
+      });
       return;
     }
     this.saving = true;
@@ -629,17 +633,22 @@ export class Materials extends BaseComponent implements OnInit {
         this.selectedManageModuleId = this.indexModules[0]?.id ?? '';
         this.selectedManageLessonId = this.selectedManageModule?.lessons[0]?.id ?? '';
         this.saving = false;
-        this.managerMessage = 'Workbook imported as draft. Review it before publishing.';
+        this.managerMessage = '';
         this.messageService.add({
           severity: 'success',
           summary: 'Workbook imported',
-          detail: 'Imported content was saved as draft.',
+          detail: 'Imported content was saved.',
         });
         this.cdr.detectChanges();
         },
         error: (error) => {
         this.saving = false;
-        this.managerMessage = error?.error?.message || 'Could not import workbook.';
+        this.managerMessage = '';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Import failed',
+          detail: error?.error?.message || 'Could not import workbook.',
+        });
         this.cdr.detectChanges();
         },
       });
@@ -657,7 +666,7 @@ export class Materials extends BaseComponent implements OnInit {
     };
     module.lessons = [...module.lessons, lesson];
     this.selectedManageLessonId = lesson.id;
-    this.saveContentDraft('Slide added.');
+    this.saveContentChanges('Slide added.', true, 'Slide added');
   }
 
   deleteSlide(lesson: ContentLesson) {
@@ -665,7 +674,7 @@ export class Materials extends BaseComponent implements OnInit {
     if (!module) return;
     module.lessons = module.lessons.filter((item) => item.id !== lesson.id);
     this.selectedManageLessonId = module.lessons[0]?.id ?? '';
-    this.saveContentDraft('Slide deleted.');
+    this.saveContentChanges('Slide deleted.', true, 'Slide removed');
   }
 
   confirmDeleteSlide(event: Event, lesson: ContentLesson) {
@@ -722,14 +731,18 @@ export class Materials extends BaseComponent implements OnInit {
       ...lesson.blocks,
       baseBlock,
     ];
-    this.saveContentDraft('Content block added.');
+    this.saveContentChanges('Content block added.', true, 'Content added');
   }
 
   deleteBlock(block: ContentBlock) {
     const lesson = this.selectedManageLesson;
     if (!lesson) return;
     lesson.blocks = lesson.blocks.filter((item) => item.id !== block.id);
-    this.saveContentDraft(this.isFileBlock(block) ? 'File removed from slide.' : 'Content block removed from slide.');
+    this.saveContentChanges(
+      this.isFileBlock(block) ? 'File removed from slide.' : 'Content block removed from slide.',
+      true,
+      this.isFileBlock(block) ? 'File removed' : 'Content removed',
+    );
   }
 
   confirmDeleteBlock(event: Event, block: ContentBlock) {
@@ -772,7 +785,11 @@ export class Materials extends BaseComponent implements OnInit {
       completed++;
       if (completed !== files.length) return;
       if (uploaded > 0) {
-        this.saveContentDraft(`${uploaded} file${uploaded === 1 ? '' : 's'} uploaded and attached to slide.`, true);
+        this.saveContentChanges(
+          `${uploaded} file${uploaded === 1 ? '' : 's'} uploaded and attached to slide.`,
+          true,
+          'Upload complete',
+        );
         return;
       }
       this.saving = false;
@@ -813,11 +830,11 @@ export class Materials extends BaseComponent implements OnInit {
     });
   }
 
-  saveContentDraft(message = 'Draft saved.', showUploadToast = false) {
+  saveContentChanges(message = 'Changes saved.', showToast = false, toastSummary = 'Saved') {
     if (!this.selectedCourse || !this.selectedContent) return;
     this.saving = true;
-    this.managerMessage = 'Saving draft...';
-    this.contentService.saveDraft(this.selectedCourse.id, this.selectedContent)
+    this.managerMessage = showToast ? '' : 'Saving changes...';
+    this.contentService.saveChanges(this.selectedCourse.id, this.selectedContent)
       .pipe(this.untilDestroyed())
       .subscribe({
       next: (content) => {
@@ -825,11 +842,11 @@ export class Materials extends BaseComponent implements OnInit {
         this.selectedContent = content;
         this.reconcileManageSelection();
         this.saving = false;
-        this.managerMessage = message;
-        if (showUploadToast) {
+        this.managerMessage = showToast ? '' : message;
+        if (showToast) {
           this.messageService.add({
             severity: 'success',
-            summary: 'Upload complete',
+            summary: toastSummary,
             detail: message,
           });
         }
@@ -837,22 +854,32 @@ export class Materials extends BaseComponent implements OnInit {
       },
       error: () => {
         this.saving = false;
-        this.managerMessage = 'Could not save draft.';
+        this.managerMessage = '';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Save failed',
+          detail: 'Could not save changes.',
+        });
         this.cdr.detectChanges();
       },
     });
   }
 
+  saveSlideChanges() {
+    const slideName = this.selectedManageLesson?.title?.trim() || 'Untitled slide';
+    this.saveContentChanges(`Slide "${slideName}" has been updated.`, true, 'Slide updated');
+  }
+
   publishContent() {
     if (!this.selectedCourse || !this.selectedContent) return;
     this.saving = true;
-    this.managerMessage = 'Saving draft before publish...';
-    this.contentService.saveDraft(this.selectedCourse.id, this.selectedContent)
+    this.managerMessage = 'Saving changes before publish...';
+    this.contentService.saveChanges(this.selectedCourse.id, this.selectedContent)
       .pipe(this.untilDestroyed())
       .subscribe({
-      next: (draftContent) => {
-        this.materialsStore.setCourseContent(draftContent);
-        this.selectedContent = draftContent;
+      next: (savedContent) => {
+        this.materialsStore.setCourseContent(savedContent);
+        this.selectedContent = savedContent;
         this.reconcileManageSelection();
         this.managerMessage = 'Publishing...';
         this.contentService.publish(this.selectedCourse!.id)
@@ -863,19 +890,34 @@ export class Materials extends BaseComponent implements OnInit {
             this.selectedContent = content;
             this.reconcileManageSelection();
             this.saving = false;
-            this.managerMessage = 'Published successfully.';
+            this.managerMessage = '';
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Published',
+              detail: 'Material is available to students.',
+            });
             this.cdr.detectChanges();
           },
           error: () => {
             this.saving = false;
-            this.managerMessage = 'Could not publish content.';
+            this.managerMessage = '';
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Publish failed',
+              detail: 'Could not publish content.',
+            });
             this.cdr.detectChanges();
           },
         });
       },
       error: () => {
         this.saving = false;
-        this.managerMessage = 'Could not save draft before publishing.';
+        this.managerMessage = '';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Save failed',
+          detail: 'Could not save changes before publishing.',
+        });
         this.cdr.detectChanges();
       },
     });
@@ -1109,7 +1151,7 @@ export class Materials extends BaseComponent implements OnInit {
     if (this.tableColumns(block).length <= 1) return;
     block.columns = this.tableColumns(block).filter((_, index) => index !== columnIndex);
     block.rows = this.tableRows(block).map((row) => row.filter((_, index) => index !== columnIndex));
-    this.saveContentDraft('Table column deleted.');
+    this.saveContentChanges('Table column deleted.', true, 'Column removed');
   }
 
   confirmDeleteTableColumn(event: Event, block: ContentBlock, columnIndex: number) {
@@ -1142,7 +1184,7 @@ export class Materials extends BaseComponent implements OnInit {
   deleteTableRow(block: ContentBlock, rowIndex: number) {
     if (this.tableRows(block).length <= 1) return;
     block.rows = this.tableRows(block).filter((_, index) => index !== rowIndex);
-    this.saveContentDraft('Table row deleted.');
+    this.saveContentChanges('Table row deleted.', true, 'Row removed');
   }
 
   confirmDeleteTableRow(event: Event, block: ContentBlock, rowIndex: number) {

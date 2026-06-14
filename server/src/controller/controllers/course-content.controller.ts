@@ -37,13 +37,13 @@ export class CourseContentController {
     );
   }
 
-  /** Saves editor/imported JSON as the course draft; publish status is handled in the service. */
-  async saveDraft(request: FastifyRequest) {
+  /** Saves editor/imported JSON changes; publish status is handled in the service. */
+  async saveChanges(request: FastifyRequest) {
     // courseId comes from URL path: /:courseId/content/import or /:courseId/content.
     const params = request.params as { courseId: string };
     // request.body is the client JSON payload; DTO schema rejects invalid/non-object bodies before this.
     // request.user is the sanitized JWT user created by auth middleware.
-    const result = await services.courseContentService.saveDraft(params.courseId, request.body, (request as AuthenticatedRequest).user);
+    const result = await services.courseContentService.saveChanges(params.courseId, request.body, (request as AuthenticatedRequest).user);
     await this.invalidateContentCache(params.courseId);
     return result;
   }
@@ -55,7 +55,7 @@ export class CourseContentController {
     const part = await requireMultipartFile(await request.file(), 'No workbook uploaded');
     // Convert XLSX upload into a buffer so CourseContentService can parse workbook XML.
     const file = await fileToBuffer(part, 10 * 1024 * 1024, /\.xlsx$/i);
-    const result = await services.courseContentService.importWorkbookDraft(params.courseId, file, (request as AuthenticatedRequest).user);
+    const result = await services.courseContentService.importWorkbookChanges(params.courseId, file, (request as AuthenticatedRequest).user);
     await this.invalidateContentCache(params.courseId);
     return result;
   }

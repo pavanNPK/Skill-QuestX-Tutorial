@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { finalize } from 'rxjs';
@@ -44,9 +45,10 @@ import { ManualMaterialEditorComponent } from './manual-material-editor.componen
             <article
               class="file-card"
               draggable="true"
-              (dragstart)="dragFileId = file.id"
+              (dragstart)="startFileDrag($event, file.id)"
+              (dragend)="clearDragState()"
               (dragover)="$event.preventDefault()"
-              (drop)="dropFile(file.id)"
+              (drop)="dropFile($event, file.id)"
             >
               <div class="file-row">
                 <i class="pi pi-bars drag-icon"></i>
@@ -57,7 +59,14 @@ import { ManualMaterialEditorComponent } from './manual-material-editor.componen
                 </div>
                 <p-tag [value]="file.status" [severity]="file.status === 'PUBLISHED' ? 'success' : 'warn'" />
                 <button pButton type="button" icon="pi pi-eye" label="Preview" class="p-button-text" (click)="preview.emit(file.slides[0])"></button>
-                <button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-danger" aria-label="Remove" (click)="removeFile(file.id)"></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-text p-button-danger"
+                aria-label="Remove"
+                (click)="confirmRemoveFile($event, file)"
+              ></button>
               </div>
               <div class="slide-strip">
                 @for (slide of orderedSlides(file); track slide.id) {
@@ -65,9 +74,10 @@ import { ManualMaterialEditorComponent } from './manual-material-editor.componen
                     type="button"
                     class="slide-chip"
                     draggable="true"
-                    (dragstart)="dragSlideId = slide.id"
+                    (dragstart)="startSlideDrag($event, file.id, slide.id)"
+                    (dragend)="clearDragState()"
                     (dragover)="$event.preventDefault()"
-                    (drop)="dropSlide(file.id, slide.id)"
+                    (drop)="dropSlide($event, file.id, slide.id)"
                   >
                     <i class="pi pi-bars"></i>
                     {{ slide.order }}. {{ slide.title }}
@@ -131,6 +141,7 @@ import { ManualMaterialEditorComponent } from './manual-material-editor.componen
 })
 export class MaterialUploadStepComponent {
   private readonly materialDraftService = inject(MaterialDraftService);
+  private readonly confirmationService = inject(ConfirmationService);
 
   @Input() files: MaterialFile[] = [];
   @Output() filesChange = new EventEmitter<MaterialFile[]>();
@@ -140,6 +151,7 @@ export class MaterialUploadStepComponent {
   uploading = false;
   dragFileId = '';
   dragSlideId = '';
+  dragSlideFileId = '';
   private readonly pendingUploadKeys = new Set<string>();
 
   get orderedFiles(): MaterialFile[] {
@@ -185,16 +197,67 @@ export class MaterialUploadStepComponent {
     this.emitFiles(this.files.filter((file) => file.id !== fileId).map((file, index) => ({ ...file, order: index + 1 })));
   }
 
-  dropFile(targetId: string): void {
-    if (!this.dragFileId) return;
-    this.emitFiles(reorderById(this.files, this.dragFileId, targetId));
-    this.dragFileId = '';
+  confirmRemoveFile(event: Event, file: MaterialFile): void {
+    event.stopPropagation();
+    const slideCount = file.slides.length;
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      header: 'Remove file',
+      message: `Remove "${file.fileName}" and ${slideCount} slide${slideCount === 1 ? '' : 's'} from this upload?`,
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Remove',
+        severity: 'danger',
+      },
+      accept: () => this.removeFile(file.id),
+    });
   }
 
-  dropSlide(fileId: string, targetSlideId: string): void {
-    if (!this.dragSlideId) return;
-    this.emitFiles(this.files.map((file) => file.id === fileId ? { ...file, slides: reorderById(file.slides, this.dragSlideId, targetSlideId) } : file));
+  startFileDrag(event: DragEvent, fileId: string): void {
+    if (this.dragSlideId) return;
+    this.dragFileId = fileId;
+    event.dataTransfer?.setData('text/plain', fileId);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+  }
+
+  startSlideDrag(event: DragEvent, fileId: string, slideId: string): void {
+    event.stopPropagation();
+    this.dragFileId = '';
+    this.dragSlideFileId = fileId;
+    this.dragSlideId = slideId;
+    event.dataTransfer?.setData('text/plain', slideId);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+  }
+
+  clearDragState(): void {
+    this.dragFileId = '';
     this.dragSlideId = '';
+    this.dragSlideFileId = '';
+  }
+
+  dropFile(event: DragEvent, targetId: string): void {
+    event.preventDefault();
+    if (this.dragSlideId) return;
+    if (!this.dragFileId) return;
+    this.emitFiles(reorderById(this.files, this.dragFileId, targetId));
+    this.clearDragState();
+  }
+
+  dropSlide(event: DragEvent, fileId: string, targetSlideId: string): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.dragSlideId) return;
+    if (this.dragSlideFileId !== fileId) {
+      this.clearDragState();
+      return;
+    }
+    this.emitFiles(this.files.map((file) => file.id === fileId ? { ...file, slides: reorderById(file.slides, this.dragSlideId, targetSlideId) } : file));
+    this.clearDragState();
   }
 
   private addFiles(files: File[]): void {

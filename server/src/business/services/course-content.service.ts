@@ -126,23 +126,23 @@ export class CourseContentService {
   }
 
   /**
-   * Saves course content into the draft snapshot.
+   * Saves course content changes into the editable snapshot.
    * The route passes `courseId` from params, `body` from DTO-validated JSON, and `user` from JWT auth.
    */
-  async saveDraft(courseId: string, body: unknown, user: AuthUser) {
+  async saveChanges(courseId: string, body: unknown, user: AuthUser) {
     // Step 1: load and validate the course id.
     const course = await this.requireCourse(courseId);
-    // Step 2: enforce edit permission before touching draft data.
+    // Step 2: enforce edit permission before touching content data.
     this.requireManage(user, course);
     // Step 3: normalize raw client data into the exact nested snapshot shape stored in Mongo.
-    const draft = this.normalizeSnapshot(body, course.name, course.description ?? '');
+    const changes = this.normalizeSnapshot(body, course.name, course.description ?? '');
     // Step 4: check whether this course already has a content document.
     const existing = await CourseContentModel.findOne({ courseId: new Types.ObjectId(courseId) }).exec();
     if (!existing) {
-      // First save creates the content document with only a draft; published remains null until publish().
+      // First save creates the content document; published remains null until publish().
       const created = await CourseContentModel.create({
         courseId: new Types.ObjectId(courseId),
-        draft,
+        draft: changes,
         published: null,
         status: 'draft',
         createdBy: new Types.ObjectId(user.id),
@@ -151,8 +151,8 @@ export class CourseContentService {
       // Return a stable API DTO instead of the raw Mongoose document.
       return this.toResponse(courseId, created.draft, created.status, true, 'draft', created.publishedAt, (created as any).updatedAt);
     }
-    // Existing content keeps its published snapshot and replaces only the draft snapshot.
-    existing.draft = draft as any;
+    // Existing content keeps its published snapshot and replaces only the editable snapshot.
+    existing.draft = changes as any;
     // If content was already published, keep that status; otherwise it remains a draft.
     existing.status = existing.published ? existing.status : 'draft';
     existing.updatedBy = new Types.ObjectId(user.id);
@@ -161,8 +161,8 @@ export class CourseContentService {
     return this.toResponse(courseId, existing.draft, existing.status, true, 'draft', existing.publishedAt, (existing as any).updatedAt);
   }
 
-  /** Imports workbook rows, merges them into the existing draft, then saves through saveDraft(). */
-  async importWorkbookDraft(courseId: string, file: UploadedFile, user: AuthUser) {
+  /** Imports workbook rows, merges them into the existing editable content, then saves changes. */
+  async importWorkbookChanges(courseId: string, file: UploadedFile, user: AuthUser) {
     const course = await this.requireCourse(courseId);
     this.requireManage(user, course);
     if (!file?.buffer?.length) throw badRequest('No workbook uploaded.');
@@ -175,7 +175,7 @@ export class CourseContentService {
       ? this.normalizeSnapshot(existing.draft, course.name, course.description ?? '')
       : this.emptySnapshot(course.name, course.description ?? '');
     const snapshot = this.mergeImportedModules(baseSnapshot, importedSnapshot);
-    return this.saveDraft(courseId, snapshot, user);
+    return this.saveChanges(courseId, snapshot, user);
   }
 
   /** Publishes the current draft by copying it into the published snapshot. */

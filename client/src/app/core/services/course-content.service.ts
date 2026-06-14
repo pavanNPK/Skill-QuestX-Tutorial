@@ -148,7 +148,7 @@ export class CourseContentService {
 
   importContent(courseId: string, payload: unknown): Observable<CourseContent> {
     // use of this is:
-    // Imports raw JSON content into the selected course draft.
+    // Imports raw JSON content into the selected course editable content.
     const url = `${this.apiUrl}/courses/${courseId}/content/import`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, payload).pipe(
@@ -162,7 +162,7 @@ export class CourseContentService {
 
   importWorkbook(courseId: string, file: File): Observable<CourseContent> {
     // use of this is:
-    // Uploads an XLSX workbook and receives normalized draft content.
+    // Uploads an XLSX workbook and receives normalized editable content.
     const formData = new FormData();
     formData.append('file', file);
     const url = `${this.apiUrl}/courses/${courseId}/content/import-workbook`;
@@ -176,10 +176,10 @@ export class CourseContentService {
     );
   }
 
-  saveDraft(courseId: string, payload: unknown): Observable<CourseContent> {
+  saveChanges(courseId: string, payload: unknown): Observable<CourseContent> {
     // use of this is:
-    // Persists editor changes to backend draft snapshot.
-    const url = `${this.apiUrl}/courses/${courseId}/content`;
+    // Persists editor changes to backend editable content.
+    const url = `${this.apiUrl}/courses/${courseId}/content/changes`;
     this.logRequest('PATCH', url);
     return this.http.patch<CourseContent>(url, payload).pipe(
       tap((content) => {
@@ -192,7 +192,7 @@ export class CourseContentService {
 
   publish(courseId: string): Observable<CourseContent> {
     // use of this is:
-    // Copies backend draft into published content for students.
+    // Copies saved editable content into published content for students.
     const url = `${this.apiUrl}/courses/${courseId}/content/publish`;
     this.logRequest('POST', url);
     return this.http.post<CourseContent>(url, {}).pipe(

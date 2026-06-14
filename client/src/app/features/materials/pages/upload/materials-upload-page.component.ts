@@ -14,6 +14,7 @@ import {
   MaterialSlide,
   createMaterialId,
 } from '../../domain/material-draft.model';
+import { MaterialsStore } from '../../state/materials.store';
 import { MaterialEditDialogComponent } from './components/material-edit-dialog.component';
 import { MaterialPreviewDialogComponent } from './components/material-preview-dialog.component';
 import { MaterialReviewStepComponent } from './components/material-review-step.component';
@@ -72,6 +73,7 @@ import { MaterialUploadStepComponent } from './components/material-upload-step.c
           (preview)="openPreview($event)"
           (edit)="openEdit($event)"
           (delete)="confirmDelete($event)"
+          (publishAll)="publishAllSlides()"
           (submit)="submit()"
         />
       }
@@ -111,6 +113,7 @@ export class MaterialsUploadPageComponent implements OnInit {
   private readonly headerService = inject(HeaderService);
   private readonly materialDraftService = inject(MaterialDraftService);
   private readonly contentService = inject(CourseContentService);
+  private readonly materialsStore = inject(MaterialsStore);
   private uploadCourseId = '';
 
   readonly step = signal<1 | 2>(1);
@@ -186,6 +189,20 @@ export class MaterialsUploadPageComponent implements OnInit {
     this.messageService.add({ severity: 'success', summary: 'Slide updated', detail: 'Review data was saved.' });
   }
 
+  publishAllSlides(): void {
+    const nextFiles = this.files().map((file) => ({
+      ...file,
+      status: 'PUBLISHED' as const,
+      slides: file.slides.map((slide) => ({ ...slide, status: 'PUBLISHED' as const })),
+    }));
+    this.setFiles(nextFiles);
+    this.messageService.add({
+      severity: 'success',
+      summary: 'All slides published',
+      detail: 'Every uploaded slide is marked Published for review.',
+    });
+  }
+
   confirmDelete(slide: MaterialSlide): void {
     this.confirmationService.confirm({
       header: 'Delete Slide / Content',
@@ -208,23 +225,27 @@ export class MaterialsUploadPageComponent implements OnInit {
       .pipe(
         switchMap((createdDraft) => this.materialDraftService.submit(createdDraft.id, draftToSave)),
         switchMap((submittedDraft) => {
-          if (!this.uploadCourseId) return of(submittedDraft);
+          if (!this.uploadCourseId) return of({ submittedDraft, savedContent: null as CourseContent | null });
           return this.contentService.getContent(this.uploadCourseId).pipe(
-            switchMap((content) => this.contentService.saveDraft(this.uploadCourseId, this.mergeSubmittedFiles(content, submittedDraft.files))),
-            map(() => submittedDraft),
+            switchMap((content) => this.contentService.saveChanges(this.uploadCourseId, this.mergeSubmittedFiles(content, submittedDraft.files))),
+            map((savedContent) => ({ submittedDraft, savedContent })),
           );
         }),
         finalize(() => this.saving.set(false)),
       )
       .subscribe({
-        next: (submittedDraft) => {
+        next: ({ submittedDraft, savedContent }) => {
+          if (savedContent) {
+            this.materialsStore.setCourseContent(savedContent);
+            void this.materialsStore.loadAvailableCourses(true).catch(() => undefined);
+          }
           this.draft.set(submittedDraft);
           this.messageService.add({
             severity: 'success',
             summary: 'Material submitted',
             detail: this.uploadCourseId ? 'The material was saved and added to this course.' : 'The material was saved to the database and submitted.',
           });
-          this.router.navigate(['/materials'], { queryParams: this.uploadCourseId ? { course: this.uploadCourseId, mode: 'manage' } : undefined });
+          this.router.navigate(['/materials']);
         },
         error: (error) => {
           this.messageService.add({

@@ -33,18 +33,18 @@ export const courseContentRoutes: FastifyPluginAsync = async (app) => {
   });
 
   // use of this route is:
-  // Save imported/editor JSON into the course draft.
+  // Save imported/editor JSON changes into course content.
   // preHandler: comes from auth.middleware.ts and verifies the bearer JWT.
   // schema: comes from dto/shared.schemas.ts and validates params/body before controller.
-  // handler: points to controller.saveDraft, which calls services.courseContentService.saveDraft().
+  // handler: points to controller.saveChanges, which calls services.courseContentService.saveChanges().
   app.post('/:courseId/content/import', {
     preHandler: [app.authenticate],
     schema: { params: courseIdParamsSchema, body: looseObjectBodySchema },
-    handler: courseContentController.saveDraft,
+    handler: courseContentController.saveChanges,
   });
 
   // use of this route is:
-  // Accept XLSX upload and import workbook rows into draft modules/lessons/blocks.
+  // Accept XLSX upload and import workbook rows into modules/lessons/blocks.
   // schema only validates params because multipart file validation happens in controller upload helpers.
   app.post('/:courseId/content/import-workbook', {
     preHandler: [app.authenticate],
@@ -53,12 +53,11 @@ export const courseContentRoutes: FastifyPluginAsync = async (app) => {
   });
 
   // use of this route is:
-  // Save editor changes to existing draft content.
-  // PATCH and POST import share the same controller method because both update draft snapshot.
-  app.patch('/:courseId/content', {
+  // Save editor changes to existing content.
+  app.patch('/:courseId/content/changes', {
     preHandler: [app.authenticate],
     schema: { params: courseIdParamsSchema, body: looseObjectBodySchema },
-    handler: courseContentController.saveDraft,
+    handler: courseContentController.saveChanges,
   });
 
   // use of this route is:

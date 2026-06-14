@@ -87,6 +87,28 @@ $surface: #ffffff;
   }
 }
 
+.p-toast {
+  .p-toast-message-content {
+    gap: 0.55rem !important;
+    padding: 0.75rem 0.85rem !important;
+  }
+
+  .p-toast-message-text {
+    gap: 0.15rem !important;
+    margin: 0 !important;
+  }
+
+  .p-toast-summary,
+  .p-toast-detail {
+    margin: 0 !important;
+    line-height: 1.25 !important;
+  }
+
+  .p-toast-detail {
+    font-size: 12.5px !important;
+  }
+}
+
 .p-tabs,
 .p-tabview {
   .p-tab-active,

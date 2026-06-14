@@ -30,6 +30,12 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
               <i class="pi pi-volume-up"></i>
               Read
             </button>
+            @if (tts.speaking()) {
+              <button type="button" class="read-btn stop-read-btn" (click)="stopReading()" aria-label="Stop reading aloud">
+                <i class="pi pi-stop-circle"></i>
+                Stop
+              </button>
+            }
             <button type="button" class="tool-btn" (click)="changeZoom(-0.1)" aria-label="Zoom out">
               <i class="pi pi-minus"></i>
             </button>
@@ -177,6 +183,12 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
       font-weight: 800;
     }
 
+    .stop-read-btn {
+      border-color: rgba(248,113,113,.45);
+      color: #fecaca;
+      background: rgba(239,68,68,.16);
+    }
+
     .zoom-chip {
       height: 30px;
       padding: 0 .68rem;
@@ -306,7 +318,7 @@ import { MaterialSlidePreviewComponent } from './material-slide-preview.componen
   `],
 })
 export class MaterialPreviewDialogComponent implements OnChanges, OnDestroy {
-  private readonly tts = inject(TextToSpeechService);
+  readonly tts = inject(TextToSpeechService);
 
   @Input() visible = false;
   @Input() files: MaterialFile[] = [];
@@ -347,6 +359,10 @@ export class MaterialPreviewDialogComponent implements OnChanges, OnDestroy {
 
   readDeck(): void {
     this.tts.speak(this.deckSlides.map((slide) => this.slideText(slide)).filter(Boolean).join('\n\n'));
+  }
+
+  stopReading(): void {
+    this.tts.stop();
   }
 
   close(): void {
